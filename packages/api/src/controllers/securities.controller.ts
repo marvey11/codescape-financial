@@ -1,4 +1,4 @@
-import { CreateSecurityDTO } from "@csfin/core";
+import { AddSecurityDTO } from "@csfin/core";
 import { Response } from "express";
 import { StatusCodes } from "http-status-codes";
 import { Body, Get, JsonController, Param, Post, Res } from "routing-controllers";
@@ -27,7 +27,7 @@ export class SecuritiesController {
   }
 
   @Post("/securities")
-  async addOne(@Body({ required: true }) data: CreateSecurityDTO, @Res() response: Response): Promise<Response> {
+  async addOne(@Body({ required: true }) data: AddSecurityDTO, @Res() response: Response): Promise<Response> {
     return this.service
       .addOne(data)
       .then((result) => response.status(StatusCodes.CREATED).send(result))

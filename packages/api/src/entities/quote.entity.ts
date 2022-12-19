@@ -9,16 +9,21 @@ class QuoteData {
   id!: number;
 
   @Column({ type: "date" })
-  date!: Date;
+  date: Date;
 
   @Column({ type: "decimal", precision: 12, scale: 4 })
-  quote!: number;
+  price: number;
 
   @ManyToOne(() => Security, (security) => security.quotes)
   security!: Security;
 
   @ManyToOne(() => SecuritiesExchange, (exchange) => exchange.quotes)
   exchange!: SecuritiesExchange;
+
+  constructor(date: Date, price: number) {
+    this.date = date;
+    this.price = price;
+  }
 }
 
 export { QuoteData };

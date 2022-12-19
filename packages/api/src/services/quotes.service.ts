@@ -1,4 +1,4 @@
-import { CreateQuotesDTO } from "@csfin/core";
+import { AddQuoteDataDTO } from "@csfin/core";
 import { Service } from "typedi";
 import { InsertResult, Repository } from "typeorm";
 import { AppDataSource } from "../data-source";
@@ -24,20 +24,18 @@ export class QuoteDataService {
       .setParameters({ isin: isin, exchangeName: exchange })
       .getMany();
 
-  add = async (data: CreateQuotesDTO): Promise<InsertResult> => {
+  add = async (data: AddQuoteDataDTO): Promise<InsertResult> => {
     return this.securityService.getOneByISIN(data.isin).then(async (security) => {
       const exchange = await this.exchangeService.getOneByName(data.exchange);
 
       const quoteItems = data.quotes.map(({ date, price }) => {
-        const qd = new QuoteData();
+        const qd = new QuoteData(date, price);
         qd.security = security;
         qd.exchange = exchange;
-        qd.date = date;
-        qd.quote = price;
         return qd;
       });
 
-      return this.repository.createQueryBuilder().insert().values(quoteItems).orUpdate(["quote"]).execute();
+      return this.repository.createQueryBuilder().insert().values(quoteItems).orUpdate(["price"]).execute();
     });
   };
 }

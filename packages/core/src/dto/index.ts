@@ -1,3 +1,3 @@
-export { CreateExchangeDTO } from "./exchanges.dto";
-export { CreateQuotesDTO, QuoteItem } from "./quotes.dto";
-export { CreateSecurityDTO, SecurityType } from "./securities.dto";
+export { AddExchangeDTO } from "./exchanges.dto";
+export { AddQuoteDataDTO, QuoteDataItem } from "./quotes.dto";
+export { AddSecurityDTO, SecurityType } from "./securities.dto";

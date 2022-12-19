@@ -1,4 +1,4 @@
-import { CreateExchangeDTO } from "@csfin/core";
+import { AddExchangeDTO } from "@csfin/core";
 import { Service } from "typedi";
 import { FindOneOptions, Repository } from "typeorm";
 import { AppDataSource } from "../data-source";
@@ -20,14 +20,10 @@ export class SecuritiesExchangeService {
   getOneByName = async (name: string): Promise<SecuritiesExchange> => this.getOne({ where: { name: name } });
 
   /** Adds a single exchange to the database. Rejects with error if the exchange could not be saved. */
-  addOne = async (dto: CreateExchangeDTO): Promise<SecuritiesExchange> => {
+  addOne = async (dto: AddExchangeDTO): Promise<SecuritiesExchange> => {
     return this.repository.save(this.dto2Entity(dto));
   };
 
   /** Converts a request DTO into an exchange entity. */
-  private dto2Entity = (dto: CreateExchangeDTO): SecuritiesExchange => {
-    const exchange = new SecuritiesExchange();
-    exchange.name = dto.name;
-    return exchange;
-  };
+  private dto2Entity = (dto: AddExchangeDTO): SecuritiesExchange => new SecuritiesExchange(dto.name);
 }
