@@ -1,10 +1,10 @@
 import config from "config";
 import { DataSource } from "typeorm";
-import { SecuritiesExchange, Security } from "./entities";
+import { QuoteData, SecuritiesExchange, Security } from "./entities";
 
 export const AppDataSource = new DataSource({
   ...config.get("database"),
   synchronize: true,
   logging: false,
-  entities: [Security, SecuritiesExchange]
+  entities: [QuoteData, SecuritiesExchange, Security]
 });
