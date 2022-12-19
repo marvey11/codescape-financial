@@ -1,5 +1,6 @@
 import { SecurityType } from "@csfin/core";
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { QuoteData } from "./quote.entity";
 
 @Entity({ name: "securities" })
 class Security {
@@ -18,11 +19,11 @@ class Security {
   @Column({ name: "short_name", nullable: true })
   shortName?: string;
 
-  @Column({
-    type: "enum",
-    enum: SecurityType
-  })
+  @Column({ type: "enum", enum: SecurityType })
   type!: SecurityType;
+
+  @OneToMany(() => QuoteData, (quote) => quote.security)
+  quotes!: QuoteData[];
 }
 
 export { Security, SecurityType };
