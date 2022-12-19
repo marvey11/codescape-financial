@@ -1,4 +1,4 @@
-import { IsArray, IsDateString, IsNumber, Length, MinLength } from "class-validator";
+import { IsArray, IsDateString, IsNumber, Length, MinLength, ValidateNested } from "class-validator";
 
 class QuoteItem {
   @IsDateString()
@@ -15,7 +15,8 @@ class CreateQuotesDTO {
   @MinLength(4, { message: "Exchange name must be at least 4 characters long" })
   exchange!: string;
 
-  @IsArray({ each: true })
+  @IsArray()
+  @ValidateNested({ each: true })
   quotes!: QuoteItem[];
 }
 

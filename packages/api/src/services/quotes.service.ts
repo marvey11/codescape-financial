@@ -7,7 +7,7 @@ import { SecuritiesExchangeService } from "./exchanges.service";
 import { SecuritiesService } from "./securities.service";
 
 @Service()
-export class QuotesService {
+export class QuoteDataService {
   private repository: Repository<QuoteData>;
 
   constructor(private securityService: SecuritiesService, private exchangeService: SecuritiesExchangeService) {
@@ -37,7 +37,7 @@ export class QuotesService {
         return qd;
       });
 
-      return this.repository.createQueryBuilder().insert().values(quoteItems).execute();
+      return this.repository.createQueryBuilder().insert().values(quoteItems).orUpdate(["quote"]).execute();
     });
   };
 }
