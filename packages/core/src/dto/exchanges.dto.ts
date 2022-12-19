@@ -5,4 +5,4 @@ class CreateExchangeDTO {
   name!: string;
 }
 
-export type { CreateExchangeDTO };
+export { CreateExchangeDTO };
