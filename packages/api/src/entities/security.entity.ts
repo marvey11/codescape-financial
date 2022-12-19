@@ -1,13 +1,12 @@
 import { SecurityType } from "@csfin/core";
-import { Column, Entity, PrimaryGeneratedColumn, Unique } from "typeorm";
+import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity({ name: "securities" })
-@Unique(["isin"])
 class Security {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @Column()
+  @Column({ unique: true })
   isin!: string;
 
   @Column()
