@@ -1,4 +1,4 @@
-import { CreateSecurityDTO } from "@csfin/core";
+import { AddSecurityDTO } from "@csfin/core";
 import { Service } from "typedi";
 import { FindOneOptions, Repository } from "typeorm";
 import { AppDataSource } from "../data-source";
@@ -25,16 +25,13 @@ export class SecuritiesService {
   getOneByISIN = async (isin: string): Promise<Security> => this.getOneOrFail({ where: { isin: isin } });
 
   /** Adds a single security to the database. Rejects with error if the security could not be saved. */
-  addOne = async (data: CreateSecurityDTO): Promise<Security> => this.repository.save(this.dto2Entity(data));
+  addOne = async (data: AddSecurityDTO): Promise<Security> => this.repository.save(this.dto2Entity(data));
 
   /** Converts a request DTO into a security entity. */
-  private dto2Entity = (dto: CreateSecurityDTO): Security => {
-    const security = new Security();
-    security.isin = dto.isin;
-    security.nsin = dto.nsin;
-    security.name = dto.name;
-    security.shortName = dto.shortName;
-    security.type = dto.type;
+  private dto2Entity = (dto: AddSecurityDTO): Security => {
+    const { isin, nsin, name, shortName, type } = dto;
+    const security = new Security(isin, nsin, name, type);
+    security.shortName = shortName;
     return security;
   };
 }

@@ -7,7 +7,7 @@ enum SecurityType {
   CERTIFICATE = "certificate"
 }
 
-class CreateSecurityDTO {
+class AddSecurityDTO {
   @Length(12, 12, { message: "ISIN must be exactly 12 characters long" })
   isin!: string;
 
@@ -25,4 +25,4 @@ class CreateSecurityDTO {
   type!: SecurityType;
 }
 
-export { CreateSecurityDTO, SecurityType };
+export { AddSecurityDTO, SecurityType };

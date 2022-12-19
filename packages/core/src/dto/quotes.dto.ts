@@ -1,6 +1,6 @@
-import { IsArray, IsDateString, IsNumber, Length, MinLength, ValidateNested } from "class-validator";
+import { ArrayNotEmpty, IsArray, IsDateString, IsNumber, Length, MinLength, ValidateNested } from "class-validator";
 
-class QuoteItem {
+class QuoteDataItem {
   @IsDateString()
   date!: Date;
 
@@ -8,7 +8,7 @@ class QuoteItem {
   price!: number;
 }
 
-class CreateQuotesDTO {
+class AddQuoteDataDTO {
   @Length(12, 12, { message: "ISIN must be exactly 12 characters long" })
   isin!: string;
 
@@ -16,8 +16,9 @@ class CreateQuotesDTO {
   exchange!: string;
 
   @IsArray()
+  @ArrayNotEmpty()
   @ValidateNested({ each: true })
-  quotes!: QuoteItem[];
+  quotes!: QuoteDataItem[];
 }
 
-export { CreateQuotesDTO, QuoteItem };
+export { AddQuoteDataDTO, QuoteDataItem };

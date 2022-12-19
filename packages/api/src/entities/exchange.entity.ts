@@ -9,10 +9,14 @@ class SecuritiesExchange {
 
   @Column({ unique: true })
   @IsString()
-  name!: string;
+  name: string;
 
   @OneToMany(() => QuoteData, (quote) => quote.exchange)
   quotes!: QuoteData[];
+
+  constructor(name: string) {
+    this.name = name;
+  }
 }
 
 export { SecuritiesExchange };

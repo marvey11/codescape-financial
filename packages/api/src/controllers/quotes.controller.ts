@@ -1,4 +1,4 @@
-import { CreateQuotesDTO } from "@csfin/core";
+import { AddQuoteDataDTO } from "@csfin/core";
 import { Response } from "express";
 import { StatusCodes } from "http-status-codes";
 import { Body, Get, JsonController, Param, Post, Res } from "routing-controllers";
@@ -23,7 +23,7 @@ export class QuoteDataController {
   }
 
   @Post("/quotes")
-  async add(@Body({ required: true }) data: CreateQuotesDTO, @Res() response: Response): Promise<Response> {
+  async add(@Body({ required: true }) data: AddQuoteDataDTO, @Res() response: Response): Promise<Response> {
     return this.service
       .add(data)
       .then((result) => response.status(StatusCodes.OK).send(result))
