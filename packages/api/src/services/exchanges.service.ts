@@ -1,5 +1,4 @@
 import { CreateExchangeDTO } from "@csfin/core";
-import { plainToClass } from "class-transformer";
 import { Service } from "typedi";
 import { Repository } from "typeorm";
 import { AppDataSource } from "../data-source";
@@ -22,5 +21,9 @@ export class SecuritiesExchangeService {
   };
 
   /** Converts a request DTO into an exchange entity. */
-  private dto2Entity = (dto: CreateExchangeDTO): SecuritiesExchange => plainToClass(SecuritiesExchange, dto);
+  private dto2Entity = (dto: CreateExchangeDTO): SecuritiesExchange => {
+    const exchange = new SecuritiesExchange();
+    exchange.name = dto.name;
+    return exchange;
+  };
 }
