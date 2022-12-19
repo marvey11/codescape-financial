@@ -1,0 +1,13 @@
+{
+  "express": {
+    "port": 4000
+  },
+  "database": {
+    "type": "mariadb",
+    "host": "localhost",
+    "port": 3306,
+    "username": "codescape",
+    "password": "codescape",
+    "database": "financial"
+  }
+}

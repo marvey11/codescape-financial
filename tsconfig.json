@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "rootDir": ".",
+
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "Node",
+
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+
+    "forceConsistentCasingInFileNames": true,
+    "allowSyntheticDefaultImports": true,
+
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+
+    "composite": true
+  }
+}
