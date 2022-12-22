@@ -3,7 +3,7 @@ import { Response } from "express";
 import { StatusCodes } from "http-status-codes";
 import { Body, Get, JsonController, Post, Res } from "routing-controllers";
 import { Service } from "typedi";
-import { SecuritiesExchangeService } from "../services/exchanges.service";
+import { SecuritiesExchangeService } from "../services";
 
 @Service()
 @JsonController()

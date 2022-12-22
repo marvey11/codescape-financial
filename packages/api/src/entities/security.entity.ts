@@ -1,6 +1,7 @@
 import { SecurityType } from "@csfin/core";
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { QuoteData } from "./quote.entity";
+import { Transaction } from "./transaction.entity";
 
 @Entity({ name: "securities" })
 class Security {
@@ -24,6 +25,9 @@ class Security {
 
   @OneToMany(() => QuoteData, (quote) => quote.security)
   quotes!: QuoteData[];
+
+  @OneToMany(() => Transaction, (transaction) => transaction.security)
+  transactions!: Transaction[];
 
   constructor(isin: string, nsin: string, name: string, type: SecurityType) {
     this.isin = isin;
