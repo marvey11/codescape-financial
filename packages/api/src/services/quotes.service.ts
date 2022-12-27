@@ -1,8 +1,8 @@
-import { AddQuoteDataDTO } from "@csfin/core";
+import { AddQuoteDataDTO, QuoteDataItem } from "@csfin/core";
 import { Service } from "typedi";
 import { InsertResult, Repository } from "typeorm";
 import { AppDataSource } from "../data-source";
-import { QuoteData } from "../entities";
+import { QuoteData, SecuritiesExchange, Security } from "../entities";
 import { SecuritiesExchangeService } from "./exchanges.service";
 import { SecuritiesService } from "./securities.service";
 
@@ -19,23 +19,26 @@ export class QuoteDataService {
       .createQueryBuilder("q")
       .innerJoin("q.security", "s")
       .innerJoin("q.exchange", "e")
-      .where("s.isin = :isin")
-      .andWhere("e.name = :exchangeName")
-      .setParameters({ isin: isin, exchangeName: exchange })
+      .where("s.isin = :isin", { isin: isin })
+      .andWhere("e.name = :exchangeName", { exchangeName: exchange })
       .getMany();
 
-  add = async (data: AddQuoteDataDTO): Promise<InsertResult> => {
-    return this.securityService.getOneByISIN(data.isin).then(async (security) => {
-      const exchange = await this.exchangeService.getOneByName(data.exchange);
+  add = async (data: AddQuoteDataDTO): Promise<InsertResult> =>
+    this.securityService.getOneByISIN(data.isin).then(async (security) =>
+      this.exchangeService.getOneByName(data.exchange).then(async (exchange) =>
+        this.repository
+          .createQueryBuilder()
+          .insert()
+          .values(data.quotes.map((item) => this.createEntity(item, security, exchange)))
+          .orUpdate(["price"])
+          .execute()
+      )
+    );
 
-      const quoteItems = data.quotes.map(({ date, price }) => {
-        const qd = new QuoteData(date, price);
-        qd.security = security;
-        qd.exchange = exchange;
-        return qd;
-      });
-
-      return this.repository.createQueryBuilder().insert().values(quoteItems).orUpdate(["price"]).execute();
-    });
+  private createEntity = ({ date, price }: QuoteDataItem, security: Security, exchange: SecuritiesExchange) => {
+    const qd = new QuoteData(date, price);
+    qd.security = security;
+    qd.exchange = exchange;
+    return qd;
   };
 }

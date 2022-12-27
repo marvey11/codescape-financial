@@ -1,18 +1,32 @@
-import { ArrayNotEmpty, IsArray, IsDateString, IsNumber, Length, MinLength, ValidateNested } from "class-validator";
+import {
+  ArrayNotEmpty,
+  IsArray,
+  IsDateString,
+  IsDefined,
+  IsISIN,
+  IsNotEmpty,
+  IsNumber,
+  IsString,
+  ValidateNested
+} from "class-validator";
 
 class QuoteDataItem {
+  @IsDefined()
   @IsDateString()
   date!: Date;
 
+  @IsDefined()
   @IsNumber()
   price!: number;
 }
 
 class AddQuoteDataDTO {
-  @Length(12, 12, { message: "ISIN must be exactly 12 characters long" })
+  @IsDefined()
+  @IsISIN()
   isin!: string;
 
-  @MinLength(4, { message: "Exchange name must be at least 4 characters long" })
+  @IsNotEmpty()
+  @IsString()
   exchange!: string;
 
   @IsArray()

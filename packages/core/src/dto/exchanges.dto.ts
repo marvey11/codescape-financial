@@ -1,7 +1,8 @@
-import { MinLength } from "class-validator";
+import { IsNotEmpty, IsString } from "class-validator";
 
 class AddExchangeDTO {
-  @MinLength(4, { message: "Exchange name must be at least 4 characters long" })
+  @IsNotEmpty()
+  @IsString()
   name!: string;
 }
 

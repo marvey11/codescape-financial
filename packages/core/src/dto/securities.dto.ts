@@ -1,4 +1,4 @@
-import { IsEnum, IsOptional, Length, MinLength } from "class-validator";
+import { IsDefined, IsEnum, IsISIN, IsOptional, IsString, Length, MinLength } from "class-validator";
 
 enum SecurityType {
   STOCK = "stock",
@@ -8,19 +8,25 @@ enum SecurityType {
 }
 
 class AddSecurityDTO {
-  @Length(12, 12, { message: "ISIN must be exactly 12 characters long" })
+  @IsDefined()
+  @IsISIN()
   isin!: string;
 
-  @MinLength(4, { message: "NSIN must be at least 4 characters long" })
+  @IsDefined()
+  @IsString()
+  @Length(6, 6, { message: "NSIN (WKN) must be exactly 6 characters long" })
   nsin!: string;
 
-  @MinLength(3, { message: "Security Name must be at least 3 characters long" })
+  @IsDefined()
+  @IsString()
+  @MinLength(6, { message: "Security Name must be at least 6 characters long" })
   name!: string;
 
-  @MinLength(3, { message: "Security Short Name must be at least 3 characters long" })
   @IsOptional()
+  @MinLength(3, { message: "Security Short Name must be at least 3 characters long" })
   shortName?: string;
 
+  @IsDefined()
   @IsEnum(SecurityType)
   type!: SecurityType;
 }
