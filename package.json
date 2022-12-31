@@ -3,7 +3,7 @@
   "name": "codescape-financial",
   "version": "0.0.1",
   "repository": {
-    "url": "https://github.com/marvey11/codescape-financial"
+    "url": "https://github.com/marvey11/codescape-financial.git"
   },
   "workspaces": [
     "packages/**"

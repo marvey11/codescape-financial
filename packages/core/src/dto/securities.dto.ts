@@ -19,7 +19,7 @@ class AddSecurityDTO {
 
   @IsDefined()
   @IsString()
-  @MinLength(6, { message: "Security Name must be at least 6 characters long" })
+  @MinLength(4, { message: "Security Name must be at least 4 characters long" })
   name!: string;
 
   @IsOptional()

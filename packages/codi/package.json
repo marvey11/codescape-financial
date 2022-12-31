@@ -1,17 +1,18 @@
 {
   "private": "true",
-  "name": "@csfin/core",
+  "name": "@csfin/codi",
   "version": "0.0.1",
   "types": "build/index.d.ts",
-  "files": [
-    "build"
-  ],
   "scripts": {
-    "build": "tsc --build --verbose",
+    "build": "tsc --build",
     "lint": "eslint --color --ext .ts --ext .tsx src/",
     "lint:fix": "eslint --color --fix --ext .ts --ext .tsx src/"
   },
   "dependencies": {
-    "class-validator": "^0.14.0"
+    "@csfin/core": "^0.0.1",
+    "csv-parse": "^5.3.3"
+  },
+  "devDependencies": {
+    "ts-node": "^10.9.1"
   }
 }
