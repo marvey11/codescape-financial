@@ -1,5 +1,6 @@
 import { TransactionType } from "@csfin/core";
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { SecuritiesAccount } from "./account.entity";
 import { Security } from "./security.entity";
 
 @Entity({ name: "transactions" })
@@ -18,6 +19,9 @@ class Transaction {
 
   @Column({ type: "decimal", precision: 11, scale: 3 })
   shares: number;
+
+  @ManyToOne(() => SecuritiesAccount, (account) => account.transactions)
+  account!: SecuritiesAccount;
 
   @ManyToOne(() => Security, (security) => security.transactions)
   security!: Security;

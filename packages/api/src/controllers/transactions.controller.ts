@@ -10,26 +10,34 @@ import { TransactionService } from "../services";
 export class TransactionController {
   constructor(private service: TransactionService) {}
 
-  @Get("/transactions")
-  async getAll(@Res() response: Response): Promise<Response> {
+  @Get("/accounts/:id/transactions")
+  async getAll(@Res() response: Response, @Param("id") accountID: number): Promise<Response> {
     return this.service
-      .getAll()
+      .getAll(accountID)
       .then((transactions) => response.status(StatusCodes.OK).send(transactions))
       .catch((error) => response.status(StatusCodes.BAD_REQUEST).send({ message: error.message }));
   }
 
-  @Get("/transactions/:isin")
-  async getAllByISIN(@Res() response: Response, @Param("isin") isin: string): Promise<Response> {
+  @Get("/accounts/:id/transactions/:isin")
+  async getAllByISIN(
+    @Res() response: Response,
+    @Param("id") accountID: number,
+    @Param("isin") isin: string
+  ): Promise<Response> {
     return this.service
-      .getAllByISIN(isin)
+      .getAllByISIN(accountID, isin)
       .then((transactions) => response.status(StatusCodes.OK).send(transactions))
       .catch((error) => response.status(StatusCodes.BAD_REQUEST).send({ message: error.message }));
   }
 
-  @Post("/transactions")
-  async addOne(@Body({ required: true }) data: AddTransactionDTO, @Res() response: Response): Promise<Response> {
+  @Post("/accounts/:id/transactions")
+  async addOne(
+    @Res() response: Response,
+    @Param("id") accountID: number,
+    @Body({ required: true }) data: AddTransactionDTO
+  ): Promise<Response> {
     return this.service
-      .addOne(data)
+      .addOne(accountID, data)
       .then((result) => response.status(StatusCodes.CREATED).send(result))
       .catch((error) => response.status(StatusCodes.BAD_REQUEST).send({ message: error.message }));
   }

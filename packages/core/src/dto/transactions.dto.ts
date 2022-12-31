@@ -1,4 +1,4 @@
-import { IsDateString, IsEnum, IsNumber, IsString, Length } from "class-validator";
+import { IsDateString, IsDefined, IsEnum, IsISIN, IsNumber } from "class-validator";
 
 enum TransactionType {
   BUY = "buy",
@@ -6,19 +6,23 @@ enum TransactionType {
 }
 
 class AddTransactionDTO {
+  @IsDefined()
   @IsEnum(TransactionType)
   type!: TransactionType;
 
-  @IsString()
-  @Length(12, 12, { message: "ISIN must be exactly 12 characters long" })
+  @IsDefined()
+  @IsISIN()
   isin!: string;
 
+  @IsDefined()
   @IsDateString()
   date!: Date;
 
+  @IsDefined()
   @IsNumber()
   price!: number;
 
+  @IsDefined()
   @IsNumber()
   shares!: number;
 }

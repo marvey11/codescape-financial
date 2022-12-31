@@ -5,7 +5,9 @@ import express from "express";
 
 import { useContainer, useExpressServer } from "routing-controllers";
 import { Container } from "typedi";
+
 import {
+  AccountController,
   QuoteDataController,
   SecuritiesController,
   SecuritiesExchangeController,
@@ -25,7 +27,13 @@ AppDataSource.initialize()
       routePrefix: "/api",
       classTransformer: true,
       validation: true,
-      controllers: [QuoteDataController, SecuritiesController, SecuritiesExchangeController, TransactionController]
+      controllers: [
+        AccountController,
+        QuoteDataController,
+        SecuritiesController,
+        SecuritiesExchangeController,
+        TransactionController
+      ]
     });
 
     const port: number = config.get("express.port");
