@@ -1,6 +1,6 @@
+import { TransactionServiceClient } from "@csfin/clients";
 import { parseFromCSV, TransactionData } from "@csfin/codi";
 import { AddTransactionDTO } from "@csfin/core";
-import { TransactionServiceClient } from "./clients";
 
 /** main() -- IIFE */
 (async () => {
