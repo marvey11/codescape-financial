@@ -1,6 +1,6 @@
+import { SecurityServiceClient } from "@csfin/clients";
 import { AddSecurityDTO } from "@csfin/core";
 import fs from "fs";
-import { SecurityServiceClient } from "./clients";
 import { Metadata } from "./types";
 
 /** Converts a metadata instance into the appropriate DTO. */
