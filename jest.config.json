@@ -1,6 +1,6 @@
 {
   "verbose": true,
   "projects": [
-    "<rootDir>/packages/api"
+    "<rootDir>/apps/api"
   ]
 }
