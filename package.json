@@ -6,6 +6,7 @@
     "url": "https://github.com/marvey11/codescape-financial.git"
   },
   "workspaces": [
+    "apps/**",
     "packages/**"
   ],
   "scripts": {
