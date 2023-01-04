@@ -1,4 +1,4 @@
-import { AddQuoteDataDTO } from "@csfin/core";
+import { AddQuoteDataDTO } from "../dto";
 import { ServiceClientBase } from "./ServiceClientBase";
 
 export class QuoteDataServiceClient extends ServiceClientBase {

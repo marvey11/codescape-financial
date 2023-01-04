@@ -1,4 +1,4 @@
-import { AddExchangeDTO } from "@csfin/core";
+import { AddExchangeDTO } from "../dto";
 import { ServiceClientBase } from "./ServiceClientBase";
 
 export class SecuritiesExchangeServiceClient extends ServiceClientBase {

@@ -1,5 +1,4 @@
-import { SecurityServiceClient } from "@csfin/clients";
-import { AddSecurityDTO } from "@csfin/core";
+import { AddSecurityDTO, SecurityServiceClient } from "@csfin/core";
 import fs from "fs";
 import { Metadata } from "./types";
 

@@ -1,4 +1,4 @@
-import { AddSecurityDTO } from "@csfin/core";
+import { AddSecurityDTO } from "../dto";
 import { ServiceClientBase } from "./ServiceClientBase";
 
 export class SecurityServiceClient extends ServiceClientBase {
