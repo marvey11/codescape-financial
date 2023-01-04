@@ -1,4 +1,4 @@
-import { AddTransactionDTO } from "@csfin/core";
+import { AddTransactionDTO } from "../dto";
 import { ServiceClientBase } from "./ServiceClientBase";
 
 export class TransactionServiceClient extends ServiceClientBase {
