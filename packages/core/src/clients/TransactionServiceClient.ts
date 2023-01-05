@@ -12,21 +12,21 @@ export class TransactionServiceClient extends ServiceClientBase {
       data: data,
       transformRequest: [
         // first, execute the transformer that simplifies the date...
-        (data: AddTransactionDTO) => {
-          const d = data.date;
-
-          const year = d.getFullYear();
-          const month = (d.getMonth() + 1).toString().padStart(2, "0");
-          const day = d.getDate().toString().padStart(2, "0");
-
-          return {
-            ...data,
-            date: `${year}-${month}-${day}`
-          };
-        },
+        (data: AddTransactionDTO) => ({
+          ...data,
+          date: this.simplifyDateString(data.date)
+        }),
 
         // ... and then run all the default transformers after that
         ...(axios.defaults.transformRequest as AxiosRequestTransformer[])
       ]
     });
+
+  /** Converts a Date object to a simplified ISO 8601 date format string in the form "YYYY-MM-DD". */
+  private simplifyDateString = (date: Date) => {
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, "0");
+    const day = date.getDate().toString().padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
 }
