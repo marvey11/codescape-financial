@@ -13,7 +13,8 @@
     "build": "lerna run build --stream",
     "test": "jest",
     "lint": "lerna run lint --parallel",
-    "lint:fix": "lerna run lint:fix --parallel"
+    "lint:fix": "lerna run lint:fix --parallel",
+    "prepare": "husky install"
   },
   "dependencies": {},
   "devDependencies": {
