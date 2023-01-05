@@ -11,12 +11,9 @@
   },
   "dependencies": {
     "@csfin/codi": "^0.0.1",
-    "@csfin/core": "^0.0.1",
-    "axios": "^1.2.1",
-    "config": "^3.3.8"
+    "@csfin/core": "^0.0.1"
   },
   "devDependencies": {
-    "@types/config": "^3.3.0",
     "ts-node": "^10.9.1"
   }
 }

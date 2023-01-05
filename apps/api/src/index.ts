@@ -1,11 +1,10 @@
 import "reflect-metadata";
 
-import config from "config";
 import express from "express";
 
+import { getExpressPort } from "@csfin/core";
 import { useContainer, useExpressServer } from "routing-controllers";
 import { Container } from "typedi";
-
 import {
   AccountController,
   QuoteDataController,
@@ -36,7 +35,7 @@ AppDataSource.initialize()
       ]
     });
 
-    const port: number = config.get("express.port");
+    const port = getExpressPort();
 
     app.listen(port, "0.0.0.0", () => {
       console.log(`Server listening on port ${port}`);
