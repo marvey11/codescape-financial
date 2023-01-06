@@ -22,6 +22,12 @@ class Transaction {
   @Column({ type: "decimal", precision: 10, scale: 2 })
   price!: number;
 
+  @ManyToOne(() => SecuritiesAccount, (account) => account.transactions)
+  account!: SecuritiesAccount;
+
+  @ManyToOne(() => Security, (security) => security.transactions)
+  security!: Security;
+
   /**
    * Making sure that transactions are unique and cannot added more than once. Determining uniqueness is done by
    * calculating a hash over the relevant columns (all of them at the moment, other than the auto-generated ID).
@@ -30,12 +36,6 @@ class Transaction {
    */
   @Column({ unique: true })
   hash!: string;
-
-  @ManyToOne(() => SecuritiesAccount, (account) => account.transactions)
-  account!: SecuritiesAccount;
-
-  @ManyToOne(() => Security, (security) => security.transactions)
-  security!: Security;
 
   /**
    * Hash is calculated and set before we try to insert it into the database.

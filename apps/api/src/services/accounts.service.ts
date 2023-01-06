@@ -22,6 +22,10 @@ export class AccountService {
 
   getOneByID = async (id: number): Promise<SecuritiesAccount> => this.getOneBy({ id: id });
 
-  addOne = async (data: CreateAccountDTO): Promise<SecuritiesAccount> =>
-    this.repository.save(new SecuritiesAccount(data.name, data.description));
+  addOne = async (dto: CreateAccountDTO): Promise<SecuritiesAccount> => {
+    const account = new SecuritiesAccount();
+    account.name = dto.name;
+    account.description = dto.description;
+    return this.repository.save(account);
+  };
 }

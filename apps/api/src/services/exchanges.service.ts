@@ -21,9 +21,8 @@ export class SecuritiesExchangeService {
 
   /** Adds a single exchange to the database. Rejects with error if the exchange could not be saved. */
   addOne = async (dto: AddExchangeDTO): Promise<SecuritiesExchange> => {
-    return this.repository.save(this.dto2Entity(dto));
+    const exchange = new SecuritiesExchange();
+    exchange.name = dto.name;
+    return this.repository.save(exchange);
   };
-
-  /** Converts a request DTO into an exchange entity. */
-  private dto2Entity = (dto: AddExchangeDTO): SecuritiesExchange => new SecuritiesExchange(dto.name);
 }

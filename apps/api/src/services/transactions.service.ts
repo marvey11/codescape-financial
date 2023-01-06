@@ -35,17 +35,19 @@ export class TransactionService {
       .getMany();
 
   /** Adds a single transaction to the specified account. */
-  addOne = async (accountID: number, data: AddTransactionDTO): Promise<Transaction> =>
-    this.accountService.getOneByID(accountID).then(async (account) =>
-      this.securityService.getOneByISIN(data.isin).then(async (security) => {
-        const transaction = new Transaction();
-        transaction.account = account;
-        transaction.security = security;
-        transaction.type = data.type;
-        transaction.date = data.date;
-        transaction.shares = data.shares;
-        transaction.price = data.price;
-        return this.repository.save(transaction);
-      })
-    );
+  addOne = async (accountID: number, dto: AddTransactionDTO): Promise<Transaction> => {
+    const [account, security] = await Promise.all([
+      this.accountService.getOneByID(accountID),
+      this.securityService.getOneByISIN(dto.isin)
+    ]);
+
+    const transaction = new Transaction();
+    transaction.account = account;
+    transaction.security = security;
+    transaction.type = dto.type;
+    transaction.date = dto.date;
+    transaction.shares = dto.shares;
+    transaction.price = dto.price;
+    return this.repository.save(transaction);
+  };
 }
