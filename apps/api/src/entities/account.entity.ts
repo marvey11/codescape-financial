@@ -11,7 +11,7 @@ class SecuritiesAccount {
   @Column({ unique: true })
   @IsString()
   @IsNotEmpty()
-  name: string;
+  name!: string;
 
   @Column({ nullable: true })
   @IsOptional()
@@ -20,11 +20,6 @@ class SecuritiesAccount {
 
   @OneToMany(() => Transaction, (transaction) => transaction.account)
   transactions!: Transaction[];
-
-  constructor(name: string, description?: string) {
-    this.name = name;
-    this.description = description;
-  }
 }
 
 export { SecuritiesAccount };

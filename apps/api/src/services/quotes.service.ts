@@ -1,8 +1,8 @@
-import { AddQuoteDataDTO, QuoteDataItem } from "@csfin/core";
+import { AddQuoteDataDTO } from "@csfin/core";
 import { Service } from "typedi";
 import { InsertResult, Repository } from "typeorm";
 import { AppDataSource } from "../data-source";
-import { QuoteData, SecuritiesExchange, Security } from "../entities";
+import { QuoteData } from "../entities";
 import { SecuritiesExchangeService } from "./exchanges.service";
 import { SecuritiesService } from "./securities.service";
 
@@ -23,22 +23,21 @@ export class QuoteDataService {
       .andWhere("e.name = :exchangeName", { exchangeName: exchange })
       .getMany();
 
-  add = async (data: AddQuoteDataDTO): Promise<InsertResult> =>
-    this.securityService.getOneByISIN(data.isin).then(async (security) =>
-      this.exchangeService.getOneByName(data.exchange).then(async (exchange) =>
-        this.repository
-          .createQueryBuilder()
-          .insert()
-          .values(data.quotes.map((item) => this.createEntity(item, security, exchange)))
-          .orUpdate(["price"])
-          .execute()
-      )
-    );
+  add = async (dto: AddQuoteDataDTO): Promise<InsertResult> => {
+    const [security, exchange] = await Promise.all([
+      this.securityService.getOneByISIN(dto.isin),
+      this.exchangeService.getOneByName(dto.exchange)
+    ]);
 
-  private createEntity = ({ date, price }: QuoteDataItem, security: Security, exchange: SecuritiesExchange) => {
-    const qd = new QuoteData(date, price);
-    qd.security = security;
-    qd.exchange = exchange;
-    return qd;
+    const quotes = dto.quotes.map((item) => {
+      const qde = new QuoteData();
+      qde.security = security;
+      qde.exchange = exchange;
+      qde.date = item.date;
+      qde.price = item.price;
+      return qde;
+    });
+
+    return this.repository.createQueryBuilder().insert().values(quotes).orUpdate(["price"]).execute();
   };
 }
