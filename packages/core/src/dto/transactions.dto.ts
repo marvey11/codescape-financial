@@ -1,4 +1,4 @@
-import { IsDateString, IsDefined, IsEnum, IsISIN, IsNumber } from "class-validator";
+import { IsDefined, IsEnum, IsISIN, IsISO8601, IsNumber } from "class-validator";
 
 enum TransactionType {
   BUY = "buy",
@@ -15,8 +15,8 @@ class AddTransactionDTO {
   isin!: string;
 
   @IsDefined()
-  @IsDateString()
-  date!: Date;
+  @IsISO8601()
+  date!: string;
 
   @IsDefined()
   @IsNumber()
