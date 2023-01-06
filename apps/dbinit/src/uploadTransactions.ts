@@ -1,5 +1,5 @@
 import { parseFromCSV, TransactionData } from "@csfin/codi";
-import { AddTransactionDTO, TransactionServiceClient } from "@csfin/core";
+import { AddTransactionDTO, dateToISO8601, TransactionServiceClient } from "@csfin/core";
 
 /** main() -- IIFE */
 (async () => {
@@ -33,14 +33,11 @@ const processTransactions = (accountID: number, data: TransactionData[]) => {
 };
 
 const transformTransactionData = (t: TransactionData) => {
-  const { isin, type, date, price, shares } = t;
-
   const dto = new AddTransactionDTO();
-  dto.isin = isin;
-  dto.type = type;
-  dto.date = date;
-  dto.price = price;
-  dto.shares = shares;
-
+  dto.type = t.type;
+  dto.isin = t.isin;
+  dto.date = dateToISO8601(t.date);
+  dto.shares = t.shares;
+  dto.price = t.price;
   return dto;
 };

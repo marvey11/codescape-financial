@@ -38,10 +38,13 @@ export class TransactionService {
   addOne = async (accountID: number, data: AddTransactionDTO): Promise<Transaction> =>
     this.accountService.getOneByID(accountID).then(async (account) =>
       this.securityService.getOneByISIN(data.isin).then(async (security) => {
-        const { type, date, price, shares } = data;
-        const transaction = new Transaction(type, date, price, shares);
+        const transaction = new Transaction();
         transaction.account = account;
         transaction.security = security;
+        transaction.type = data.type;
+        transaction.date = data.date;
+        transaction.shares = data.shares;
+        transaction.price = data.price;
         return this.repository.save(transaction);
       })
     );
