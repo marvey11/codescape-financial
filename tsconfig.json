@@ -5,6 +5,9 @@
   "references": [
     {
       "path": "./apps/portfolio-frontend"
+    },
+    {
+      "path": "./apps/portfolio-api"
     }
   ]
 }
