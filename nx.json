@@ -28,7 +28,11 @@
           "watchDepsName": "watch-deps"
         }
       },
-      "exclude": ["libs/portfolio-data-access/*", "libs/core/*"]
+      "exclude": [
+        "libs/portfolio-data-access/*",
+        "libs/core/*",
+        "libs/portfolio-data-models/*"
+      ]
     },
     {
       "plugin": "@nx/react/router-plugin",
@@ -80,7 +84,11 @@
     },
     {
       "plugin": "@nx/js/typescript",
-      "include": ["libs/portfolio-data-access/*", "libs/core/*"],
+      "include": [
+        "libs/portfolio-data-access/*",
+        "libs/core/*",
+        "libs/portfolio-data-models/*"
+      ],
       "options": {
         "typecheck": {
           "targetName": "typecheck"

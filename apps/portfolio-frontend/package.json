@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "dependencies": {
-    "@codescape-financial/core-ui": "*"
+    "@codescape-financial/core-ui": "*",
+    "@codescape-financial/portfolio-data-models": "*"
   }
 }
