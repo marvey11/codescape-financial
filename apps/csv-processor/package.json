@@ -1,5 +1,5 @@
 {
-  "name": "@codescape-financial/portfolio-api",
+  "name": "@codescape-financial/csv-processor",
   "version": "0.0.1",
   "private": true,
   "dependencies": {
@@ -31,15 +31,15 @@
           "build"
         ],
         "options": {
-          "buildTarget": "@codescape-financial/portfolio-api:build",
+          "buildTarget": "@codescape-financial/csv-processor:build",
           "runBuildTargetDependencies": false
         },
         "configurations": {
           "development": {
-            "buildTarget": "@codescape-financial/portfolio-api:build:development"
+            "buildTarget": "@codescape-financial/csv-processor:build:development"
           },
           "production": {
-            "buildTarget": "@codescape-financial/portfolio-api:build:production"
+            "buildTarget": "@codescape-financial/csv-processor:build:production"
           }
         }
       },

@@ -27,7 +27,8 @@
           "buildDepsName": "build-deps",
           "watchDepsName": "watch-deps"
         }
-      }
+      },
+      "exclude": ["libs/portfolio-data-access/*", "libs/core/*"]
     },
     {
       "plugin": "@nx/react/router-plugin",
@@ -75,7 +76,16 @@
       "options": {
         "targetName": "test"
       },
-      "exclude": []
+      "exclude": ["apps/csv-processor-e2e/**/*"]
+    },
+    {
+      "plugin": "@nx/js/typescript",
+      "include": ["libs/portfolio-data-access/*", "libs/core/*"],
+      "options": {
+        "typecheck": {
+          "targetName": "typecheck"
+        }
+      }
     }
   ],
   "targetDefaults": {
@@ -96,7 +106,8 @@
       },
       "library": {
         "style": "tailwind",
-        "linter": "eslint"
+        "linter": "eslint",
+        "unitTestRunner": "vitest"
       }
     }
   },

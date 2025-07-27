@@ -1,5 +1,8 @@
 {
   "name": "@codescape-financial/portfolio-frontend",
   "version": "0.0.1",
-  "private": true
+  "private": true,
+  "dependencies": {
+    "@codescape-financial/core-ui": "*"
+  }
 }
