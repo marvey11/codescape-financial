@@ -35,6 +35,9 @@
   "include": ["src/**/*.js", "src/**/*.jsx", "src/**/*.ts", "src/**/*.tsx"],
   "references": [
     {
+      "path": "../../libs/portfolio-data-models/tsconfig.lib.json"
+    },
+    {
       "path": "../../libs/core-ui/tsconfig.lib.json"
     }
   ]

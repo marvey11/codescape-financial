@@ -31,15 +31,15 @@
           "build"
         ],
         "options": {
-          "buildTarget": "@codescape-financial/csv-processor:build",
+          "buildTarget": "@codescape-financial/portfolio-csv-processor:build",
           "runBuildTargetDependencies": false
         },
         "configurations": {
           "development": {
-            "buildTarget": "@codescape-financial/csv-processor:build:development"
+            "buildTarget": "@codescape-financial/portfolio-csv-processor:build:development"
           },
           "production": {
-            "buildTarget": "@codescape-financial/csv-processor:build:production"
+            "buildTarget": "@codescape-financial/portfolio-csv-processor:build:production"
           }
         }
       },
@@ -48,6 +48,7 @@
           "passWithNoTests": true
         }
       }
-    }
+    },
+    "name": "@codescape-financial/portfolio-csv-processor"
   }
 }

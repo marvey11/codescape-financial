@@ -16,13 +16,13 @@
       "path": "./libs/core-ui"
     },
     {
-      "path": "./apps/csv-processor"
-    },
-    {
       "path": "./libs/core"
     },
     {
       "path": "./libs/portfolio-data-models"
+    },
+    {
+      "path": "./apps/portfolio-csv-processor"
     }
   ]
 }
