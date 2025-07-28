@@ -1,6 +1,6 @@
 export function CodescapeFinancialCoreUi() {
   return (
-    <div className={styles['container']}>
+    <div>
       <h1>Welcome to CodescapeFinancialCoreUi!</h1>
     </div>
   );
