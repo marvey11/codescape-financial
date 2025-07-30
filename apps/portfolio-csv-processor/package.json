@@ -3,7 +3,10 @@
   "version": "0.0.1",
   "private": true,
   "dependencies": {
-    "@codescape-financial/portfolio-data-access": "*"
+    "@codescape-financial/core": "*",
+    "@codescape-financial/portfolio-config": "*",
+    "@codescape-financial/portfolio-data-access": "*",
+    "csv-parser": "^3.2.0"
   },
   "nx": {
     "targets": {
