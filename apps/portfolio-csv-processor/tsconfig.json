@@ -7,6 +7,12 @@
       "path": "../../libs/portfolio-data-access"
     },
     {
+      "path": "../../libs/portfolio-config"
+    },
+    {
+      "path": "../../libs/core"
+    },
+    {
       "path": "./tsconfig.app.json"
     },
     {

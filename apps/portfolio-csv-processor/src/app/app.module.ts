@@ -1,10 +1,38 @@
+import {
+  ConfigService,
+  SharedConfigModule,
+} from "@codescape-financial/portfolio-config";
+import { HistoricalQuotesDataAccessModule } from "@codescape-financial/portfolio-data-access";
 import { Module } from "@nestjs/common";
-import { AppController } from "./app.controller";
-import { AppService } from "./app.service";
+import { TypeOrmModule } from "@nestjs/typeorm";
+import { CsvParserService } from "../csv-parser/index.js";
+import { CsvProcessingService } from "../csv-processing/index.js";
+import { DataIngestionService } from "../data-ingestion/index.js";
 
 @Module({
-  imports: [],
-  controllers: [AppController],
-  providers: [AppService],
+  imports: [
+    SharedConfigModule,
+    TypeOrmModule.forRootAsync({
+      imports: [SharedConfigModule],
+      useFactory: (configService: ConfigService) => ({
+        type: "postgres",
+        host: configService.getDatabaseHost(),
+        port: configService.getDatabasePort(),
+        username: configService.getDatabaseUser(),
+        password: configService.getDatabasePassword(),
+        database: configService.getDatabaseName(),
+        // This option is crucial. It tells TypeORM to automatically load entities
+        // that have been registered with `forFeature` in other modules.
+        autoLoadEntities: true,
+        synchronize: true, // For development only, do not use in production
+        logging: true,
+      }),
+      inject: [ConfigService],
+    }),
+    HistoricalQuotesDataAccessModule, // <--- Import your new data access module
+    // ... other modules
+  ],
+  controllers: [],
+  providers: [CsvProcessingService, CsvParserService, DataIngestionService],
 })
 export class AppModule {}

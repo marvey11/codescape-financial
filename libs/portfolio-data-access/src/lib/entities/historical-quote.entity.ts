@@ -1,7 +1,14 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import {
+  Column,
+  Entity,
+  Index,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from "typeorm";
 import { StockMetadata } from "./stock-metadata.entity.js";
 
 @Entity("historical_quotes")
+@Index(["stock", "date"], { unique: true })
 export class HistoricalQuote {
   @PrimaryGeneratedColumn("uuid")
   id!: string;
