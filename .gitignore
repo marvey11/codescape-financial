@@ -9,8 +9,12 @@ out-tsc
 node_modules
 
 # environment files
+# Ignore all .env files by default to protect secrets.
 .env
-.env.test
+.env.*
+# ...but explicitly allow the test environment file for the config library,
+# as it contains only non-sensitive mock data required for CI.
+!/libs/portfolio-config/.env.test
 
 # IDEs and editors
 /.idea
