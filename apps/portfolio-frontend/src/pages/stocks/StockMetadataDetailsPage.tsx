@@ -2,8 +2,8 @@ import { Button } from "@codescape-financial/core-ui";
 import { StockResponseDTO } from "@codescape-financial/portfolio-data-models";
 import { AxiosRequestConfig } from "axios";
 import { Link, useNavigate } from "react-router-dom";
-import { DataPageContainer } from "../../components";
-import { useOutletContextData } from "../../hooks";
+import { DataPageContainer } from "../../components/index.js";
+import { useOutletContextData } from "../../hooks/index.js";
 
 export const StockMetadataDetailsPage = () => {
   const navigate = useNavigate();

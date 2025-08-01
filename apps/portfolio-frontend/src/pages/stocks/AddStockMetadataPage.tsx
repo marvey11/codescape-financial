@@ -5,9 +5,8 @@ import {
 } from "@codescape-financial/portfolio-data-models";
 import { FormEvent, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { StockMetadataForm } from "../../components";
-import { StockFormData } from "../../components/StockMetadataForm";
-import { useAxios } from "../../hooks";
+import { useAxios } from "../../hooks/index.js";
+import { StockFormData, StockMetadataForm } from "./StockMetadataForm.js";
 
 export const AddStockMetadataPage = () => {
   const navigate = useNavigate();

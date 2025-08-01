@@ -1,5 +1,5 @@
 import React from "react";
-import { cn } from "../utility";
+import { cn } from "../utility/index.js";
 
 export type SelectProps = React.ComponentPropsWithoutRef<"select">;
 

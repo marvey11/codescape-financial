@@ -6,9 +6,9 @@ import {
 } from "@codescape-financial/portfolio-data-models";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { DataPageContainer, StockMetadataForm } from "../../components";
-import { StockFormData } from "../../components/StockMetadataForm";
-import { useAxios, useOutletContextData } from "../../hooks";
+import { DataPageContainer } from "../../components/index.js";
+import { useAxios, useOutletContextData } from "../../hooks/index.js";
+import { StockFormData, StockMetadataForm } from "./StockMetadataForm.js";
 
 export const EditStockMetadataPage = () => {
   const navigate = useNavigate();

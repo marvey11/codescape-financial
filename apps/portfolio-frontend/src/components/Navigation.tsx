@@ -1,4 +1,4 @@
-import { NavigationLink } from "./NavigationLink";
+import { NavigationLink } from "./NavigationLink.js";
 
 export const Navigation = () => {
   return (
