@@ -1,1 +1,2 @@
-export * from './lib/core-ui';
+export * from "./lib/components/index.js";
+export * from "./lib/utility/index.js";

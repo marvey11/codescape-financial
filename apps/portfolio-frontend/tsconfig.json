@@ -3,6 +3,9 @@
   "include": [],
   "references": [
     {
+      "path": "../../libs/core"
+    },
+    {
       "path": "../../libs/portfolio-data-models"
     },
     {

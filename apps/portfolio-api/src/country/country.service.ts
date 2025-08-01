@@ -1,5 +1,10 @@
 import { Country } from "@codescape-financial/portfolio-data-access";
-import { Injectable } from "@nestjs/common";
+import {
+  CountryResponseDTO,
+  CreateCountryDTO,
+  UpdateCountryDTO,
+} from "@codescape-financial/portfolio-data-models";
+import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 
@@ -7,27 +12,64 @@ import { Repository } from "typeorm";
 export class CountryService {
   constructor(
     @InjectRepository(Country)
-    private countryRepository: Repository<Country>
+    private countryRepository: Repository<Country>,
   ) {}
 
-  async findAll(): Promise<Country[]> {
-    return this.countryRepository.find();
+  async findAll(): Promise<CountryResponseDTO[]> {
+    return this.countryRepository
+      .find()
+      .then((countries) => countries.map(this.mapEntityToDto));
   }
 
-  async findOne(id: string): Promise<Country | null> {
-    return this.countryRepository.findOne({ where: { id } });
+  async findOne(id: string): Promise<CountryResponseDTO | null> {
+    return this.countryRepository
+      .findOne({ where: { id } })
+      .then((country) => (country ? this.mapEntityToDto(country) : null));
   }
 
-  async create(country: Country): Promise<Country> {
-    return this.countryRepository.save(country);
+  async create(countryDto: CreateCountryDTO): Promise<CountryResponseDTO> {
+    const { countryCode, ...rest } = countryDto;
+    const newCountry = this.countryRepository.create({
+      ...rest,
+      isoCode: countryCode,
+    });
+    const savedCountry = await this.countryRepository.save(newCountry);
+    return this.mapEntityToDto(savedCountry);
   }
 
-  async update(id: string, country: Country): Promise<Country | null> {
-    await this.countryRepository.update(id, country);
-    return this.countryRepository.findOne({ where: { id } });
+  async update(
+    countryId: string,
+    countryUpdate: UpdateCountryDTO,
+  ): Promise<CountryResponseDTO> {
+    const countryToUpdate = await this.countryRepository.findOneBy({
+      id: countryId,
+    });
+    if (!countryToUpdate) {
+      throw new NotFoundException(`Country with ID "${countryId}" not found`);
+    }
+
+    const { countryCode, ...rest } = countryUpdate;
+    this.countryRepository.merge(countryToUpdate, {
+      ...rest,
+      isoCode: countryCode,
+    });
+
+    const savedCountry = await this.countryRepository.save(countryToUpdate);
+
+    return this.mapEntityToDto(savedCountry);
   }
 
   async remove(id: string): Promise<void> {
     await this.countryRepository.delete(id);
+  }
+
+  private mapEntityToDto(country: Country): CountryResponseDTO {
+    const { id, name, isoCode, withholdingTaxRate } = country;
+    return {
+      id,
+      name,
+      countryCode: isoCode,
+      withholdingTaxRate,
+    };
   }
 }
