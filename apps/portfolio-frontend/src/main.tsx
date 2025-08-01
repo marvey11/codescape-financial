@@ -7,8 +7,8 @@ import {
   createRoutesFromElements,
 } from "react-router-dom";
 import App from "./app/App.js";
-import { CountryLayout } from "./components/CountryLayout.js";
 import { StockMetadataLayout } from "./components/index.js";
+import { CountryLayout } from "./pages/countries/CountryLayout.js";
 import {
   AddCountryPage,
   CountryDetailsPage,

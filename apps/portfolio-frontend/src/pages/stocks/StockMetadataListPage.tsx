@@ -8,8 +8,8 @@ import { StockResponseDTO } from "@codescape-financial/portfolio-data-models";
 import { Bars3Icon } from "@heroicons/react/16/solid";
 import { useEffect, useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { DataPageContainer } from "../../components";
-import { useAxios } from "../../hooks";
+import { DataPageContainer } from "../../components/index.js";
+import { useAxios } from "../../hooks/index.js";
 
 export const StockMetadataListPage = () => {
   const { loading, error, data, sendRequest } = useAxios<StockResponseDTO[]>();

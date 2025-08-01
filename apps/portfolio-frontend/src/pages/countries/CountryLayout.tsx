@@ -1,8 +1,8 @@
 import { CountryResponseDTO } from "@codescape-financial/portfolio-data-models";
 import { useEffect } from "react";
 import { Outlet, useParams } from "react-router-dom";
-import { useAxios } from "../hooks";
-import { UseGenericContextType } from "../types";
+import { useAxios } from "../../hooks/index.js";
+import { UseGenericContextType } from "../../types/index.js";
 
 export const CountryLayout = () => {
   const { id } = useParams();

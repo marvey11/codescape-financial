@@ -1,6 +1,6 @@
 import React from "react";
-import { cn } from "../../utility";
-import { ColumnSchema } from "./ColumnSchema";
+import { cn } from "../../utility/index.js";
+import { ColumnSchema } from "./ColumnSchema.js";
 
 export interface DataTableProps<T> {
   columns: ColumnSchema<T>[];

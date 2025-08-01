@@ -1,4 +1,4 @@
-export { AddCountryPage } from "./AddCountryPage";
-export { CountryDetailsPage } from "./CountryDetailsPage";
-export { CountryListPage } from "./CountryListPage";
-export { EditCountryPage } from "./EditCountryPage";
+export { AddCountryPage } from "./AddCountryPage.js";
+export { CountryDetailsPage } from "./CountryDetailsPage.js";
+export { CountryListPage } from "./CountryListPage.js";
+export { EditCountryPage } from "./EditCountryPage.js";

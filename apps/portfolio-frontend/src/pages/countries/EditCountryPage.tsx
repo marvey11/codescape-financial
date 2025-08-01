@@ -5,12 +5,9 @@ import {
 } from "@codescape-financial/portfolio-data-models";
 import { FormEvent, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  CountryForm,
-  CountryFormData,
-  DataPageContainer,
-} from "../../components/index.js";
+import { DataPageContainer } from "../../components/index.js";
 import { useOutletContextData } from "../../hooks/index.js";
+import { CountryForm, CountryFormData } from "./CountryForm.js";
 
 export const EditCountryPage = () => {
   const navigate = useNavigate();
