@@ -4,6 +4,11 @@
   "private": true,
   "dependencies": {
     "@codescape-financial/core-ui": "*",
-    "@codescape-financial/portfolio-data-models": "*"
+    "@codescape-financial/portfolio-data-models": "*",
+    "@heroicons/react": "^2.2.0",
+    "axios": "^1.11.0"
+  },
+  "devDependencies": {
+    "@types/axios": "^0.9.36"
   }
 }

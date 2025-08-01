@@ -1,4 +1,8 @@
-import { StockMetadata } from "@codescape-financial/portfolio-data-access";
+import {
+  CreateStockDTO,
+  StockResponseDTO,
+  UpdateStockDTO,
+} from "@codescape-financial/portfolio-data-models";
 import {
   Body,
   Controller,
@@ -15,26 +19,26 @@ export class StockMetadataController {
   constructor(private readonly stockMetadataService: StockMetadataService) {}
 
   @Get()
-  async findAll(): Promise<StockMetadata[]> {
+  async findAll(): Promise<StockResponseDTO[]> {
     return this.stockMetadataService.findAll();
   }
 
   @Get(":id")
-  async findOne(@Param("id") id: string): Promise<StockMetadata | null> {
+  async findOne(@Param("id") id: string): Promise<StockResponseDTO | null> {
     return this.stockMetadataService.findOne(id);
   }
 
   @Post()
-  async create(@Body() stockMetadata: StockMetadata): Promise<StockMetadata> {
-    return this.stockMetadataService.create(stockMetadata);
+  async create(@Body() newStockDto: CreateStockDTO): Promise<StockResponseDTO> {
+    return this.stockMetadataService.create(newStockDto);
   }
 
   @Put(":id")
   async update(
     @Param("id") id: string,
-    @Body() stockMetadata: StockMetadata
-  ): Promise<StockMetadata | null> {
-    return this.stockMetadataService.update(id, stockMetadata);
+    @Body() stockUpdate: UpdateStockDTO,
+  ): Promise<StockResponseDTO> {
+    return this.stockMetadataService.update(id, stockUpdate);
   }
 
   @Delete(":id")
