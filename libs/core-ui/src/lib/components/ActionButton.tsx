@@ -6,7 +6,7 @@ interface Props {
   children: ReactNode;
 }
 
-export const DetailsActionButton = ({
+export const ActionButton = ({
   "aria-label": ariaLabel,
   onClick,
   children,
