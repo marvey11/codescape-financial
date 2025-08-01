@@ -7,11 +7,10 @@ import {
   createRoutesFromElements,
 } from "react-router-dom";
 import App from "./app/App.js";
-import { StockMetadataLayout } from "./components/index.js";
-import { CountryLayout } from "./pages/countries/CountryLayout.js";
 import {
   AddCountryPage,
   CountryDetailsPage,
+  CountryLayout,
   CountryListPage,
   EditCountryPage,
 } from "./pages/countries/index.js";
@@ -19,6 +18,7 @@ import {
   AddStockMetadataPage,
   EditStockMetadataPage,
   StockMetadataDetailsPage,
+  StockMetadataLayout,
   StockMetadataListPage,
 } from "./pages/stocks/index.js";
 
