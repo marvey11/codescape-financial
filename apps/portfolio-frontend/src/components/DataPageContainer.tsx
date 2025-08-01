@@ -1,6 +1,6 @@
+import { Spinner } from "@codescape-financial/core-ui";
 import { ReactNode } from "react";
 import { ErrorMessage } from "./ErrorMessage";
-import { Spinner } from "./Spinner";
 
 interface DataPageContainerProps {
   isLoading: boolean;
