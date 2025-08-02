@@ -1,5 +1,5 @@
 {
-  "name": "@codescape-financial/portfolio-data-access",
+  "name": "@codescape-financial/historical-data-access",
   "version": "0.0.1",
   "private": true,
   "main": "./src/index.ts",
@@ -12,5 +12,8 @@
     },
     "./package.json": "./package.json"
   },
-  "dependencies": {}
+  "dependencies": {},
+  "nx": {
+    "name": "@codescape-financial/historical-data-access"
+  }
 }

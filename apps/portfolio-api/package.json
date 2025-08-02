@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "dependencies": {
-    "@codescape-financial/portfolio-data-access": "*",
+    "@codescape-financial/historical-data-access": "*",
     "@codescape-financial/portfolio-data-models": "*",
     "@nestjs/config": "^4.0.2",
     "@nestjs/typeorm": "^11.0.0",

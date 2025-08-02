@@ -1,4 +1,4 @@
-import { HistoricalQuote } from "@codescape-financial/portfolio-data-access";
+import { HistoricalQuote } from "@codescape-financial/historical-data-access";
 import { Injectable, Logger } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
@@ -9,7 +9,7 @@ export class DataIngestionService {
 
   constructor(
     @InjectRepository(HistoricalQuote)
-    private readonly historicalQuoteRepository: Repository<HistoricalQuote>
+    private readonly historicalQuoteRepository: Repository<HistoricalQuote>,
   ) {}
 
   async ingestHistoricalQuotes(quotes: HistoricalQuote[]): Promise<void> {
@@ -27,7 +27,7 @@ export class DataIngestionService {
     });
 
     this.logger.log(
-      `Successfully upserted ${quotes.length} historical quotes.`
+      `Successfully upserted ${quotes.length} historical quotes.`,
     );
   }
 }

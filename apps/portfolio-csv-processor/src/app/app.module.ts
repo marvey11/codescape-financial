@@ -1,8 +1,8 @@
+import { HistoricalQuotesDataAccessModule } from "@codescape-financial/historical-data-access";
 import {
   ConfigService,
   SharedConfigModule,
 } from "@codescape-financial/portfolio-config";
-import { HistoricalQuotesDataAccessModule } from "@codescape-financial/portfolio-data-access";
 import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { CsvParserService } from "../csv-parser/index.js";

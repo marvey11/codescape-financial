@@ -1,7 +1,7 @@
 import {
   Country,
   StockMetadata,
-} from "@codescape-financial/portfolio-data-access";
+} from "@codescape-financial/historical-data-access";
 import {
   CreateStockDTO,
   StockMetadataFilterDTO,

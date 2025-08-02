@@ -1,7 +1,7 @@
 import {
   HistoricalQuote,
   HistoricalQuoteService,
-} from "@codescape-financial/portfolio-data-access";
+} from "@codescape-financial/historical-data-access";
 import {
   Body,
   Controller,
@@ -15,7 +15,7 @@ import {
 @Controller("historical-quotes")
 export class HistoricalQuoteController {
   constructor(
-    private readonly historicalQuoteService: HistoricalQuoteService
+    private readonly historicalQuoteService: HistoricalQuoteService,
   ) {}
 
   @Get()
@@ -30,7 +30,7 @@ export class HistoricalQuoteController {
 
   @Post()
   async create(
-    @Body() historicalQuote: HistoricalQuote
+    @Body() historicalQuote: HistoricalQuote,
   ): Promise<HistoricalQuote> {
     return this.historicalQuoteService.create(historicalQuote);
   }
@@ -38,7 +38,7 @@ export class HistoricalQuoteController {
   @Put(":id")
   async update(
     @Param("id") id: string,
-    @Body() historicalQuote: HistoricalQuote
+    @Body() historicalQuote: HistoricalQuote,
   ): Promise<HistoricalQuote | null> {
     return this.historicalQuoteService.update(id, historicalQuote);
   }

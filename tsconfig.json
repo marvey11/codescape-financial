@@ -10,7 +10,7 @@
       "path": "./apps/portfolio-api"
     },
     {
-      "path": "./libs/portfolio-data-access"
+      "path": "./libs/historical-data-access"
     },
     {
       "path": "./libs/core-ui"
