@@ -8,20 +8,20 @@ import {
   Min,
 } from "class-validator";
 
-class CountryEmbeddedDTO {
-  id!: string;
-  name!: string;
-  countryCode!: string;
+export interface CountryEmbeddedDTO {
+  id: string;
+  name: string;
+  countryCode: string;
 }
 
-class CountryResponseDTO {
-  id!: string;
-  name!: string;
-  countryCode!: string;
-  withholdingTaxRate!: number;
+export interface CountryResponseDTO {
+  id: string;
+  name: string;
+  countryCode: string;
+  withholdingTaxRate: number;
 }
 
-class CreateCountryDTO {
+export class CreateCountryDTO {
   @IsString()
   @IsNotEmpty()
   @Length(1, 100)
@@ -38,7 +38,7 @@ class CreateCountryDTO {
   withholdingTaxRate!: number;
 }
 
-class UpdateCountryDTO {
+export class UpdateCountryDTO {
   @IsOptional()
   @IsString()
   @IsNotEmpty()
@@ -57,10 +57,3 @@ class UpdateCountryDTO {
   @Max(1)
   withholdingTaxRate?: number;
 }
-
-export {
-  CountryEmbeddedDTO,
-  CountryResponseDTO,
-  CreateCountryDTO,
-  UpdateCountryDTO,
-};

@@ -1,5 +1,5 @@
 import { FormCancelButton } from "./FormCancelButton";
-import { FormSaveButton } from "./FormSubmitButton";
+import { FormSubmitButton } from "./FormSubmitButton";
 
 interface Props {
   submitButtonTitle?: string;
@@ -13,7 +13,7 @@ export const FormButtonsComponent = ({
   onCancel,
 }: Props) => (
   <div className="col-span-2 flex flex-row items-center justify-end gap-2">
-    <FormSaveButton title={submitButtonTitle} />
+    <FormSubmitButton title={submitButtonTitle} />
     <FormCancelButton title={cancelButtonTitle} onClick={onCancel} />
   </div>
 );

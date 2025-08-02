@@ -4,6 +4,6 @@ interface Props {
   title?: string;
 }
 
-export const FormSaveButton = ({ title = "Save" }: Props) => (
+export const FormSubmitButton = ({ title = "Save" }: Props) => (
   <Button type="submit">{title}</Button>
 );

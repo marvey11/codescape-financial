@@ -85,7 +85,7 @@ const columnMapping: {
 };
 
 const createActionsComponent = (
-  actionsComponent?: ReactNode | ((item: StockResponseDTO) => ReactNode),
+  actionsComponent: ReactNode | ((item: StockResponseDTO) => ReactNode),
 ) => {
   const fn =
     typeof actionsComponent === "function"

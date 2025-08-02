@@ -72,7 +72,7 @@ const columnMapping: {
 };
 
 const createActionsComponent = (
-  actionsComponent?: ReactNode | ((item: CountryResponseDTO) => ReactNode),
+  actionsComponent: ReactNode | ((item: CountryResponseDTO) => ReactNode),
 ) => {
   const fn =
     typeof actionsComponent === "function"

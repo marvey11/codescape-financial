@@ -39,7 +39,7 @@ export const EditCountryPage = () => {
         url: `/countries/${country.id}`,
         method: "put",
         data: payload,
-      }).then(() => navigate("..", { replace: true }));
+      }).then(() => navigate("/countries"));
     }
   };
 
