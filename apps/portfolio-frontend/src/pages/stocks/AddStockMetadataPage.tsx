@@ -62,7 +62,9 @@ export const AddStockMetadataPage = () => {
             value={formData}
             onChange={setFormData}
           />
-          <FormButtonsComponent onCancel={() => navigate("/stocks")} />
+          <FormButtonsComponent
+            onCancel={() => navigate("..", { replace: true })}
+          />
         </form>
       )}
     </div>

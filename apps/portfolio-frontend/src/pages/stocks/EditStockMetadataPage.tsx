@@ -78,7 +78,7 @@ export const EditStockMetadataPage = () => {
           />
           <FormButtonsComponent
             onCancel={() => {
-              navigate("/stocks");
+              navigate("..", { replace: true });
             }}
           />
         </form>

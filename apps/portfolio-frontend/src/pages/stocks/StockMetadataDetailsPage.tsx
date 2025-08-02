@@ -24,7 +24,7 @@ export const StockMetadataDetailsPage = () => {
         url: `/stock-metadata/${stock.id}`,
         method: "delete",
       } satisfies AxiosRequestConfig);
-      navigate("..", { replace: true });
+      navigate("/stocks");
     }
   };
 

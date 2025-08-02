@@ -7,16 +7,16 @@ import {
 } from "class-validator";
 import { CountryEmbeddedDTO } from "./country.dto.js";
 
-class StockResponseDTO {
-  id!: string;
-  isin!: string;
-  nsin!: string;
-  name!: string;
-  country!: CountryEmbeddedDTO;
-  currency!: string;
+export interface StockResponseDTO {
+  id: string;
+  isin: string;
+  nsin: string;
+  name: string;
+  country: CountryEmbeddedDTO;
+  currency: string;
 }
 
-class CreateStockDTO {
+export class CreateStockDTO {
   @IsString()
   @IsNotEmpty()
   @Length(1, 255)
@@ -41,7 +41,7 @@ class CreateStockDTO {
   countryId!: string;
 }
 
-class UpdateStockDTO {
+export class UpdateStockDTO {
   @IsOptional()
   @IsString()
   @IsNotEmpty()
@@ -71,7 +71,7 @@ class UpdateStockDTO {
   countryId?: string;
 }
 
-class StockMetadataFilterDTO {
+export class StockMetadataFilterDTO {
   @IsOptional()
   @IsUUID()
   countryId?: string;
@@ -82,10 +82,3 @@ class StockMetadataFilterDTO {
   @Length(3, 3)
   currency?: string;
 }
-
-export {
-  CreateStockDTO,
-  StockMetadataFilterDTO,
-  StockResponseDTO,
-  UpdateStockDTO,
-};
