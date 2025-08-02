@@ -7,6 +7,7 @@ export default [
   {
     ignores: [
       "**/dist",
+      "**/jest.config.ts",
       "**/vite.config.*.timestamp*",
       "**/vitest.config.*.timestamp*",
     ],
