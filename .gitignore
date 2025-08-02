@@ -62,3 +62,6 @@ test-output
 
 # the application data path
 /data/
+
+# docker-compose authentication secrets
+/secrets/

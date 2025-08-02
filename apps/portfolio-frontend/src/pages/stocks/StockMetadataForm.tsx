@@ -91,6 +91,25 @@ export const StockMetadataForm = ({
         />
       </FormRow>
 
+      <FormRow label={<label htmlFor="stock-country">Country:</label>}>
+        <Select
+          id="stock-country"
+          name="countryId"
+          value={value.countryId}
+          onChange={handleChange}
+          required
+        >
+          <option value="" disabled>
+            Select a country...
+          </option>
+          {availableCountries.map(({ id, name }) => (
+            <option key={id} value={id}>
+              {name}
+            </option>
+          ))}
+        </Select>
+      </FormRow>
+
       <FormRow label={<label htmlFor="stock-currency">Currency:</label>}>
         <Input
           id="stock-currency"
@@ -110,25 +129,6 @@ export const StockMetadataForm = ({
             <option key={currency} value={currency} />
           ))}
         </datalist>
-      </FormRow>
-
-      <FormRow label={<label htmlFor="stock-country">Country:</label>}>
-        <Select
-          id="stock-country"
-          name="countryId"
-          value={value.countryId}
-          onChange={handleChange}
-          required
-        >
-          <option value="" disabled>
-            Select a country...
-          </option>
-          {availableCountries.map(({ id, name }) => (
-            <option key={id} value={id}>
-              {name}
-            </option>
-          ))}
-        </Select>
       </FormRow>
     </>
   );

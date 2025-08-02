@@ -19,15 +19,19 @@ export const DataTable = <T,>({
     <table className="w-full table-auto text-left">
       <thead className="bg-gray-50 text-sm uppercase text-gray-700">
         <tr>
-          {columns.map((col, index) => (
-            <th
-              key={index}
-              scope="col"
-              className={cn("px-6 py-3", col.headerClassNames)}
-            >
-              {col.header}
-            </th>
-          ))}
+          {columns.map((col) => {
+            const { className, ...rest } = col.headerCellProps ?? {};
+            return (
+              <th
+                key={col.id}
+                scope="col"
+                {...rest}
+                className={cn("px-6 py-3", col.headerClassNames, className)}
+              >
+                {col.header}
+              </th>
+            );
+          })}
         </tr>
       </thead>
 
@@ -37,11 +41,18 @@ export const DataTable = <T,>({
             key={keyExtractor(item)}
             className="border-b bg-white hover:bg-gray-100"
           >
-            {columns.map((col, index) => (
-              <td key={index} className={cn("px-6 py-4", col.cellClassNames)}>
-                {col.value(item)}
-              </td>
-            ))}
+            {columns.map((col) => {
+              const { className, ...rest } = col.cellProps ?? {};
+              return (
+                <td
+                  key={col.id}
+                  {...rest}
+                  className={cn("px-6 py-4", col.cellClassNames, className)}
+                >
+                  {col.value(item)}
+                </td>
+              );
+            })}
           </tr>
         ))}
       </tbody>
@@ -49,13 +60,50 @@ export const DataTable = <T,>({
       {hasFooter && (
         <tfoot className="bg-gray-50 text-sm font-bold text-gray-700">
           <tr>
-            {columns.map((col, index) => (
-              <td key={index} className={cn("px-6 py-3", col.footerClassNames)}>
-                {typeof col.footer === "function"
-                  ? col.footer(data)
-                  : col.footer}
-              </td>
-            ))}
+            {(() => {
+              // Check if any column specifies a colSpan. If so, we render that single cell
+              // to span the entire table width. This is useful for summary rows.
+              const footerWithColspan = columns.find(
+                (c) => c.footerCellProps?.colSpan,
+              );
+
+              if (footerWithColspan) {
+                const { className, ...rest } =
+                  footerWithColspan.footerCellProps ?? {};
+
+                return (
+                  <td
+                    key={footerWithColspan.id}
+                    {...rest}
+                    className={cn(
+                      "px-6 py-3",
+                      footerWithColspan.footerClassNames,
+                      className,
+                    )}
+                  >
+                    {typeof footerWithColspan.footer === "function"
+                      ? footerWithColspan.footer(data)
+                      : footerWithColspan.footer}
+                  </td>
+                );
+              }
+
+              // Default behavior: render a footer cell for each column.
+              return columns.map((col) => {
+                const { className, ...rest } = col.footerCellProps ?? {};
+                return (
+                  <td
+                    key={col.id}
+                    {...rest}
+                    className={cn("px-6 py-3", col.footerClassNames, className)}
+                  >
+                    {typeof col.footer === "function"
+                      ? col.footer(data)
+                      : col.footer}
+                  </td>
+                );
+              });
+            })()}
           </tr>
         </tfoot>
       )}

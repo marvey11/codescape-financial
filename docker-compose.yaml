@@ -1,0 +1,49 @@
+services:
+  database:
+    image: postgres:16
+    container_name: portfolio-db
+    environment:
+      POSTGRES_DB: codescape-financial
+      POSTGRES_USER: codescape
+      POSTGRES_PASSWORD_FILE: /run/secrets/db_password
+    secrets:
+      - db_password
+    restart: always
+    ports:
+      - "5432:5432"
+    volumes:
+      - csfin:/var/lib/postgresql/data
+
+  # portfolio-api:
+  #   build:
+  #     context: .
+  #     dockerfile: apps/portfolio-api/Dockerfile
+  #   container_name: portfolio-api
+  #   ports:
+  #     - "3000:3000"
+  #   depends_on:
+  #     - database
+
+  # data-ingester: # <--- Your new worker service
+  #   build:
+  #     context: .
+  #     dockerfile: apps/csv-processor/Dockerfile # <--- You'll create this Dockerfile
+  #     target: production # Use a production build stage if your Dockerfile has it
+  #   container_name: data-ingester
+  #   environment:
+  #     DATABASE_URL: postgres://your_user:your_password@database:5432/portfolio_db
+  #     CSV_INPUT_DIR: /app/input-csv-data # Directory inside the container where CSVs will appear
+  #   volumes:
+  #     # Mount a local directory to the container. Drop CSVs into './data/csv_uploads' on your host.
+  #     - ./data/csv_uploads:/app/input-csv-data
+  #   depends_on:
+  #     - database # Ensure the database is up before the ingester starts
+  #   # command: node dist/apps/csv-processor/main.js # Or define ENTRYPOINT in Dockerfile
+  #   # This service will start and the Node.js application inside it will run continuously.
+
+secrets:
+   db_password:
+     file: secrets/postgres-password.txt
+
+volumes:
+  csfin:

@@ -1,15 +1,11 @@
-import {
-  ActionButton,
-  Button,
-  ColumnSchema,
-  DataTable,
-} from "@codescape-financial/core-ui";
+import { Button, DataTable } from "@codescape-financial/core-ui";
 import { StockResponseDTO } from "@codescape-financial/portfolio-data-models";
-import { Bars3Icon } from "@heroicons/react/16/solid";
 import { useEffect, useMemo } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
+import { ViewStockDetailsButton } from "../../components/action-buttons/index.js";
 import { DataPageContainer } from "../../components/index.js";
 import { useAxios } from "../../hooks/index.js";
+import { buildStockMetadataTableSchema } from "../../utils/index.js";
 
 export const StockMetadataListPage = () => {
   const { loading, error, data, sendRequest } = useAxios<StockResponseDTO[]>();
@@ -41,7 +37,11 @@ export const StockMetadataListPage = () => {
       {sortedStocks && (
         <div className="overflow-x-auto rounded-md border border-gray-300 shadow-sm">
           <DataTable<StockResponseDTO>
-            columns={stockTableSchema}
+            columns={buildStockMetadataTableSchema({
+              actionsComponent: (item) => (
+                <ViewStockDetailsButton stock={item} />
+              ),
+            })}
             data={sortedStocks}
             keyExtractor={(item) => item.id}
           />
@@ -50,50 +50,3 @@ export const StockMetadataListPage = () => {
     </DataPageContainer>
   );
 };
-
-const ViewStockDetailsButton = ({ stock }: { stock: StockResponseDTO }) => {
-  const navigate = useNavigate();
-  return (
-    <ActionButton
-      aria-label={`Show details for ${stock.name}`}
-      onClick={() => {
-        navigate(`/stocks/${stock.id}`);
-      }}
-    >
-      <Bars3Icon className="h-6 w-6" aria-hidden="true" />
-    </ActionButton>
-  );
-};
-
-const stockTableSchema: ColumnSchema<StockResponseDTO>[] = [
-  {
-    header: "Name",
-    value: (item) => item.name,
-  },
-  {
-    header: "ISIN",
-    value: (item) => item.isin,
-    cellClassNames: "font-mono",
-  },
-  {
-    header: "NSIN",
-    value: (item) => item.nsin,
-    cellClassNames: "font-mono",
-  },
-  {
-    header: "Country",
-    value: (item) => item.country.name,
-  },
-  {
-    header: "Currency",
-    value: (item) => item.currency,
-  },
-  {
-    header: undefined,
-    value: (item) => <ViewStockDetailsButton stock={item} />,
-    headerClassNames: "text-right",
-    cellClassNames: "text-right",
-    footer: (data) => `${data.length} rows`,
-    footerClassNames: "text-right uppercase",
-  },
-];
