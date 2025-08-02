@@ -48,12 +48,16 @@ export class CountryService {
       throw new NotFoundException(`Country with ID "${countryId}" not found`);
     }
 
+    // Destructure to separate `countryCode` (which requires special name mapping)
+    // from the rest of the properties that can be merged directly.
     const { countryCode, ...rest } = countryUpdate;
-    this.countryRepository.merge(countryToUpdate, {
-      ...rest,
-      isoCode: countryCode,
-    });
+    this.countryRepository.merge(countryToUpdate, rest);
 
+    // Explicitly update `isoCode` from `countryCode` only if it was provided.
+    // This is safer and clearer than relying on `merge` to ignore `undefined`.
+    if (countryCode !== undefined) {
+      countryToUpdate.isoCode = countryCode;
+    }
     const savedCountry = await this.countryRepository.save(countryToUpdate);
 
     return this.mapEntityToDto(savedCountry);

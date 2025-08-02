@@ -1,5 +1,6 @@
 import {
   CreateStockDTO,
+  StockMetadataFilterDTO,
   StockResponseDTO,
   UpdateStockDTO,
 } from "@codescape-financial/portfolio-data-models";
@@ -11,6 +12,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
 } from "@nestjs/common";
 import { StockMetadataService } from "./stock-metadata.service.js";
 
@@ -19,8 +21,10 @@ export class StockMetadataController {
   constructor(private readonly stockMetadataService: StockMetadataService) {}
 
   @Get()
-  async findAll(): Promise<StockResponseDTO[]> {
-    return this.stockMetadataService.findAll();
+  async findAll(
+    @Query() filter: StockMetadataFilterDTO,
+  ): Promise<StockResponseDTO[]> {
+    return this.stockMetadataService.findAll(filter);
   }
 
   @Get(":id")

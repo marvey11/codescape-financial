@@ -1,8 +1,11 @@
-import { Button } from "@codescape-financial/core-ui";
+import { Tag } from "@codescape-financial/core-ui";
 import { StockResponseDTO } from "@codescape-financial/portfolio-data-models";
 import { AxiosRequestConfig } from "axios";
-import { Link, useNavigate } from "react-router-dom";
-import { DataPageContainer } from "../../components/index.js";
+import { useNavigate } from "react-router-dom";
+import {
+  DataPageContainer,
+  DetailsPageHeader,
+} from "../../components/index.js";
 import { useOutletContextData } from "../../hooks/index.js";
 
 export const StockMetadataDetailsPage = () => {
@@ -28,23 +31,33 @@ export const StockMetadataDetailsPage = () => {
   return (
     <DataPageContainer isLoading={loading} error={error}>
       {stock && (
-        <div className="mb-3 flex flex-row items-center justify-between gap-1">
-          <h1
-            className="me-auto w-full overflow-x-clip text-ellipsis whitespace-nowrap text-4xl font-extrabold"
+        <div className="flex flex-col gap-3">
+          <DetailsPageHeader
             title={stock.name}
+            editPath={`/stocks/${stock.id}/edit`}
+            onDelete={handleDelete}
           >
-            {stock.name}
-          </h1>
-
-          <Link to={`/stocks/${stock.id}/edit`}>
-            <Button>Edit</Button>
-          </Link>
-
-          <Button onClick={handleDelete} variant="destructive">
-            Delete
-          </Button>
+            <StockTags stock={stock} />
+          </DetailsPageHeader>
         </div>
       )}
     </DataPageContainer>
   );
 };
+
+const StockTags = ({ stock }: { stock: StockResponseDTO }) => (
+  <>
+    <Tag title="ISIN" className="font-mono">
+      {stock.isin}
+    </Tag>
+    <Tag title="NSIN" className="font-mono">
+      {stock.nsin}
+    </Tag>
+    <Tag variant="primary" title={stock.country.name}>
+      {stock.country.countryCode}
+    </Tag>
+    <Tag title="Currency" className="font-mono">
+      {stock.currency}
+    </Tag>
+  </>
+);

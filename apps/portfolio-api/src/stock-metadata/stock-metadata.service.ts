@@ -4,12 +4,13 @@ import {
 } from "@codescape-financial/portfolio-data-access";
 import {
   CreateStockDTO,
+  StockMetadataFilterDTO,
   StockResponseDTO,
   UpdateStockDTO,
 } from "@codescape-financial/portfolio-data-models";
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
+import { FindOptionsWhere, Repository } from "typeorm";
 
 @Injectable()
 export class StockMetadataService {
@@ -20,9 +21,18 @@ export class StockMetadataService {
     private countryRepository: Repository<Country>,
   ) {}
 
-  async findAll(): Promise<StockResponseDTO[]> {
+  async findAll(filter?: StockMetadataFilterDTO): Promise<StockResponseDTO[]> {
+    const where: FindOptionsWhere<StockMetadata> = {};
+
+    if (filter?.countryId) {
+      where.country = { id: filter.countryId };
+    }
+
     return this.stockMetadataRepository
-      .find({ relations: ["country"] })
+      .find({
+        relations: ["country"],
+        where,
+      })
       .then((stocks) => stocks.map(this.mapEntityToDto));
   }
 

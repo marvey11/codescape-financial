@@ -13,5 +13,7 @@
     },
     "./package.json": "./package.json"
   },
-  "dependencies": {}
+  "dependencies": {
+    "class-validator": "^0.14.2"
+  }
 }
