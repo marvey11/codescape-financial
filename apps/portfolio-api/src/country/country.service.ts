@@ -1,4 +1,4 @@
-import { Country } from "@codescape-financial/portfolio-data-access";
+import { Country } from "@codescape-financial/historical-data-access";
 import {
   CountryResponseDTO,
   CreateCountryDTO,

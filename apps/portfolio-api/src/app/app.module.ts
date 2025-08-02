@@ -2,7 +2,7 @@ import {
   Country,
   HistoricalQuote,
   StockMetadata,
-} from "@codescape-financial/portfolio-data-access";
+} from "@codescape-financial/historical-data-access";
 import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { CountryModule } from "../country";

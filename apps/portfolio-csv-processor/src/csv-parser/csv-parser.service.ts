@@ -1,7 +1,7 @@
 import {
   HistoricalQuote,
   StockMetadata,
-} from "@codescape-financial/portfolio-data-access";
+} from "@codescape-financial/historical-data-access";
 import {
   Injectable,
   Logger,
@@ -24,7 +24,7 @@ export class CsvParserService {
 
   constructor(
     @InjectRepository(StockMetadata)
-    private readonly stockMetadataRepository: Repository<StockMetadata>
+    private readonly stockMetadataRepository: Repository<StockMetadata>,
   ) {}
 
   /**
@@ -57,7 +57,7 @@ export class CsvParserService {
     const wknMatch = firstLine.match(/WKN: (\w{6})/);
     if (!wknMatch || !wknMatch[1]) {
       throw new UnprocessableEntityException(
-        `Could not find NSIN/WKN in file: ${filePath}`
+        `Could not find NSIN/WKN in file: ${filePath}`,
       );
     }
     const wkn = wknMatch[1];
@@ -101,18 +101,18 @@ export class CsvParserService {
     try {
       await pipeline(sourceStream, csvParserStream, dataProcessingStream);
       this.logger.log(
-        `Finished parsing CSV. Found ${quotes.length} quotes for WKN ${wkn}.`
+        `Finished parsing CSV. Found ${quotes.length} quotes for WKN ${wkn}.`,
       );
       return quotes;
     } catch (error) {
       this.logger.error(
         `Error during CSV stream pipeline for ${filePath}`,
-        error
+        error,
       );
       throw new UnprocessableEntityException(
         `Failed to parse CSV file ${filePath}: ${
           error instanceof Error ? error.message : error
-        }`
+        }`,
       );
     }
   }

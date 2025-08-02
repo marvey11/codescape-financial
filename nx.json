@@ -1,7 +1,10 @@
 {
   "$schema": "./node_modules/nx/schemas/nx-schema.json",
   "namedInputs": {
-    "default": ["{projectRoot}/**/*", "sharedGlobals"],
+    "default": [
+      "{projectRoot}/**/*",
+      "sharedGlobals"
+    ],
     "production": [
       "default",
       "!{projectRoot}/.eslintrc.json",
@@ -12,7 +15,9 @@
       "!{projectRoot}/jest.config.[jt]s",
       "!{projectRoot}/test-setup.[jt]s"
     ],
-    "sharedGlobals": ["{workspaceRoot}/.github/workflows/ci.yml"]
+    "sharedGlobals": [
+      "{workspaceRoot}/.github/workflows/ci.yml"
+    ]
   },
   "plugins": [
     {
@@ -29,10 +34,10 @@
         }
       },
       "exclude": [
-        "libs/portfolio-data-access/*",
         "libs/core/*",
-        "libs/portfolio-data-models/*",
-        "libs/portfolio-config/*"
+        "libs/historical-data-access/*",
+        "libs/portfolio-config/*",
+        "libs/portfolio-data-models/*"
       ]
     },
     {
@@ -81,15 +86,17 @@
       "options": {
         "targetName": "test"
       },
-      "exclude": ["apps/csv-processor-e2e/**/*"]
+      "exclude": [
+        "apps/csv-processor-e2e/**/*"
+      ]
     },
     {
       "plugin": "@nx/js/typescript",
       "include": [
-        "libs/portfolio-data-access/*",
         "libs/core/*",
-        "libs/portfolio-data-models/*",
-        "libs/portfolio-config/*"
+        "libs/historical-data-access/*",
+        "libs/portfolio-config/*",
+        "libs/portfolio-data-models/*"
       ],
       "options": {
         "typecheck": {
@@ -100,7 +107,9 @@
   ],
   "targetDefaults": {
     "test": {
-      "dependsOn": ["^build"]
+      "dependsOn": [
+        "^build"
+      ]
     }
   },
   "generators": {

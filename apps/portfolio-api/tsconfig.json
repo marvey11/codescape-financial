@@ -7,7 +7,7 @@
       "path": "../../libs/portfolio-data-models"
     },
     {
-      "path": "../../libs/portfolio-data-access"
+      "path": "../../libs/historical-data-access"
     },
     {
       "path": "./tsconfig.app.json"

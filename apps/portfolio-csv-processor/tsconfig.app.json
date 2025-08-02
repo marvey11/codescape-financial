@@ -24,7 +24,7 @@
   ],
   "references": [
     {
-      "path": "../../libs/portfolio-data-access/tsconfig.lib.json"
+      "path": "../../libs/historical-data-access/tsconfig.lib.json"
     },
     {
       "path": "../../libs/portfolio-config/tsconfig.lib.json"

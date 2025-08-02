@@ -7,7 +7,7 @@ import { HistoricalQuote } from "../entities/index.js";
 export class HistoricalQuoteService {
   constructor(
     @InjectRepository(HistoricalQuote)
-    private historicalQuoteRepository: Repository<HistoricalQuote>
+    private historicalQuoteRepository: Repository<HistoricalQuote>,
   ) {}
 
   async findAll(): Promise<HistoricalQuote[]> {
@@ -27,7 +27,7 @@ export class HistoricalQuoteService {
 
   async update(
     id: string,
-    historicalQuote: HistoricalQuote
+    historicalQuote: HistoricalQuote,
   ): Promise<HistoricalQuote | null> {
     await this.historicalQuoteRepository.update(id, historicalQuote);
     return this.historicalQuoteRepository.findOne({
