@@ -2,7 +2,7 @@ import { ReactNode } from "react";
 
 interface BuildTableSchemaOptions<T, U> {
   columnKeys?: U[] | undefined;
-  actionsComponent?: ReactNode | ((item: T) => ReactNode);
+  actionsComponent?: (item: T) => ReactNode;
   disableFooter?: boolean;
 }
 

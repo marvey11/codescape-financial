@@ -1,5 +1,12 @@
-import { formatCurrency, formatPercent } from "@codescape-financial/core";
-import { ColumnSchema } from "@codescape-financial/core-ui";
+import {
+  formatCurrency,
+  formatNormalizedDate,
+  formatPercent,
+} from "@codescape-financial/core";
+import {
+  ColumnSchema,
+  createNumberValueCellClassNames,
+} from "@codescape-financial/core-ui";
 import {
   AllLatestQuotesResponseDTO,
   PortfolioHoldingEmbeddedDTO,
@@ -91,6 +98,12 @@ const getLatestPriceColumnSchema = (latestPrices: AllLatestQuotesResponseDTO) =>
       latestPrices[isin] != null
         ? formatCurrency(latestPrices[isin].price)
         : "--",
+    cellTitle: ({ stock: { isin } }) => {
+      const latest = latestPrices[isin];
+      return latest != null
+        ? formatNormalizedDate(new Date(latest.date), "en-GB")
+        : undefined;
+    },
     cellClassNames: "text-xs",
   }) satisfies ColumnSchema<PortfolioHoldingEmbeddedDTO>;
 
@@ -104,6 +117,12 @@ const getCurrentValueColumnSchema = (
     value: (item) => {
       const current = calculateCurrentHoldingValue(item, latestPrices);
       return current != null ? formatCurrency(current) : "--";
+    },
+    cellTitle: ({ stock: { isin } }) => {
+      const latest = latestPrices[isin];
+      return latest != null
+        ? formatNormalizedDate(new Date(latest.date), "en-GB")
+        : undefined;
     },
     cellClassNames: "text-xs",
     footer: (data) =>
@@ -123,12 +142,30 @@ const getAbsoluteGainLossColumnSchema = (
         item,
         latestPrices,
       );
-      return absoluteGainLoss != null ? formatCurrency(absoluteGainLoss) : "--";
+      return {
+        cellValue: absoluteGainLoss,
+        display:
+          absoluteGainLoss != null ? formatCurrency(absoluteGainLoss) : "--",
+      };
     },
-    cellClassNames: "text-xs",
-    footer: (data) =>
-      formatCurrency(calculateTotalAbsoluteGainLoss(data, latestPrices)),
-    footerClassNames: "text-xs",
+    cellClassNames: (item, cellValue) => {
+      const colorClasses = createNumberValueCellClassNames(cellValue);
+      return ["text-xs", ...(colorClasses ? [colorClasses] : [])].join(" ");
+    },
+    footer: (data) => {
+      const totalAbsoluteGainLoss = calculateTotalAbsoluteGainLoss(
+        data,
+        latestPrices,
+      );
+      return {
+        cellValue: totalAbsoluteGainLoss,
+        display: formatCurrency(totalAbsoluteGainLoss),
+      };
+    },
+    footerClassNames: (data, cellValue) => {
+      const colorClasses = createNumberValueCellClassNames(cellValue);
+      return ["text-xs", ...(colorClasses ? [colorClasses] : [])].join(" ");
+    },
   }) satisfies ColumnSchema<PortfolioHoldingEmbeddedDTO>;
 
 const getRelativeGainLossColumnSchema = (
@@ -143,9 +180,16 @@ const getRelativeGainLossColumnSchema = (
         item,
         latestPrices,
       );
-      return relativeGainLoss != null ? formatPercent(relativeGainLoss) : "--";
+      return {
+        cellValue: relativeGainLoss,
+        display:
+          relativeGainLoss != null ? formatPercent(relativeGainLoss) : "--",
+      };
     },
-    cellClassNames: "text-xs",
+    cellClassNames: (_, cellValue) => {
+      const colorClasses = createNumberValueCellClassNames(cellValue);
+      return ["text-xs", ...(colorClasses ? [colorClasses] : [])].join(" ");
+    },
     footer: (data) => {
       const totalCostBasis = calculateTotalCostBasis(data);
       const totalAbsoluteGainLoss = calculateTotalAbsoluteGainLoss(
@@ -158,9 +202,16 @@ const getRelativeGainLossColumnSchema = (
         totalAbsoluteGainLoss,
       );
 
-      return relativeGainLoss != null ? formatPercent(relativeGainLoss) : "--";
+      return {
+        cellValue: relativeGainLoss,
+        display:
+          relativeGainLoss != null ? formatPercent(relativeGainLoss) : "--",
+      };
     },
-    footerClassNames: "text-xs",
+    footerClassNames: (_, cellValue) => {
+      const colorClasses = createNumberValueCellClassNames(cellValue);
+      return ["text-xs", ...(colorClasses ? [colorClasses] : [])].join(" ");
+    },
   }) satisfies ColumnSchema<PortfolioHoldingEmbeddedDTO>;
 
 const getColumnMapping = (

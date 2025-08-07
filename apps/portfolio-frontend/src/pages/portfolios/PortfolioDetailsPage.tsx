@@ -74,7 +74,9 @@ const PortfolioHoldingsTable = ({
         .post<AllLatestQuotesResponseDTO>("/historical-quotes/latest-batch", {
           isins,
         })
-        .then((response) => setLatestPrices(response.data))
+        .then((response) => {
+          setLatestPrices(response.data);
+        })
         .catch(console.error);
     }
   }, [data]);
