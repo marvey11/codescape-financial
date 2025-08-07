@@ -75,7 +75,7 @@ const PortfolioHoldingsTable = ({
           isins,
         })
         .then((response) => {
-          response.data && setLatestPrices(response.data);
+          setLatestPrices(response.data);
         })
         .catch(console.error);
     }
