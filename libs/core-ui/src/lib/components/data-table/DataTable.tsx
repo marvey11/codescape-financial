@@ -1,6 +1,6 @@
-import React from "react";
-import { cn } from "../../utility";
-import { ColumnSchema } from "./ColumnSchema";
+import React, { ReactNode } from "react";
+import { cn, isCompositeCellNode } from "../../utility";
+import { CellValue, ColumnSchema, CompositeCellNode } from "./ColumnSchema";
 
 export interface DataTableProps<T> {
   columns: ColumnSchema<T>[];
@@ -42,14 +42,32 @@ export const DataTable = <T,>({
             className="border-b bg-white hover:bg-gray-100"
           >
             {columns.map((col) => {
-              const { className, ...rest } = col.cellProps ?? {};
+              const { cellValue, display: cellDisplayValue } =
+                processColumnContent(col.value, item);
+
+              const { className: cellPropClassName, ...rest } =
+                col.cellProps ?? {};
+
+              const dynamicCellClassNames =
+                typeof col.cellClassNames === "function"
+                  ? col.cellClassNames(item, cellValue)
+                  : col.cellClassNames;
+
+              const cellTitle =
+                col.cellTitle != null ? col.cellTitle(item) : undefined;
+
               return (
                 <td
                   key={col.id}
+                  title={cellTitle}
                   {...rest}
-                  className={cn("px-6 py-4", col.cellClassNames, className)}
+                  className={cn(
+                    "px-6 py-4",
+                    dynamicCellClassNames,
+                    cellPropClassName,
+                  )}
                 >
-                  {col.value(item)}
+                  {cellDisplayValue}
                 </td>
               );
             })}
@@ -68,8 +86,16 @@ export const DataTable = <T,>({
               );
 
               if (footerWithColspan) {
-                const { className, ...rest } =
+                const { className: footerPropClassName, ...rest } =
                   footerWithColspan.footerCellProps ?? {};
+
+                const { cellValue, display: cellDisplayValue } =
+                  processColumnContent(footerWithColspan.footer, data);
+
+                const dynamicFooterClassNames =
+                  typeof footerWithColspan.footerClassNames === "function"
+                    ? footerWithColspan.footerClassNames(data, cellValue)
+                    : footerWithColspan.footerClassNames;
 
                 return (
                   <td
@@ -77,29 +103,38 @@ export const DataTable = <T,>({
                     {...rest}
                     className={cn(
                       "px-6 py-3",
-                      footerWithColspan.footerClassNames,
-                      className,
+                      dynamicFooterClassNames,
+                      footerPropClassName,
                     )}
                   >
-                    {typeof footerWithColspan.footer === "function"
-                      ? footerWithColspan.footer(data)
-                      : footerWithColspan.footer}
+                    {cellDisplayValue}
                   </td>
                 );
               }
 
               // Default behavior: render a footer cell for each column.
               return columns.map((col) => {
-                const { className, ...rest } = col.footerCellProps ?? {};
+                const { className: footerPropClassName, ...rest } =
+                  col.footerCellProps ?? {};
+
+                const { cellValue, display: cellDisplayValue } =
+                  processColumnContent(col.footer, data);
+
+                const dynamicFooterClassNames =
+                  typeof col.footerClassNames === "function"
+                    ? col.footerClassNames(data, cellValue)
+                    : col.footerClassNames;
                 return (
                   <td
                     key={col.id}
                     {...rest}
-                    className={cn("px-6 py-3", col.footerClassNames, className)}
+                    className={cn(
+                      "px-6 py-3",
+                      dynamicFooterClassNames,
+                      footerPropClassName,
+                    )}
                   >
-                    {typeof col.footer === "function"
-                      ? col.footer(data)
-                      : col.footer}
+                    {cellDisplayValue}
                   </td>
                 );
               });
@@ -109,4 +144,34 @@ export const DataTable = <T,>({
       )}
     </table>
   );
+};
+
+/**
+ * Helper function to process the column content.
+ *
+ * `U` can represent `T` or `T[]`
+ */
+const processColumnContent = <U extends T | T[], T>(
+  contentFnOrNode: ReactNode | ((arg: U) => ReactNode | CompositeCellNode),
+  argForContentFn: U,
+): CompositeCellNode => {
+  let cellValue: CellValue = undefined;
+  let display: ReactNode;
+
+  if (typeof contentFnOrNode === "function") {
+    const result = contentFnOrNode(argForContentFn);
+    if (isCompositeCellNode(result)) {
+      // (arg: U) => CompositeCellNode
+      cellValue = result.cellValue;
+      display = result.display;
+    } else {
+      // (arg: U) => ReactNode
+      display = result;
+    }
+  } else {
+    // ReactNode
+    display = contentFnOrNode;
+  }
+
+  return { cellValue, display } satisfies CompositeCellNode;
 };
