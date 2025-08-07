@@ -1,5 +1,5 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
-import { StockMetadata } from "./stock-metadata.entity.js";
+import { StockMetadata } from "./stock-metadata.entity";
 
 @Entity("countries")
 export class Country {

@@ -5,15 +5,15 @@ import {
   StockResponseDTO,
 } from "@codescape-financial/portfolio-data-models";
 import { AxiosRequestConfig } from "axios";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   DataPageContainer,
   DetailsPageHeader,
   ViewStockDetailsButton,
-} from "../../components/index.js";
-import { useAxios, useOutletContextData } from "../../hooks/index.js";
-import { buildStockMetadataTableSchema } from "../../utils/index.js";
+} from "../../components";
+import { useAxios, useOutletContextData } from "../../hooks";
+import { buildStockMetadataTableSchema } from "../../utils";
 
 export const CountryDetailsPage = () => {
   const navigate = useNavigate();
@@ -29,22 +29,21 @@ export const CountryDetailsPage = () => {
     useAxios<StockResponseDTO[]>();
 
   useEffect(() => {
-    if (country) {
+    country &&
       sendStocksForCountryRequest({
         url: `/stock-metadata?countryId=${country.id}`,
         method: "get",
       });
-    }
   }, [country, sendStocksForCountryRequest]);
 
   const handleDelete = () => {
-    if (country) {
+    country &&
       sendRequest({
         url: `/countries/${country.id}`,
         method: "delete",
-      } satisfies AxiosRequestConfig);
-      navigate("/countries");
-    }
+      } satisfies AxiosRequestConfig).then(() => {
+        navigate("/countries");
+      });
   };
 
   return (
@@ -63,7 +62,7 @@ export const CountryDetailsPage = () => {
             <>
               <h2 className="text-2xl font-extrabold">Stock List</h2>
               <div className="overflow-x-auto rounded-md border border-gray-300 shadow-sm">
-                <CountryStockTable stocks={countryStocks} />
+                <CountryStockTable data={countryStocks} />
               </div>
             </>
           ) : (
@@ -86,13 +85,21 @@ const CountryTags = ({ country }: { country: CountryResponseDTO }) => (
   </>
 );
 
-const CountryStockTable = ({ stocks }: { stocks: StockResponseDTO[] }) => (
-  <DataTable<StockResponseDTO>
-    columns={buildStockMetadataTableSchema({
-      columnKeys: ["name", "isin", "nsin", "currency"],
-      actionsComponent: (item) => <ViewStockDetailsButton stock={item} />,
-    })}
-    data={stocks}
-    keyExtractor={(item) => item.id}
-  />
-);
+const CountryStockTable = ({ data }: { data: StockResponseDTO[] }) => {
+  const columns = useMemo(
+    () =>
+      buildStockMetadataTableSchema({
+        columnKeys: ["name", "isin", "nsin", "currency"],
+        actionsComponent: (item) => <ViewStockDetailsButton stock={item} />,
+      }),
+    [],
+  );
+
+  return (
+    <DataTable<StockResponseDTO>
+      columns={columns}
+      data={data}
+      keyExtractor={(item) => item.id}
+    />
+  );
+};

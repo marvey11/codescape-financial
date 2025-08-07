@@ -3,6 +3,11 @@ import {
   HistoricalQuoteService,
 } from "@codescape-financial/historical-data-access";
 import {
+  AllLatestQuotesResponseDTO,
+  LatestQuoteResponseDTO,
+  LatestQuotesRequestDTO,
+} from "@codescape-financial/portfolio-data-models";
+import {
   Body,
   Controller,
   Delete,
@@ -21,6 +26,20 @@ export class HistoricalQuoteController {
   @Get()
   async findAll(): Promise<HistoricalQuote[]> {
     return this.historicalQuoteService.findAll();
+  }
+
+  @Get(":isin/latest")
+  async findLatestByIsin(
+    @Param("isin") isin: string,
+  ): Promise<LatestQuoteResponseDTO | null> {
+    return this.historicalQuoteService.findLatestByIsin(isin);
+  }
+
+  @Post("latest-batch")
+  async findLatestByIsins(
+    @Body() body: LatestQuotesRequestDTO,
+  ): Promise<AllLatestQuotesResponseDTO> {
+    return this.historicalQuoteService.findLatestByIsins(body.isins);
   }
 
   @Get(":id")

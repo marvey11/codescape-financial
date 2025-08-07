@@ -22,9 +22,7 @@ export const EditCountryPage = () => {
   const [formData, setFormData] = useState<CountryFormData | undefined>();
 
   useEffect(() => {
-    if (country) {
-      setFormData(country);
-    }
+    country && setFormData(country);
   }, [country]);
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
@@ -39,7 +37,9 @@ export const EditCountryPage = () => {
         url: `/countries/${country.id}`,
         method: "put",
         data: payload,
-      }).then(() => navigate("/countries"));
+      }).then(() => {
+        navigate("/countries");
+      });
     }
   };
 

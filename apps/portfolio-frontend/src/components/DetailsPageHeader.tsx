@@ -6,7 +6,7 @@ interface DetailsPageHeaderProps {
   title: string;
   editPath: string;
   onDelete: () => void;
-  children: ReactNode;
+  children?: ReactNode | undefined;
 }
 
 export const DetailsPageHeader = ({
@@ -33,8 +33,10 @@ export const DetailsPageHeader = ({
       </Button>
     </div>
 
-    <div className="mb-3 flex flex-row flex-wrap items-center justify-start gap-1">
-      {children}
-    </div>
+    {children != null && (
+      <div className="mb-3 flex flex-row flex-wrap items-center justify-start gap-1">
+        {children}
+      </div>
+    )}
   </div>
 );

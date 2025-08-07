@@ -59,7 +59,9 @@ export const EditStockMetadataPage = () => {
         url: `/stock-metadata/${stock.id}`,
         method: "put",
         data: payload,
-      }).then(() => navigate("/stocks"));
+      }).then(() => {
+        navigate("/stocks");
+      });
     }
   };
 

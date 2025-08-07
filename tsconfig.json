@@ -26,6 +26,9 @@
     },
     {
       "path": "./libs/portfolio-config"
+    },
+    {
+      "path": "./libs/portfolio-data-access"
     }
   ]
 }

@@ -5,7 +5,7 @@ import { ApplicationConfigData } from "./application-config-schema";
 @Injectable()
 export class ConfigService {
   constructor(
-    private nestConfigService: NestConfigService<ApplicationConfigData, true>
+    private nestConfigService: NestConfigService<ApplicationConfigData, true>,
   ) {}
 
   /**

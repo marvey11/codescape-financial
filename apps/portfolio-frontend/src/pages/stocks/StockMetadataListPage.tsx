@@ -2,10 +2,10 @@ import { Button, DataTable } from "@codescape-financial/core-ui";
 import { StockResponseDTO } from "@codescape-financial/portfolio-data-models";
 import { useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
-import { ViewStockDetailsButton } from "../../components/action-buttons/index.js";
-import { DataPageContainer } from "../../components/index.js";
-import { useAxios } from "../../hooks/index.js";
-import { buildStockMetadataTableSchema } from "../../utils/index.js";
+import { DataPageContainer } from "../../components";
+import { ViewStockDetailsButton } from "../../components/action-buttons";
+import { useAxios } from "../../hooks";
+import { buildStockMetadataTableSchema } from "../../utils";
 
 export const StockMetadataListPage = () => {
   const { loading, error, data, sendRequest } = useAxios<StockResponseDTO[]>();
@@ -36,17 +36,27 @@ export const StockMetadataListPage = () => {
 
       {sortedStocks && (
         <div className="overflow-x-auto rounded-md border border-gray-300 shadow-sm">
-          <DataTable<StockResponseDTO>
-            columns={buildStockMetadataTableSchema({
-              actionsComponent: (item) => (
-                <ViewStockDetailsButton stock={item} />
-              ),
-            })}
-            data={sortedStocks}
-            keyExtractor={(item) => item.id}
-          />
+          <StockMetadataTable data={sortedStocks} />
         </div>
       )}
     </DataPageContainer>
+  );
+};
+
+const StockMetadataTable = ({ data }: { data: StockResponseDTO[] }) => {
+  const columns = useMemo(
+    () =>
+      buildStockMetadataTableSchema({
+        actionsComponent: (item) => <ViewStockDetailsButton stock={item} />,
+      }),
+    [],
+  );
+
+  return (
+    <DataTable<StockResponseDTO>
+      columns={columns}
+      data={data}
+      keyExtractor={(item) => item.id}
+    />
   );
 };

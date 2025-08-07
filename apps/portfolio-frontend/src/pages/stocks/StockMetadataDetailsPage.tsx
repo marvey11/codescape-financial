@@ -2,11 +2,8 @@ import { Tag } from "@codescape-financial/core-ui";
 import { StockResponseDTO } from "@codescape-financial/portfolio-data-models";
 import { AxiosRequestConfig } from "axios";
 import { useNavigate } from "react-router-dom";
-import {
-  DataPageContainer,
-  DetailsPageHeader,
-} from "../../components/index.js";
-import { useOutletContextData } from "../../hooks/index.js";
+import { DataPageContainer, DetailsPageHeader } from "../../components";
+import { useOutletContextData } from "../../hooks";
 
 export const StockMetadataDetailsPage = () => {
   const navigate = useNavigate();
@@ -19,13 +16,13 @@ export const StockMetadataDetailsPage = () => {
   } = useOutletContextData<StockResponseDTO>();
 
   const handleDelete = () => {
-    if (stock) {
+    stock &&
       sendRequest({
         url: `/stock-metadata/${stock.id}`,
         method: "delete",
-      } satisfies AxiosRequestConfig);
-      navigate("/stocks");
-    }
+      } satisfies AxiosRequestConfig).then(() => {
+        navigate("/stocks");
+      });
   };
 
   return (

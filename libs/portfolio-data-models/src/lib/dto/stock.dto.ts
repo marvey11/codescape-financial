@@ -82,3 +82,10 @@ export class StockMetadataFilterDTO {
   @Length(3, 3)
   currency?: string;
 }
+
+export interface StockEmbeddedDTO {
+  id: string;
+  isin: string;
+  nsin: string;
+  name: string;
+}
