@@ -6,8 +6,8 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from "typeorm";
-import { Country } from "./country.entity.js";
-import { HistoricalQuote } from "./historical-quote.entity.js";
+import { Country } from "./country.entity";
+import { HistoricalQuote } from "./historical-quote.entity";
 
 @Entity("stock_metadata")
 @Index(["isin", "nsin"], { unique: true })

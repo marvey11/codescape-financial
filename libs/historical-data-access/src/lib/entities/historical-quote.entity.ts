@@ -5,7 +5,7 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from "typeorm";
-import { StockMetadata } from "./stock-metadata.entity.js";
+import { StockMetadata } from "./stock-metadata.entity";
 
 @Entity("historical_quotes")
 @Index(["stock", "date"], { unique: true })

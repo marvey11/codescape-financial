@@ -6,25 +6,37 @@ import {
   createBrowserRouter,
   createRoutesFromElements,
 } from "react-router-dom";
-import App from "./app/App.js";
+import App from "./app/App";
 import {
   AddCountryPage,
   CountryDetailsPage,
   CountryLayout,
   CountryListPage,
   EditCountryPage,
-} from "./pages/countries/index.js";
+} from "./pages/countries";
+import {
+  PortfolioDetailsPage,
+  PortfolioLayout,
+  PortfolioListPage,
+} from "./pages/portfolios";
 import {
   AddStockMetadataPage,
   EditStockMetadataPage,
   StockMetadataDetailsPage,
   StockMetadataLayout,
   StockMetadataListPage,
-} from "./pages/stocks/index.js";
+} from "./pages/stocks";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
     <Route path="/" element={<App />}>
+      <Route path="portfolios">
+        <Route index element={<PortfolioListPage />} />
+        <Route path=":id" element={<PortfolioLayout />}>
+          <Route index element={<PortfolioDetailsPage />} />
+        </Route>
+      </Route>
+
       <Route path="stocks">
         <Route index element={<StockMetadataListPage />} />
         <Route path="add" element={<AddStockMetadataPage />} />

@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "@codescape-financial/historical-data-access": "*",
+    "@codescape-financial/portfolio-config": "*",
     "@codescape-financial/portfolio-data-models": "*",
     "@nestjs/config": "^4.0.2",
     "@nestjs/typeorm": "^11.0.0",

@@ -1,10 +1,9 @@
-import { HistoricalQuotesDataAccessModule } from "@codescape-financial/historical-data-access";
+import { HistoricalDataAccessModule } from "@codescape-financial/historical-data-access";
 import { Module } from "@nestjs/common";
 import { HistoricalQuoteController } from "./historical-quote.controller.js";
 
 @Module({
-  imports: [HistoricalQuotesDataAccessModule],
+  imports: [HistoricalDataAccessModule],
   controllers: [HistoricalQuoteController],
-  // providers: [HistoricalQuoteService],
 })
 export class HistoricalQuoteModule {}

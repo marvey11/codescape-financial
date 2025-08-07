@@ -2,12 +2,9 @@ import { Button, DataTable } from "@codescape-financial/core-ui";
 import { CountryResponseDTO } from "@codescape-financial/portfolio-data-models";
 import { useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
-import {
-  DataPageContainer,
-  ViewCountryDetailsButton,
-} from "../../components/index.js";
-import { useAxios } from "../../hooks/index.js";
-import { buildCountryTableSchema } from "../../utils/index.js";
+import { DataPageContainer, ViewCountryDetailsButton } from "../../components";
+import { useAxios } from "../../hooks";
+import { buildCountryTableSchema } from "../../utils";
 
 export const CountryListPage = () => {
   const { loading, error, data, sendRequest } =
@@ -39,17 +36,27 @@ export const CountryListPage = () => {
 
       {sortedCountries && (
         <div className="overflow-x-auto rounded-md border border-gray-300 shadow-sm">
-          <DataTable<CountryResponseDTO>
-            columns={buildCountryTableSchema({
-              actionsComponent: (item) => (
-                <ViewCountryDetailsButton country={item} />
-              ),
-            })}
-            data={sortedCountries}
-            keyExtractor={(item) => item.id}
-          />
+          <CountryTable data={sortedCountries} />
         </div>
       )}
     </DataPageContainer>
+  );
+};
+
+const CountryTable = ({ data }: { data: CountryResponseDTO[] }) => {
+  const columns = useMemo(
+    () =>
+      buildCountryTableSchema({
+        actionsComponent: (item) => <ViewCountryDetailsButton country={item} />,
+      }),
+    [],
+  );
+
+  return (
+    <DataTable<CountryResponseDTO>
+      columns={columns}
+      data={data}
+      keyExtractor={(item) => item.id}
+    />
   );
 };

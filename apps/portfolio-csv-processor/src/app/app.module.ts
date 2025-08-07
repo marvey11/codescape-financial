@@ -1,13 +1,14 @@
-import { HistoricalQuotesDataAccessModule } from "@codescape-financial/historical-data-access";
+import { HistoricalDataAccessModule } from "@codescape-financial/historical-data-access";
 import {
   ConfigService,
   SharedConfigModule,
 } from "@codescape-financial/portfolio-config";
 import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
-import { CsvParserService } from "../csv-parser/index.js";
-import { CsvProcessingService } from "../csv-processing/index.js";
-import { DataIngestionService } from "../data-ingestion/index.js";
+import * as path from "path";
+import { CsvParserService } from "../csv-parser/index";
+import { CsvProcessingService } from "../csv-processing/index";
+import { DataIngestionService } from "../data-ingestion/index";
 
 @Module({
   imports: [
@@ -24,12 +25,20 @@ import { DataIngestionService } from "../data-ingestion/index.js";
         // This option is crucial. It tells TypeORM to automatically load entities
         // that have been registered with `forFeature` in other modules.
         autoLoadEntities: true,
-        synchronize: true, // For development only, do not use in production
+        synchronize: false, // Set to false because we are using migrations
         logging: true,
+        // Point to the location of your migration files.
+        // The path is relative to the final `main.js` in the `dist` folder.
+        migrations: [
+          path.join(__dirname, "..", "portfolio-api", "migrations", "*.js"),
+        ],
+        // Migrations are not run automatically on startup.
+        // They should be run explicitly via the `yarn migration:run` script.
+        migrationsRun: false,
       }),
       inject: [ConfigService],
     }),
-    HistoricalQuotesDataAccessModule, // <--- Import your new data access module
+    HistoricalDataAccessModule, // <--- Import your new data access module
     // ... other modules
   ],
   controllers: [],

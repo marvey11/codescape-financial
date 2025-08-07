@@ -1,1 +1,1 @@
-export { HistoricalQuoteModule } from "./historical-quote.module";
+export { HistoricalQuoteModule } from "./historical-quote.module.js";

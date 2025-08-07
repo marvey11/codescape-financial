@@ -4,6 +4,9 @@
   "include": [],
   "references": [
     {
+      "path": "../portfolio-data-models"
+    },
+    {
       "path": "./tsconfig.lib.json"
     },
     {

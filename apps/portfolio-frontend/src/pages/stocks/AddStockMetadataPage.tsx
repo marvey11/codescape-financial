@@ -45,7 +45,9 @@ export const AddStockMetadataPage = () => {
       ...formData,
     };
     sendRequest({ url: "/stock-metadata", method: "post", data: payload }).then(
-      () => navigate("/stocks"),
+      () => {
+        navigate("/stocks");
+      },
     );
   };
 
@@ -63,7 +65,9 @@ export const AddStockMetadataPage = () => {
             onChange={setFormData}
           />
           <FormButtonsComponent
-            onCancel={() => navigate("..", { replace: true })}
+            onCancel={() => {
+              navigate("..", { replace: true });
+            }}
           />
         </form>
       )}

@@ -1,3 +1,3 @@
-export { Country } from "./country.entity.js";
-export { HistoricalQuote } from "./historical-quote.entity.js";
-export { StockMetadata } from "./stock-metadata.entity.js";
+export { Country } from "./country.entity";
+export { HistoricalQuote } from "./historical-quote.entity";
+export { StockMetadata } from "./stock-metadata.entity";

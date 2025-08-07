@@ -21,8 +21,10 @@ export const AddCountryPage = () => {
     const payload: CreateCountryDTO = {
       ...formData,
     };
-    sendRequest({ url: "/countries", method: "post", data: payload }).then(() =>
-      navigate("/countries"),
+    sendRequest({ url: "/countries", method: "post", data: payload }).then(
+      () => {
+        navigate("/countries");
+      },
     );
   };
 

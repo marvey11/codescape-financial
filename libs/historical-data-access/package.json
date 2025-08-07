@@ -12,8 +12,5 @@
     },
     "./package.json": "./package.json"
   },
-  "dependencies": {},
-  "nx": {
-    "name": "@codescape-financial/historical-data-access"
-  }
+  "dependencies": {}
 }

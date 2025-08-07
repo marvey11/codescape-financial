@@ -1,6 +1,6 @@
 import { Logger, ValidationPipe } from "@nestjs/common";
 import { NestFactory } from "@nestjs/core";
-import { AppModule } from "./app/app.module.js";
+import { AppModule } from "./app/app.module";
 
 const GLOBAL_PREFIX = "api";
 const logger = new Logger("Bootstrap");

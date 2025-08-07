@@ -1,1 +1,1 @@
-export { HistoricalQuoteService } from "./historical-quote.service.js";
+export { HistoricalQuoteService } from "./historical-quote.service";

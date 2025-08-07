@@ -7,6 +7,9 @@ export const Navigation = () => {
 
       <ul className="m-0 flex list-none p-0">
         <li>
+          <NavigationLink to="/portfolios">Portfolios</NavigationLink>
+        </li>
+        <li>
           <NavigationLink to="/stocks">Stocks</NavigationLink>
         </li>
         <li>
