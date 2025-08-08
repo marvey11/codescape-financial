@@ -8,7 +8,7 @@ import {
   createNumberValueCellClassNames,
 } from "@codescape-financial/core-ui";
 import {
-  AllLatestQuotesResponseDTO,
+  AllLatestQuotesTransformedDTO,
   PortfolioHoldingEmbeddedDTO,
 } from "@codescape-financial/portfolio-data-models";
 import { ReactNode } from "react";
@@ -32,7 +32,7 @@ const buildPortfolioHoldingColumnSchema = (
     PortfolioHoldingEmbeddedDTO,
     PortfolioHoldingColumnKey
   > = {},
-  latestPrices: AllLatestQuotesResponseDTO,
+  latestPrices: AllLatestQuotesTransformedDTO,
 ): ColumnSchema<PortfolioHoldingEmbeddedDTO>[] => {
   const { columnKeys = [...allColumnKeys], actionsComponent } = options;
 
@@ -89,7 +89,9 @@ const averagePriceColumnSchema = {
   cellClassNames: "text-xs",
 } satisfies ColumnSchema<PortfolioHoldingEmbeddedDTO>;
 
-const getLatestPriceColumnSchema = (latestPrices: AllLatestQuotesResponseDTO) =>
+const getLatestPriceColumnSchema = (
+  latestPrices: AllLatestQuotesTransformedDTO,
+) =>
   ({
     id: "colid-holding-stock-latest-price",
     header: "Latest Price",
@@ -98,17 +100,13 @@ const getLatestPriceColumnSchema = (latestPrices: AllLatestQuotesResponseDTO) =>
       latestPrices[isin] != null
         ? formatCurrency(latestPrices[isin].price)
         : "--",
-    cellTitle: ({ stock: { isin } }) => {
-      const latest = latestPrices[isin];
-      return latest != null
-        ? formatNormalizedDate(new Date(latest.date), "en-GB")
-        : undefined;
-    },
+    cellTitle: ({ stock: { isin } }) =>
+      constructLastUpdated(latestPrices[isin]),
     cellClassNames: "text-xs",
   }) satisfies ColumnSchema<PortfolioHoldingEmbeddedDTO>;
 
 const getCurrentValueColumnSchema = (
-  latestPrices: AllLatestQuotesResponseDTO,
+  latestPrices: AllLatestQuotesTransformedDTO,
 ): ColumnSchema<PortfolioHoldingEmbeddedDTO> =>
   ({
     id: "colid-holding-current-value",
@@ -118,12 +116,8 @@ const getCurrentValueColumnSchema = (
       const current = calculateCurrentHoldingValue(item, latestPrices);
       return current != null ? formatCurrency(current) : "--";
     },
-    cellTitle: ({ stock: { isin } }) => {
-      const latest = latestPrices[isin];
-      return latest != null
-        ? formatNormalizedDate(new Date(latest.date), "en-GB")
-        : undefined;
-    },
+    cellTitle: ({ stock: { isin } }) =>
+      constructLastUpdated(latestPrices[isin]),
     cellClassNames: "text-xs",
     footer: (data) =>
       formatCurrency(calculateTotalCurrentValue(data, latestPrices)),
@@ -131,7 +125,7 @@ const getCurrentValueColumnSchema = (
   }) satisfies ColumnSchema<PortfolioHoldingEmbeddedDTO>;
 
 const getAbsoluteGainLossColumnSchema = (
-  latestPrices: AllLatestQuotesResponseDTO,
+  latestPrices: AllLatestQuotesTransformedDTO,
 ) =>
   ({
     id: "colid-holding-absolute-gain-loss",
@@ -169,7 +163,7 @@ const getAbsoluteGainLossColumnSchema = (
   }) satisfies ColumnSchema<PortfolioHoldingEmbeddedDTO>;
 
 const getRelativeGainLossColumnSchema = (
-  latestPrices: AllLatestQuotesResponseDTO,
+  latestPrices: AllLatestQuotesTransformedDTO,
 ) =>
   ({
     id: "colid-holding-relative-gain-loss",
@@ -215,7 +209,7 @@ const getRelativeGainLossColumnSchema = (
   }) satisfies ColumnSchema<PortfolioHoldingEmbeddedDTO>;
 
 const getColumnMapping = (
-  latestPrices: AllLatestQuotesResponseDTO,
+  latestPrices: AllLatestQuotesTransformedDTO,
 ): {
   [key in PortfolioHoldingColumnKey]: ColumnSchema<PortfolioHoldingEmbeddedDTO>;
 } => ({
@@ -259,7 +253,7 @@ const calculateTotalCostBasis = (data: PortfolioHoldingEmbeddedDTO[]) =>
 
 const calculateCurrentHoldingValue = (
   holding: PortfolioHoldingEmbeddedDTO,
-  latestPrices: AllLatestQuotesResponseDTO,
+  latestPrices: AllLatestQuotesTransformedDTO,
 ) => {
   const {
     stock: { isin },
@@ -275,7 +269,7 @@ const calculateCurrentHoldingValue = (
 
 const calculateTotalCurrentValue = (
   data: PortfolioHoldingEmbeddedDTO[],
-  latestPrices: AllLatestQuotesResponseDTO,
+  latestPrices: AllLatestQuotesTransformedDTO,
 ) =>
   data.reduce(
     (total, item) =>
@@ -285,7 +279,7 @@ const calculateTotalCurrentValue = (
 
 const calculateAbsoluteHoldingGainLoss = (
   holding: PortfolioHoldingEmbeddedDTO,
-  latestPrices: AllLatestQuotesResponseDTO,
+  latestPrices: AllLatestQuotesTransformedDTO,
 ) => {
   const totalCostBasis = holding.summary.totalCostBasis;
   const currentValue = calculateCurrentHoldingValue(holding, latestPrices);
@@ -299,7 +293,7 @@ const calculateAbsoluteHoldingGainLoss = (
 
 const calculateTotalAbsoluteGainLoss = (
   holdings: PortfolioHoldingEmbeddedDTO[],
-  latestPrices: AllLatestQuotesResponseDTO,
+  latestPrices: AllLatestQuotesTransformedDTO,
 ) =>
   holdings.reduce(
     (total, item) =>
@@ -309,7 +303,7 @@ const calculateTotalAbsoluteGainLoss = (
 
 const calculateRelativeHoldingGainLoss = (
   holding: PortfolioHoldingEmbeddedDTO,
-  latestPrices: AllLatestQuotesResponseDTO,
+  latestPrices: AllLatestQuotesTransformedDTO,
 ) => {
   const totalCostBasis = holding.summary.totalCostBasis;
   const absoluteGainLoss = calculateAbsoluteHoldingGainLoss(
@@ -338,6 +332,13 @@ const calculateTotalRelativeGainLoss = (
 
   return totalAbsoluteGainLoss / totalCostBasis;
 };
+
+const constructLastUpdated = (
+  obj: { date: Date; price: number } | undefined,
+) =>
+  obj != null
+    ? `Last updated on ${formatNormalizedDate(obj.date, "en-GB")}`
+    : undefined;
 
 export { buildPortfolioHoldingColumnSchema };
 export type { PortfolioHoldingColumnKey };

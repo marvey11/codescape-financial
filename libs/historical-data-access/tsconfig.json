@@ -7,6 +7,9 @@
       "path": "../portfolio-data-models"
     },
     {
+      "path": "../core"
+    },
+    {
       "path": "./tsconfig.lib.json"
     },
     {

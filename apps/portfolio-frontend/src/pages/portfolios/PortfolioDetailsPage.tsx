@@ -1,6 +1,6 @@
 import { DataTable } from "@codescape-financial/core-ui";
 import {
-  AllLatestQuotesResponseDTO,
+  AllLatestQuotesTransformedDTO,
   PortfolioHoldingEmbeddedDTO,
   PortfolioResponseDTO,
 } from "@codescape-financial/portfolio-data-models";
@@ -63,17 +63,19 @@ const PortfolioHoldingsTable = ({
 }: {
   data: PortfolioHoldingEmbeddedDTO[];
 }) => {
-  const [latestPrices, setLatestPrices] = useState<AllLatestQuotesResponseDTO>(
-    {},
-  );
+  const [latestPrices, setLatestPrices] =
+    useState<AllLatestQuotesTransformedDTO>({});
 
   useEffect(() => {
     const isins = data.map((holding) => holding.stock.isin);
     if (isins.length > 0) {
       axiosInstance
-        .post<AllLatestQuotesResponseDTO>("/historical-quotes/latest-batch", {
-          isins,
-        })
+        .post<AllLatestQuotesTransformedDTO>(
+          "/historical-quotes/latest-batch",
+          {
+            isins,
+          },
+        )
         .then((response) => {
           setLatestPrices(response.data);
         })
