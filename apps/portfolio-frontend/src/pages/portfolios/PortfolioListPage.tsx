@@ -18,9 +18,10 @@ export const PortfolioListPage = () => {
     sendRequest({ url: "/portfolios", method: "get" });
   }, [sendRequest]);
 
-  const sortedPortfolios = useMemo(() => {
-    return data ? sortDataArray(data, "name") : undefined;
-  }, [data]);
+  const sortedPortfolios = useMemo(
+    () => (data ? sortDataArray(data, "name") : undefined),
+    [data],
+  );
 
   return (
     <DataPageContainer isLoading={loading} error={error}>
