@@ -1,3 +1,4 @@
+import { sortDataArray } from "@codescape-financial/core";
 import { Button, DataTable } from "@codescape-financial/core-ui";
 import { CountryResponseDTO } from "@codescape-financial/portfolio-data-models";
 import { useEffect, useMemo } from "react";
@@ -14,16 +15,10 @@ export const CountryListPage = () => {
     sendRequest({ url: "/countries", method: "get" });
   }, [sendRequest]);
 
-  const sortedCountries = useMemo(() => {
-    if (!data) {
-      return undefined;
-    }
-    const countryArray = [...data];
-    countryArray.sort((a, b) =>
-      a.name.toLowerCase().localeCompare(b.name.toLowerCase()),
-    );
-    return countryArray;
-  }, [data]);
+  const sortedCountries = useMemo(
+    () => (data ? sortDataArray(data, "name") : undefined),
+    [data],
+  );
 
   return (
     <DataPageContainer isLoading={loading} error={error}>

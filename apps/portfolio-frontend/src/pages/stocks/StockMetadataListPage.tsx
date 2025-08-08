@@ -1,3 +1,4 @@
+import { sortDataArray } from "@codescape-financial/core";
 import { Button, DataTable } from "@codescape-financial/core-ui";
 import { StockResponseDTO } from "@codescape-financial/portfolio-data-models";
 import { useEffect, useMemo } from "react";
@@ -14,16 +15,10 @@ export const StockMetadataListPage = () => {
     sendRequest({ url: "/stock-metadata", method: "get" });
   }, [sendRequest]);
 
-  const sortedStocks = useMemo(() => {
-    if (!data) {
-      return undefined;
-    }
-    const stockArray = [...data];
-    stockArray.sort((a, b) =>
-      a.name.toLowerCase().localeCompare(b.name.toLowerCase()),
-    );
-    return stockArray;
-  }, [data]);
+  const sortedStocks = useMemo(
+    () => (data ? sortDataArray(data, "name") : undefined),
+    [data],
+  );
 
   return (
     <DataPageContainer isLoading={loading} error={error}>

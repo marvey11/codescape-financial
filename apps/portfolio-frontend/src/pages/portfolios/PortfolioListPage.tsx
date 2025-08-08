@@ -1,3 +1,4 @@
+import { sortDataArray } from "@codescape-financial/core";
 import { Button, DataTable } from "@codescape-financial/core-ui";
 import { PortfolioResponseDTO } from "@codescape-financial/portfolio-data-models";
 import { useEffect, useMemo } from "react";
@@ -18,14 +19,7 @@ export const PortfolioListPage = () => {
   }, [sendRequest]);
 
   const sortedPortfolios = useMemo(() => {
-    if (!data) {
-      return undefined;
-    }
-    const portfolioArray = [...data];
-    portfolioArray.sort((a, b) =>
-      a.name.toLowerCase().localeCompare(b.name.toLowerCase()),
-    );
-    return portfolioArray;
+    return data ? sortDataArray(data, "name") : undefined;
   }, [data]);
 
   return (
