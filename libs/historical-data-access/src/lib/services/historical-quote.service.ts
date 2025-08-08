@@ -1,3 +1,4 @@
+import { formatNormalizedDate } from "@codescape-financial/core";
 import {
   AllLatestQuotesResponseDTO,
   LatestQuoteResponseDTO,
@@ -88,7 +89,7 @@ export class HistoricalQuoteService {
     return quote != null
       ? {
           isin: quote.stock.isin,
-          date: new Date(quote.date),
+          date: formatNormalizedDate(new Date(quote.date)),
           price: Number(quote.close),
         }
       : null;
