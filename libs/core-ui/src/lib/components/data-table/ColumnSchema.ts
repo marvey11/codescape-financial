@@ -22,6 +22,7 @@ export interface ColumnSchema<T> {
   cellProps?: TdHTMLAttributes<HTMLTableDataCellElement>;
 
   footer?: ReactNode | ((data: T[]) => CompositeCellNode | ReactNode);
+  footerCellTitle?: (data: T[]) => string | undefined;
   footerClassNames?: string | ((data: T[], cellValue: CellValue) => string);
   /** Optional HTML attributes for the footer `<td>` element, e.g., for `colSpan`. */
   footerCellProps?: TdHTMLAttributes<HTMLTableDataCellElement>;

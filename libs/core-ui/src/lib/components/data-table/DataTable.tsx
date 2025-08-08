@@ -1,6 +1,7 @@
-import React, { ReactNode } from "react";
-import { cn, isCompositeCellNode } from "../../utility";
-import { CellValue, ColumnSchema, CompositeCellNode } from "./ColumnSchema";
+import React from "react";
+import { cn } from "../../utility";
+import { ColumnSchema } from "./ColumnSchema";
+import { processColumnContent } from "./data-table-utils";
 
 export interface DataTableProps<T> {
   columns: ColumnSchema<T>[];
@@ -16,8 +17,8 @@ export const DataTable = <T,>({
   const hasFooter = columns.some((col) => col.footer);
 
   return (
-    <table className="w-full table-auto text-left">
-      <thead className="bg-gray-50 text-sm uppercase text-gray-700">
+    <table className="w-full table-auto overflow-hidden rounded-md text-left shadow-md">
+      <thead className="bg-gray-100 text-sm uppercase text-gray-700">
         <tr>
           {columns.map((col) => {
             const { className, ...rest } = col.headerCellProps ?? {};
@@ -26,7 +27,11 @@ export const DataTable = <T,>({
                 key={col.id}
                 scope="col"
                 {...rest}
-                className={cn("px-6 py-3", col.headerClassNames, className)}
+                className={cn(
+                  "px-6 py-3 font-semibold",
+                  col.headerClassNames,
+                  className,
+                )}
               >
                 {col.header}
               </th>
@@ -36,108 +41,47 @@ export const DataTable = <T,>({
       </thead>
 
       <tbody>
-        {data.map((item) => (
-          <tr
-            key={keyExtractor(item)}
-            className="border-b bg-white hover:bg-gray-100"
-          >
-            {columns.map((col) => {
-              const { cellValue, display: cellDisplayValue } =
-                processColumnContent(col.value, item);
-
-              const { className: cellPropClassName, ...rest } =
-                col.cellProps ?? {};
-
-              const dynamicCellClassNames =
-                typeof col.cellClassNames === "function"
-                  ? col.cellClassNames(item, cellValue)
-                  : col.cellClassNames;
-
-              const cellTitle =
-                col.cellTitle != null ? col.cellTitle(item) : undefined;
-
-              return (
-                <td
-                  key={col.id}
-                  title={cellTitle}
-                  {...rest}
-                  className={cn(
-                    "px-6 py-4",
-                    dynamicCellClassNames,
-                    cellPropClassName,
-                  )}
-                >
-                  {cellDisplayValue}
-                </td>
-              );
-            })}
+        {data.length === 0 ? (
+          <tr>
+            <td
+              colSpan={columns.length}
+              className="px-6 py-4 text-center text-gray-500"
+            >
+              No data available.
+            </td>
           </tr>
-        ))}
+        ) : (
+          data.map((item) => (
+            <tr
+              key={keyExtractor(item)}
+              className="border-b bg-white transition-colors duration-150 ease-in-out hover:bg-gray-50"
+            >
+              {columns.map((col) => (
+                <DataTableBodyCell key={col.id} column={col} item={item} />
+              ))}
+            </tr>
+          ))
+        )}
       </tbody>
 
       {hasFooter && (
-        <tfoot className="bg-gray-50 text-sm font-bold text-gray-700">
+        <tfoot className="border-t border-gray-200 bg-gray-100 text-sm font-bold text-gray-700">
           <tr>
             {(() => {
-              // Check if any column specifies a colSpan. If so, we render that single cell
-              // to span the entire table width. This is useful for summary rows.
               const footerWithColspan = columns.find(
                 (c) => c.footerCellProps?.colSpan,
               );
 
               if (footerWithColspan) {
-                const { className: footerPropClassName, ...rest } =
-                  footerWithColspan.footerCellProps ?? {};
-
-                const { cellValue, display: cellDisplayValue } =
-                  processColumnContent(footerWithColspan.footer, data);
-
-                const dynamicFooterClassNames =
-                  typeof footerWithColspan.footerClassNames === "function"
-                    ? footerWithColspan.footerClassNames(data, cellValue)
-                    : footerWithColspan.footerClassNames;
-
                 return (
-                  <td
-                    key={footerWithColspan.id}
-                    {...rest}
-                    className={cn(
-                      "px-6 py-3",
-                      dynamicFooterClassNames,
-                      footerPropClassName,
-                    )}
-                  >
-                    {cellDisplayValue}
-                  </td>
+                  <DataTableFooterCell column={footerWithColspan} data={data} />
                 );
               }
 
-              // Default behavior: render a footer cell for each column.
-              return columns.map((col) => {
-                const { className: footerPropClassName, ...rest } =
-                  col.footerCellProps ?? {};
-
-                const { cellValue, display: cellDisplayValue } =
-                  processColumnContent(col.footer, data);
-
-                const dynamicFooterClassNames =
-                  typeof col.footerClassNames === "function"
-                    ? col.footerClassNames(data, cellValue)
-                    : col.footerClassNames;
-                return (
-                  <td
-                    key={col.id}
-                    {...rest}
-                    className={cn(
-                      "px-6 py-3",
-                      dynamicFooterClassNames,
-                      footerPropClassName,
-                    )}
-                  >
-                    {cellDisplayValue}
-                  </td>
-                );
-              });
+              return columns.map((col) => (
+                // Render a footer cell for each column, even if it's empty
+                <DataTableFooterCell key={col.id} column={col} data={data} />
+              ));
             })()}
           </tr>
         </tfoot>
@@ -146,32 +90,99 @@ export const DataTable = <T,>({
   );
 };
 
-/**
- * Helper function to process the column content.
- *
- * `U` can represent `T` or `T[]`
- */
-const processColumnContent = <U extends T | T[], T>(
-  contentFnOrNode: ReactNode | ((arg: U) => ReactNode | CompositeCellNode),
-  argForContentFn: U,
-): CompositeCellNode => {
-  let cellValue: CellValue = undefined;
-  let display: ReactNode;
+interface DataTableBodyCellProps<T> {
+  column: ColumnSchema<T>;
+  item: T;
+}
 
-  if (typeof contentFnOrNode === "function") {
-    const result = contentFnOrNode(argForContentFn);
-    if (isCompositeCellNode(result)) {
-      // (arg: U) => CompositeCellNode
-      cellValue = result.cellValue;
-      display = result.display;
-    } else {
-      // (arg: U) => ReactNode
-      display = result;
+const DataTableBodyCell = React.memo(
+  <T,>({ column, item }: DataTableBodyCellProps<T>) => {
+    const baseClassName = "px-6 py-4";
+
+    // Only process if column.value is defined, though ColumnSchema makes it required
+    if (!column.value) {
+      console.warn(
+        `Column with ID ${column.id} has no 'value' function defined.`,
+      );
+      return <td className={baseClassName}></td>;
     }
-  } else {
-    // ReactNode
-    display = contentFnOrNode;
-  }
 
-  return { cellValue, display } satisfies CompositeCellNode;
-};
+    const { cellValue, display: cellDisplayValue } = processColumnContent(
+      column.value,
+      item,
+    );
+
+    const { className: cellPropClassName, ...rest } = column.cellProps ?? {};
+
+    const dynamicCellClassNames =
+      typeof column.cellClassNames === "function"
+        ? column.cellClassNames(item, cellValue)
+        : column.cellClassNames;
+
+    const cellTitle =
+      column.cellTitle != null && typeof column.cellTitle === "function"
+        ? column.cellTitle(item)
+        : undefined;
+
+    return (
+      <td
+        key={column.id}
+        title={cellTitle}
+        {...rest}
+        className={cn(baseClassName, dynamicCellClassNames, cellPropClassName)}
+      >
+        {cellDisplayValue}
+      </td>
+    );
+  },
+) as <T>(props: DataTableBodyCellProps<T>) => React.JSX.Element;
+
+interface DataTableFooterCellProps<T> {
+  column: ColumnSchema<T>;
+  data: T[];
+}
+
+const DataTableFooterCell = React.memo(
+  <T,>({ column, data }: DataTableFooterCellProps<T>) => {
+    const baseClassNames = "px-6 py-3";
+
+    // If no footer content is specified for this column, render an empty cell
+    // This helps maintain column alignment in footers where not every column has a sum/aggregate
+    if (!column.footer) {
+      return <td key={column.id} className={baseClassNames}></td>;
+    }
+
+    const { cellValue, display: cellDisplayValue } = processColumnContent(
+      column.footer,
+      data,
+    );
+
+    const { className: footerPropClassName, ...rest } =
+      column.footerCellProps ?? {};
+
+    const dynamicFooterClassNames =
+      typeof column.footerClassNames === "function"
+        ? column.footerClassNames(data, cellValue)
+        : column.footerClassNames;
+
+    const footerCellTitle =
+      column.footerCellTitle != null &&
+      typeof column.footerCellTitle === "function"
+        ? column.footerCellTitle(data)
+        : undefined;
+
+    return (
+      <td
+        title={footerCellTitle}
+        {...rest}
+        className={cn(
+          baseClassNames,
+          dynamicFooterClassNames,
+          footerPropClassName,
+        )}
+      >
+        {cellDisplayValue}
+      </td>
+    ) as React.JSX.Element;
+  },
+) as <T>(props: DataTableFooterCellProps<T>) => React.JSX.Element;

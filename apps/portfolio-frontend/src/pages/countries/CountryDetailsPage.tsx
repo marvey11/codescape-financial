@@ -1,4 +1,4 @@
-import { formatPercent } from "@codescape-financial/core";
+import { formatPercent, sortDataArray } from "@codescape-financial/core";
 import { DataTable, Tag } from "@codescape-financial/core-ui";
 import {
   CountryResponseDTO,
@@ -36,6 +36,11 @@ export const CountryDetailsPage = () => {
       });
   }, [country, sendStocksForCountryRequest]);
 
+  const sortedStocks = useMemo(
+    () => (countryStocks ? sortDataArray(countryStocks, "name") : undefined),
+    [countryStocks],
+  );
+
   const handleDelete = () => {
     country &&
       sendRequest({
@@ -58,16 +63,12 @@ export const CountryDetailsPage = () => {
             <CountryTags country={country} />
           </DetailsPageHeader>
 
-          {countryStocks?.length ? (
-            <>
-              <h2 className="text-2xl font-extrabold">Stock List</h2>
-              <div className="overflow-x-auto rounded-md border border-gray-300 shadow-sm">
-                <CountryStockTable data={countryStocks} />
-              </div>
-            </>
-          ) : (
-            <span>No stocks found for this country.</span>
-          )}
+          <>
+            <h2 className="text-2xl font-extrabold">Stock List</h2>
+            <div className="overflow-x-auto rounded-md border border-gray-300 shadow-sm">
+              <CountryStockTable data={sortedStocks ?? []} />
+            </div>
+          </>
         </div>
       )}
     </DataPageContainer>
