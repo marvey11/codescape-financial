@@ -1,1 +1,1 @@
-export { DataIngestionService } from "./data-ingestion.service";
+export { QuoteDataIngestionService } from "./quote-data-ingestion.service";

@@ -6,9 +6,9 @@ import {
 import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import * as path from "path";
-import { CsvParserService } from "../csv-parser/index";
-import { CsvProcessingService } from "../csv-processing/index";
-import { DataIngestionService } from "../data-ingestion/index";
+import { CsvQuoteParserService } from "../csv-parser/index";
+import { CsvQuoteProcessingService } from "../csv-processing/index";
+import { QuoteDataIngestionService } from "../data-ingestion/index";
 
 @Module({
   imports: [
@@ -42,6 +42,10 @@ import { DataIngestionService } from "../data-ingestion/index";
     // ... other modules
   ],
   controllers: [],
-  providers: [CsvProcessingService, CsvParserService, DataIngestionService],
+  providers: [
+    CsvQuoteProcessingService,
+    CsvQuoteParserService,
+    QuoteDataIngestionService,
+  ],
 })
 export class AppModule {}

@@ -1,1 +1,1 @@
-export { CsvParserService } from "./csv-parser.service";
+export { CsvQuoteParserService } from "./csv-quote-parser.service";

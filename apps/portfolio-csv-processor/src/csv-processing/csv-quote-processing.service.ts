@@ -1,14 +1,14 @@
 import { Injectable, Logger } from "@nestjs/common";
-import { CsvParserService } from "../csv-parser/index.js";
-import { DataIngestionService } from "../data-ingestion/index.js";
+import { CsvQuoteParserService } from "../csv-parser/index.js";
+import { QuoteDataIngestionService } from "../data-ingestion/index.js";
 
 @Injectable()
-export class CsvProcessingService {
-  private readonly logger = new Logger(CsvProcessingService.name);
+export class CsvQuoteProcessingService {
+  private readonly logger = new Logger(CsvQuoteProcessingService.name);
 
   constructor(
-    private readonly csvParserService: CsvParserService,
-    private readonly dataIngestionService: DataIngestionService
+    private readonly csvParserService: CsvQuoteParserService,
+    private readonly dataIngestionService: QuoteDataIngestionService,
   ) {}
 
   async processFile(filePath: string): Promise<void> {
@@ -17,12 +17,12 @@ export class CsvProcessingService {
       const historicalQuotes = await this.csvParserService.parseCsv(filePath);
       await this.dataIngestionService.ingestHistoricalQuotes(historicalQuotes);
       this.logger.log(
-        `Successfully processed and ingested data from ${filePath}`
+        `Successfully processed and ingested data from ${filePath}`,
       );
     } catch (error) {
       if (error instanceof Error) {
         this.logger.error(
-          `Error processing file ${filePath}: ${error.message}`
+          `Error processing file ${filePath}: ${error.message}`,
         );
       } else {
         this.logger.error(`Error processing file ${filePath}: ${error}`);

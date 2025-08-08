@@ -19,8 +19,8 @@ import { RawQuoteDataRow } from "./parser-types.js";
 import { transformRawCsvToPartialHistoricalQuote } from "./parser-utils.js";
 
 @Injectable()
-export class CsvParserService {
-  private readonly logger = new Logger(CsvParserService.name);
+export class CsvQuoteParserService {
+  private readonly logger = new Logger(CsvQuoteParserService.name);
 
   constructor(
     @InjectRepository(StockMetadata)
