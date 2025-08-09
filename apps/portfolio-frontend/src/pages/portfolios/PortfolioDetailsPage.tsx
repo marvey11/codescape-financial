@@ -1,3 +1,4 @@
+import { sortDataArray } from "@codescape-financial/core";
 import { DataTable } from "@codescape-financial/core-ui";
 import {
   AllLatestQuotesTransformedDTO,
@@ -22,6 +23,14 @@ export const PortfolioDetailsPage = () => {
     sendRequest,
   } = useOutletContextData<PortfolioResponseDTO>();
 
+  const sortedHoldings = useMemo(
+    () =>
+      portfolio?.holdings
+        ? sortDataArray(portfolio.holdings, (item) => item.stock.name)
+        : undefined,
+    [portfolio?.holdings],
+  );
+
   const handleDelete = () => {
     portfolio &&
       sendRequest({
@@ -42,11 +51,11 @@ export const PortfolioDetailsPage = () => {
             onDelete={handleDelete}
           />
 
-          {portfolio.holdings.length > 0 ? (
+          {sortedHoldings && sortedHoldings.length > 0 ? (
             <>
               <h2 className="text-2xl font-extrabold">Holdings</h2>
               <div className="overflow-x-auto rounded-md border border-gray-300 shadow-sm">
-                <PortfolioHoldingsTable data={portfolio.holdings} />
+                <PortfolioHoldingsTable data={sortedHoldings} />
               </div>
             </>
           ) : (
