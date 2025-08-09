@@ -1,6 +1,6 @@
 import { NestFactory } from "@nestjs/core";
 import { AppModule } from "./app/app.module";
-import { PortfolioIngestionService } from "./ingest/portfolio-ingestion.service";
+import { PortfolioIngestionService } from "./ingest";
 
 async function bootstrap() {
   // Use `createApplicationContext` for a standalone script that doesn't need to listen for connections.

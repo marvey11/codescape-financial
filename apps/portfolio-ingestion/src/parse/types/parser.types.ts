@@ -1,12 +1,3 @@
-export interface RawQuoteDataRow {
-  date: string;
-  open: string;
-  low: string;
-  high: string;
-  close: string;
-  volume: string;
-}
-
 export interface RawTransactionDataRow {
   processingDate: string;
   executionDate: string;
