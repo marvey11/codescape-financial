@@ -1,3 +1,4 @@
+import { FLOATING_POINT_TOLERANCE } from "@codescape-financial/core";
 import {
   CreatePortfolioDTO,
   PortfolioResponseDTO,
@@ -16,16 +17,32 @@ export class PortfolioService {
   ) {}
 
   async findAll(): Promise<PortfolioResponseDTO[]> {
-    return this.portfolioRepository
-      .find({ relations: ["holdings", "holdings.stockMetadata"] })
-      .then((portfolios) => portfolios.map(this.mapEntityToDto));
+    const portfolios = await this.portfolioRepository
+      .createQueryBuilder("portfolio")
+      .leftJoinAndSelect(
+        "portfolio.holdings",
+        "holding",
+        "holding.shares > :minShares",
+        { minShares: FLOATING_POINT_TOLERANCE },
+      )
+      .leftJoinAndSelect("holding.stockMetadata", "stockMetadata")
+      .getMany();
+
+    return portfolios.map(this.mapEntityToDto);
   }
 
   async findOne(portfolioId: string): Promise<PortfolioResponseDTO> {
-    const portfolio = await this.portfolioRepository.findOne({
-      where: { id: portfolioId },
-      relations: ["holdings", "holdings.stockMetadata"],
-    });
+    const portfolio = await this.portfolioRepository
+      .createQueryBuilder("portfolio")
+      .leftJoinAndSelect(
+        "portfolio.holdings",
+        "holding",
+        "holding.shares > :minShares",
+        { minShares: FLOATING_POINT_TOLERANCE },
+      )
+      .leftJoinAndSelect("holding.stockMetadata", "stockMetadata")
+      .where("portfolio.id = :portfolioId", { portfolioId })
+      .getOne();
 
     if (!portfolio) {
       throw new NotFoundException(
