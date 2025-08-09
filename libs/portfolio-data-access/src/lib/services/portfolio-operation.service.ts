@@ -19,7 +19,8 @@ import {
   PortfolioHolding,
   PortfolioOperation,
 } from "../entities/index";
-import { PortfolioService } from "./portfolio.service";
+import { PortfolioService } from "./portfolio.service"; // Keep this
+import { TaxCalculationService } from "./tax-calculation.service";
 
 @Injectable()
 export class PortfolioOperationService {
@@ -27,6 +28,7 @@ export class PortfolioOperationService {
     @InjectRepository(PortfolioOperation)
     private readonly operationRepository: Repository<PortfolioOperation>,
     private readonly portfolioService: PortfolioService,
+    private readonly taxCalculationService: TaxCalculationService,
     private readonly dataSource: DataSource,
   ) {}
 
@@ -90,9 +92,12 @@ export class PortfolioOperationService {
         ...operationData,
       });
 
-      await manager.save(operation);
-
+      // Calculate effects of the sale, including FIFO cost basis and taxes,
+      // and apply them to the holding and the operation entity itself.
       await this.applySellOperation(holding, operation, manager);
+
+      // Now save the operation, which includes the calculated taxes.
+      await manager.save(operation);
       await manager.save(holding);
 
       await this.portfolioService.updatePortfolioAggregates(
@@ -121,9 +126,12 @@ export class PortfolioOperationService {
         holdingId: holding.id,
         ...operationData,
       });
-      await manager.save(operation);
 
-      this.applyDividendOperation(holding, operation);
+      // Calculate dividend taxes and apply effects to the holding and operation.
+      await this.applyDividendOperation(holding, operation);
+
+      // Now save the operation, which includes the calculated taxes.
+      await manager.save(operation);
       await manager.save(holding);
 
       await this.portfolioService.updatePortfolioAggregates(
@@ -145,6 +153,22 @@ export class PortfolioOperationService {
         stockId,
         manager,
       );
+
+      // --- Idempotency Check ---
+      // Check if a split operation for this holding on this exact date already exists.
+      const existingOperation = await manager.findOne(PortfolioOperation, {
+        where: {
+          holdingId: holding.id,
+          type: OperationType.STOCK_SPLIT,
+          date: new Date(date),
+        },
+      });
+
+      if (existingOperation) {
+        // The operation already exists, so we can just return it without doing anything.
+        // This makes the operation safe to call multiple times with the same data.
+        return existingOperation;
+      }
 
       const operation = manager.create(PortfolioOperation, {
         type: OperationType.STOCK_SPLIT,
@@ -203,12 +227,7 @@ export class PortfolioOperationService {
     operation: PortfolioOperation,
     manager: EntityManager,
   ): Promise<void> {
-    const {
-      numberOfShares,
-      pricePerShare,
-      fees: sellFees = 0,
-      taxes = 0,
-    } = operation;
+    const { numberOfShares, pricePerShare, fees: sellFees = 0 } = operation;
 
     if (numberOfShares == null || pricePerShare == null) {
       // should not happen due to validation in the controller
@@ -259,11 +278,22 @@ export class PortfolioOperationService {
     // Total proceeds are the sale value minus the fees for this sale.
     const saleProceeds = numberOfShares * pricePerShare - sellFees;
 
-    // The net realized gain is the proceeds minus the adjusted cost basis of the shares sold.
+    // The net realized gain for this specific sale.
+    const realizedGainForThisSale = saleProceeds - costBasisOfSoldShares;
+
+    // Calculate taxes on the gain.
+    const taxesForThisSale =
+      this.taxCalculationService.calculateCapitalGainsTax(
+        realizedGainForThisSale,
+      );
+
+    // Update the operation with the calculated tax.
+    operation.taxes = taxesForThisSale;
+
     holding.realizedGains =
-      Number(holding.realizedGains) + (saleProceeds - costBasisOfSoldShares);
+      Number(holding.realizedGains) + realizedGainForThisSale;
     holding.fees = Number(holding.fees) + sellFees;
-    holding.salesTaxes = Number(holding.salesTaxes) + taxes;
+    holding.salesTaxes = Number(holding.salesTaxes) + taxesForThisSale;
 
     await buyTxRepo.save(transactionsToUpdate);
     await buyTxRepo.remove(transactionsToDelete);
@@ -279,12 +309,7 @@ export class PortfolioOperationService {
     holding: PortfolioHolding,
     operation: PortfolioOperation,
   ): Promise<void> {
-    const {
-      dividendPerShare,
-      applicableShares,
-      exchangeRate = 1,
-      taxes = 0,
-    } = operation;
+    const { dividendPerShare, applicableShares, exchangeRate = 1 } = operation;
 
     if (dividendPerShare == null || applicableShares == null) {
       // should not happen due to validation in the controller
@@ -293,9 +318,24 @@ export class PortfolioOperationService {
       );
     }
 
-    holding.dividends =
-      Number(holding.dividends) +
+    if (!holding.stockMetadata.country) {
+      throw new Error(
+        `Country data for stock ${holding.stockMetadata.isin} is not loaded. Cannot calculate dividend tax.`,
+      );
+    }
+
+    const grossDividendInEur =
       (dividendPerShare * applicableShares) / exchangeRate;
+
+    const taxes = this.taxCalculationService.calculateDividendTaxes(
+      grossDividendInEur,
+      Number(holding.stockMetadata.country.withholdingTaxRate),
+    );
+
+    // Update the operation with the calculated tax before it's saved.
+    operation.taxes = taxes;
+
+    holding.dividends = Number(holding.dividends) + grossDividendInEur;
     holding.totalDividendTaxes = Number(holding.totalDividendTaxes) + taxes;
   }
 
@@ -342,6 +382,7 @@ export class PortfolioOperationService {
 
     const stock = await stockRepo.findOne({
       where: { id: stockId },
+      relations: ["country"],
     });
 
     if (!stock) {
@@ -352,7 +393,7 @@ export class PortfolioOperationService {
 
     let holding = await holdingRepo.findOne({
       where: { stockId, portfolioId },
-      relations: ["buyTransactions"], // Eager loading on entity handles this, but explicit is fine
+      relations: ["buyTransactions", "stockMetadata", "stockMetadata.country"],
     });
 
     if (!holding) {

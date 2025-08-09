@@ -15,9 +15,9 @@ async function bootstrap() {
   const configService = app.get(ConfigService);
 
   // Use ConfigService to get validated and expanded paths
-  const quotesDir = configService.getCSVQuotesDir();
-  const processedDir = configService.getCSVQuotesProcessedDir();
-  const errorDir = configService.getCSVQuoteErrorsDir();
+  const quotesDir = configService.getQuotesDataDir();
+  const processedDir = configService.getQuotesProcessedDir();
+  const errorDir = configService.getQuotesErrorsDir();
 
   // Ensure destination directories exist
   // This is the crucial fix: ensure the directory to be watched exists.

@@ -50,27 +50,35 @@ export class ConfigService {
     return this.get("DATABASE_PASSWORD");
   }
 
-  getCSVQuotesDir(): ApplicationConfigData["CSV_QUOTES_DIR"] {
-    return this.get("CSV_QUOTES_DIR");
+  getQuotesDataDir(): ApplicationConfigData["QUOTES_DATA_DIR"] {
+    return this.get("QUOTES_DATA_DIR");
   }
 
-  getCSVQuotesProcessedDir(): ApplicationConfigData["CSV_QUOTES_PROCESSED_DIR"] {
-    return this.get("CSV_QUOTES_PROCESSED_DIR");
+  getQuotesProcessedDir(): ApplicationConfigData["QUOTES_PROCESSED_DIR"] {
+    return this.get("QUOTES_PROCESSED_DIR");
   }
 
-  getCSVQuoteErrorsDir(): ApplicationConfigData["CSV_QUOTE_ERRORS_DIR"] {
-    return this.get("CSV_QUOTE_ERRORS_DIR");
+  getQuotesErrorsDir(): ApplicationConfigData["QUOTES_ERRORS_DIR"] {
+    return this.get("QUOTES_ERRORS_DIR");
   }
 
-  getCSVTransactionsDir(): ApplicationConfigData["CSV_TRANSACTIONS_DIR"] {
-    return this.get("CSV_TRANSACTIONS_DIR");
+  getDefaultPortfolioId(): ApplicationConfigData["DEFAULT_PORTFOLIO_ID"] {
+    return this.get("DEFAULT_PORTFOLIO_ID");
   }
 
-  getCSVTransactionsProcessedDir(): ApplicationConfigData["CSV_TRANSACTIONS_PROCESSED_DIR"] {
-    return this.get("CSV_TRANSACTIONS_PROCESSED_DIR");
+  getPortfolioDataDir(): ApplicationConfigData["PORTFOLIO_DATA_DIR"] {
+    return this.get("PORTFOLIO_DATA_DIR");
   }
 
-  getCSVTransactionErrorsDir(): ApplicationConfigData["CSV_TRANSACTION_ERRORS_DIR"] {
-    return this.get("CSV_TRANSACTION_ERRORS_DIR");
+  getTransactionsInputDir(): ApplicationConfigData["CSV_TRANSACTIONS_INPUT_DIR"] {
+    return this.get("CSV_TRANSACTIONS_INPUT_DIR");
+  }
+
+  getDividendsInputFile(): ApplicationConfigData["JSON_DIVIDENDS_INPUT_FILE"] {
+    return this.get("JSON_DIVIDENDS_INPUT_FILE");
+  }
+
+  getStockSplitsInputFile(): ApplicationConfigData["JSON_STOCK_SPLITS_INPUT_FILE"] {
+    return this.get("JSON_STOCK_SPLITS_INPUT_FILE");
   }
 }

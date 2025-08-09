@@ -4,3 +4,4 @@ export * from "./dateutils.js";
 export * from "./formatters.js";
 export * from "./math-utils.js";
 export * from "./numberutils.js";
+export * from "./SortedList.js";

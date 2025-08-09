@@ -6,7 +6,11 @@ import {
   PortfolioHolding,
   PortfolioOperation,
 } from "./entities/index";
-import { PortfolioOperationService, PortfolioService } from "./services/index";
+import {
+  PortfolioOperationService,
+  PortfolioService,
+  TaxCalculationService,
+} from "./services/index";
 
 @Module({
   imports: [
@@ -17,7 +21,16 @@ import { PortfolioOperationService, PortfolioService } from "./services/index";
       PortfolioOperation,
     ]),
   ],
-  providers: [PortfolioOperationService, PortfolioService],
-  exports: [PortfolioOperationService, PortfolioService, TypeOrmModule],
+  providers: [
+    PortfolioOperationService,
+    PortfolioService,
+    TaxCalculationService,
+  ],
+  exports: [
+    PortfolioOperationService,
+    PortfolioService,
+    TaxCalculationService,
+    TypeOrmModule,
+  ],
 })
 export class PortfolioDataAccessModule {}

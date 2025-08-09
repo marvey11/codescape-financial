@@ -1,0 +1,56 @@
+{
+  "name": "@codescape-financial/portfolio-ingestion",
+  "version": "0.0.1",
+  "private": true,
+  "dependencies": {
+    "@codescape-financial/core": "*",
+    "@codescape-financial/portfolio-config": "*",
+    "@codescape-financial/historical-data-access": "*",
+    "csv-parser": "^3.2.0"
+  },
+  "nx": {
+    "targets": {
+      "build": {
+        "executor": "nx:run-commands",
+        "options": {
+          "command": "webpack-cli build",
+          "args": [
+            "--node-env=production"
+          ]
+        },
+        "configurations": {
+          "development": {
+            "args": [
+              "--node-env=development"
+            ]
+          }
+        }
+      },
+      "serve": {
+        "continuous": true,
+        "executor": "@nx/js:node",
+        "defaultConfiguration": "development",
+        "dependsOn": [
+          "build"
+        ],
+        "options": {
+          "buildTarget": "@codescape-financial/portfolio-ingestion:build",
+          "runBuildTargetDependencies": false
+        },
+        "configurations": {
+          "development": {
+            "buildTarget": "@codescape-financial/portfolio-ingestion:build:development"
+          },
+          "production": {
+            "buildTarget": "@codescape-financial/portfolio-ingestion:build:production"
+          }
+        }
+      },
+      "test": {
+        "options": {
+          "passWithNoTests": true
+        }
+      }
+    }
+  }
+}
