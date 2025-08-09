@@ -5,19 +5,19 @@ import * as chokidar from "chokidar";
 import * as fs from "fs/promises";
 import * as path from "path";
 import { AppModule } from "./app/app.module.js";
-import { CsvProcessingService } from "./csv-processing/csv-processing.service.js";
+import { CsvQuoteProcessingService } from "./csv-processing/csv-quote-processing.service.js";
 
 const logger = new Logger("Portfolio CSV Processor Worker");
 
 async function bootstrap() {
   const app = await NestFactory.createApplicationContext(AppModule);
-  const csvProcessingService = app.get(CsvProcessingService);
+  const csvProcessingService = app.get(CsvQuoteProcessingService);
   const configService = app.get(ConfigService);
 
   // Use ConfigService to get validated and expanded paths
-  const quotesDir = configService.getCSVQuotesDir();
-  const processedDir = configService.getCSVQuotesProcessedDir();
-  const errorDir = configService.getCSVQuoteErrorsDir();
+  const quotesDir = configService.getQuotesDataDir();
+  const processedDir = configService.getQuotesProcessedDir();
+  const errorDir = configService.getQuotesErrorsDir();
 
   // Ensure destination directories exist
   // This is the crucial fix: ensure the directory to be watched exists.
@@ -49,7 +49,7 @@ async function bootstrap() {
       logger.log(`Moved file ${filePath} to ${destPath}`);
     } catch (moveError) {
       logger.error(
-        `Failed to move file ${filePath} to ${destDir}: ${moveError}`
+        `Failed to move file ${filePath} to ${destDir}: ${moveError}`,
       );
     }
   };
@@ -57,7 +57,7 @@ async function bootstrap() {
   watcher
     .on("ready", () =>
       // This log confirms the watcher is active and watching the correct path.
-      logger.log(`Initial scan complete. Ready for new files in ${quotesDir}.`)
+      logger.log(`Initial scan complete. Ready for new files in ${quotesDir}.`),
     )
     .on("add", async (filePath) => {
       logger.log(`New CSV file detected: ${filePath}`);
@@ -69,7 +69,7 @@ async function bootstrap() {
         if (error instanceof Error) {
           logger.error(
             `Failed to process ${filePath}: ${error.message}`,
-            error.stack
+            error.stack,
           );
         } else {
           logger.error(`Failed to process ${filePath}: ${error}`);

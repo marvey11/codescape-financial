@@ -12,16 +12,18 @@ const ApplicationConfigSchema = z.object({
   DATABASE_USER: z.string().min(1).default("codescape"),
   DATABASE_PASSWORD: z.string().min(1),
 
-  // CSV Processor configuration
-  CSV_RAW_DATA_INPUT_DIR: z.string().min(1).default("./data/csv_uploads"),
+  BASE_DATA_DIR: z.string().min(1).default("./data"),
 
-  CSV_QUOTES_DIR: z.string().min(1),
-  CSV_QUOTES_PROCESSED_DIR: z.string().min(1),
-  CSV_QUOTE_ERRORS_DIR: z.string().min(1), // Renamed from SUBDIR for consistency
+  QUOTES_DATA_DIR: z.string().min(1).default("./data/quotes"),
+  QUOTES_PROCESSED_DIR: z.string().min(1),
+  QUOTES_ERRORS_DIR: z.string().min(1),
 
-  CSV_TRANSACTIONS_DIR: z.string().min(1),
-  CSV_TRANSACTIONS_PROCESSED_DIR: z.string().min(1),
-  CSV_TRANSACTION_ERRORS_DIR: z.string().min(1),
+  DEFAULT_PORTFOLIO_ID: z.uuid(),
+
+  PORTFOLIO_DATA_DIR: z.string().min(1).default("./data/portfolio"),
+  CSV_TRANSACTIONS_INPUT_DIR: z.string().min(1),
+  JSON_DIVIDENDS_INPUT_FILE: z.string().min(1),
+  JSON_STOCK_SPLITS_INPUT_FILE: z.string().min(1),
 });
 
 type ApplicationConfigData = z.infer<typeof ApplicationConfigSchema>;

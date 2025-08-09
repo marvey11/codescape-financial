@@ -12,6 +12,7 @@ import { ConfigService } from "./config.service";
         `${process.cwd()}/.env`, // Monorepo root .env
         `${process.cwd()}/apps/portfolio-api/.env`, // .env specific to REST API
         `${process.cwd()}/apps/portfolio-csv-processor/.env`, // .env specific to CSV processor
+        `${process.cwd()}/apps/portfolio-ingestion/.env`, // .env specific to portfolio ingestion
       ],
       isGlobal: true, // Makes ConfigModule available everywhere without re-importing
       validationSchema: ApplicationConfigSchema,

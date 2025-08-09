@@ -3,12 +3,16 @@ import {
   ConfigService,
   SharedConfigModule,
 } from "@codescape-financial/portfolio-config";
+import { PortfolioDataAccessModule } from "@codescape-financial/portfolio-data-access";
 import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
-import * as path from "path";
-import { CsvQuoteParserService } from "../csv-parser/index";
-import { CsvQuoteProcessingService } from "../csv-processing/index";
-import { QuoteDataIngestionService } from "../data-ingestion/index";
+import path from "path";
+import { PortfolioIngestionService } from "../ingest/portfolio-ingestion.service";
+import {
+  CsvTransactionParserService,
+  JsonDividendParserService,
+  JsonStockSplitParserService,
+} from "../parse";
 
 @Module({
   imports: [
@@ -38,14 +42,15 @@ import { QuoteDataIngestionService } from "../data-ingestion/index";
       }),
       inject: [ConfigService],
     }),
-    HistoricalDataAccessModule, // <--- Import your new data access module
-    // ... other modules
+    HistoricalDataAccessModule,
+    PortfolioDataAccessModule,
   ],
   controllers: [],
   providers: [
-    CsvQuoteProcessingService,
-    CsvQuoteParserService,
-    QuoteDataIngestionService,
+    CsvTransactionParserService,
+    JsonDividendParserService,
+    JsonStockSplitParserService,
+    PortfolioIngestionService,
   ],
 })
 export class AppModule {}

@@ -65,48 +65,30 @@ describe("ConfigService", () => {
     });
   });
 
-  describe("Test Suite for CSV processor configuration", () => {
-    it("should have the correct base directory for CSV files", () => {
-      expect(service.get("CSV_RAW_DATA_INPUT_DIR")).toBe(
-        "./test_data/csv_uploads"
+  describe("Test Suite for quotes data processor configuration", () => {
+    it("should have the correct base directory for data files", () => {
+      expect(service.getQuotesDataDir()).toBe("./test_data/quotes");
+    });
+
+    it("should have the correct directory for input/processed/error data files", () => {
+      expect(service.getQuotesProcessedDir()).toBe(
+        "./test_data/quotes/processed",
       );
+      expect(service.getQuotesErrorsDir()).toBe("./test_data/quotes/errors");
     });
+  });
 
-    it("should return the CSV quotes directory from config", () => {
-      // This test now also verifies the `expandVariables` functionality
-      expect(service.getCSVQuotesDir()).toBe("./test_data/csv_uploads/quotes");
-    });
-
-    it("should return the processed CSV quotes directory from config", () => {
-      // This test now also verifies the `expandVariables` functionality
-      expect(service.getCSVQuotesProcessedDir()).toBe(
-        // This now reads from the .env.test file
-        "./test_data/csv_uploads/quotes/processed"
+  describe("Test Suite for portfolio data processor configuration", () => {
+    it("should return the directories for specific types of data files", () => {
+      expect(service.getPortfolioDataDir()).toBe("./test_data/portfolio");
+      expect(service.getTransactionsInputDir()).toBe(
+        "./test_data/portfolio/transactions",
       );
-    });
-
-    it("should return the CSV quote errors directory from config", () => {
-      // This test now also verifies the `expandVariables` functionality
-      expect(service.getCSVQuoteErrorsDir()).toBe(
-        "./test_data/csv_uploads/quotes/errors"
+      expect(service.getStockSplitsInputFile()).toBe(
+        "./test_data/portfolio/stock-split-data.json",
       );
-    });
-
-    it("should return the CSV transactions directory from config", () => {
-      expect(service.getCSVTransactionsDir()).toBe(
-        "./test_data/csv_uploads/transactions"
-      );
-    });
-
-    it("should return the processed CSV transactions directory from config", () => {
-      expect(service.getCSVTransactionsProcessedDir()).toBe(
-        "./test_data/csv_uploads/transactions/processed"
-      );
-    });
-
-    it("should return the CSV transaction errors directory from config", () => {
-      expect(service.getCSVTransactionErrorsDir()).toBe(
-        "./test_data/csv_uploads/transactions/errors"
+      expect(service.getDividendsInputFile()).toBe(
+        "./test_data/portfolio/dividend-data.json",
       );
     });
   });

@@ -4,8 +4,8 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 
 @Injectable()
-export class DataIngestionService {
-  private readonly logger = new Logger(DataIngestionService.name);
+export class QuoteDataIngestionService {
+  private readonly logger = new Logger(QuoteDataIngestionService.name);
 
   constructor(
     @InjectRepository(HistoricalQuote)

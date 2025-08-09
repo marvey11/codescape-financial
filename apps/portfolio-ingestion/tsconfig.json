@@ -1,0 +1,28 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "files": [],
+  "include": [],
+  "references": [
+    {
+      "path": "../../libs/core"
+    },
+    {
+      "path": "../../libs/historical-data-access"
+    },
+    {
+      "path": "../../libs/portfolio-data-models"
+    },
+    {
+      "path": "../../libs/portfolio-data-access"
+    },
+    {
+      "path": "../../libs/portfolio-config"
+    },
+    {
+      "path": "./tsconfig.app.json"
+    },
+    {
+      "path": "./tsconfig.spec.json"
+    }
+  ]
+}

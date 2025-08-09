@@ -4,31 +4,34 @@
   "files": [],
   "references": [
     {
-      "path": "./apps/portfolio-frontend"
-    },
-    {
       "path": "./apps/portfolio-api"
     },
     {
-      "path": "./libs/historical-data-access"
+      "path": "./apps/portfolio-csv-processor"
     },
     {
-      "path": "./libs/core-ui"
+      "path": "./apps/portfolio-frontend"
+    },
+    {
+      "path": "./apps/portfolio-ingestion"
     },
     {
       "path": "./libs/core"
     },
     {
-      "path": "./libs/portfolio-data-models"
+      "path": "./libs/core-ui"
     },
     {
-      "path": "./apps/portfolio-csv-processor"
+      "path": "./libs/historical-data-access"
     },
     {
       "path": "./libs/portfolio-config"
     },
     {
       "path": "./libs/portfolio-data-access"
+    },
+    {
+      "path": "./libs/portfolio-data-models"
     }
   ]
 }
