@@ -1,7 +1,9 @@
 import { FLOATING_POINT_TOLERANCE } from "@codescape-financial/core";
+import { StockMetadata } from "@codescape-financial/historical-data-access";
 import {
   CreatePortfolioDTO,
   PortfolioResponseDTO,
+  StockEmbeddedDTO,
   UpdatePortfolioDTO,
 } from "@codescape-financial/portfolio-data-models";
 import { Injectable, NotFoundException } from "@nestjs/common";
@@ -28,7 +30,7 @@ export class PortfolioService {
       .leftJoinAndSelect("holding.stockMetadata", "stockMetadata")
       .getMany();
 
-    return portfolios.map(this.mapEntityToDto);
+    return portfolios.map((p) => this.mapEntityToDto(p));
   }
 
   async findOne(portfolioId: string): Promise<PortfolioResponseDTO> {
@@ -53,9 +55,35 @@ export class PortfolioService {
     return this.mapEntityToDto(portfolio);
   }
 
+  async getHistoricalPortfolioData(
+    portfolioId: string,
+  ): Promise<PortfolioResponseDTO> {
+    const portfolio = await this.portfolioRepository
+      .createQueryBuilder("portfolio")
+      .leftJoinAndSelect(
+        "portfolio.holdings",
+        "holding",
+        "abs(holding.realizedGains) > :minGains",
+        { minGains: FLOATING_POINT_TOLERANCE },
+      )
+      .leftJoinAndSelect("holding.stockMetadata", "stockMetadata")
+      .where("portfolio.id = :portfolioId", { portfolioId })
+      .getOne();
+
+    if (!portfolio) {
+      throw new NotFoundException(
+        `Portfolio with ID "${portfolioId}" not found`,
+      );
+    }
+
+    return this.mapEntityToDto(portfolio);
+  }
+
   async create(dto: CreatePortfolioDTO): Promise<PortfolioResponseDTO> {
     const portfolio = this.portfolioRepository.create(dto);
-    return this.portfolioRepository.save(portfolio).then(this.mapEntityToDto);
+    return this.portfolioRepository
+      .save(portfolio)
+      .then((p) => this.mapEntityToDto(p));
   }
 
   async update(
@@ -77,7 +105,7 @@ export class PortfolioService {
 
     return this.portfolioRepository
       .save(portfolioToUpdate)
-      .then(this.mapEntityToDto);
+      .then((p) => this.mapEntityToDto(p));
   }
 
   async remove(id: string): Promise<void> {
@@ -160,12 +188,7 @@ export class PortfolioService {
       },
       holdings: portfolio.holdings.map((holding) => ({
         id: holding.id,
-        stock: {
-          id: holding.stockId,
-          isin: holding.stockMetadata.isin,
-          nsin: holding.stockMetadata.nsin,
-          name: holding.stockMetadata.name,
-        },
+        stock: this.mapStockMetadataEntityToEmbeddedDTO(holding.stockMetadata),
         summary: {
           averagePricePerShare: Number(holding.averagePricePerShare),
           totalShares: Number(holding.shares),
@@ -178,5 +201,12 @@ export class PortfolioService {
         },
       })),
     } satisfies PortfolioResponseDTO;
+  }
+
+  private mapStockMetadataEntityToEmbeddedDTO(
+    stockMetadata: StockMetadata,
+  ): StockEmbeddedDTO {
+    const { id, isin, nsin, name } = stockMetadata;
+    return { id, isin, nsin, name };
   }
 }
