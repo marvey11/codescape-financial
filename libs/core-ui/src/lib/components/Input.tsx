@@ -1,5 +1,5 @@
 import React from "react";
-import { cn } from "../utility/index.js";
+import { cn } from "../utility";
 
 export type InputProps = React.ComponentPropsWithoutRef<"input">;
 

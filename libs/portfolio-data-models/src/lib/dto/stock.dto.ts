@@ -5,7 +5,7 @@ import {
   IsUUID,
   Length,
 } from "class-validator";
-import { CountryEmbeddedDTO } from "./country.dto.js";
+import { CountryEmbeddedDTO } from "./country.dto";
 
 export interface StockResponseDTO {
   id: string;

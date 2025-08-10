@@ -1,4 +1,4 @@
-import { cn } from "../utility/index.js";
+import { cn } from "../utility";
 
 /**
  * This simple spinner was inspired by the much more involved example from Kyle Cook (aka Web Dev Simplified).

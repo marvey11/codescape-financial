@@ -1,5 +1,5 @@
 import { IsOptional, IsString, Length } from "class-validator";
-import { PortfolioHoldingEmbeddedDTO } from "./portfolio-holding.dto.js";
+import { PortfolioHoldingEmbeddedDTO } from "./portfolio-holding.dto";
 
 export class CreatePortfolioDTO {
   @IsString()

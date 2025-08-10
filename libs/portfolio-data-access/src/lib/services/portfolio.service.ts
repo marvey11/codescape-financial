@@ -7,7 +7,7 @@ import {
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { EntityManager, Repository } from "typeorm";
-import { Portfolio } from "../entities/index";
+import { Portfolio } from "../entities";
 
 @Injectable()
 export class PortfolioService {
@@ -107,23 +107,29 @@ export class PortfolioService {
       );
     }
 
-    // Reset aggregates to 0 before recalculating
-    portfolio.totalCostBasis = 0;
-    portfolio.totalFees = 0;
-    portfolio.totalRealizedGains = 0;
-    portfolio.totalSalesTaxes = 0;
-    portfolio.totalDividends = 0;
-    portfolio.totalDividendTaxes = 0;
-
-    // Sum up the values from all holdings
-    for (const holding of portfolio.holdings) {
-      portfolio.totalCostBasis += Number(holding.totalCostBasis);
-      portfolio.totalFees += Number(holding.fees);
-      portfolio.totalRealizedGains += Number(holding.realizedGains);
-      portfolio.totalSalesTaxes += Number(holding.salesTaxes);
-      portfolio.totalDividends += Number(holding.dividends);
-      portfolio.totalDividendTaxes += Number(holding.totalDividendTaxes);
-    }
+    // Sum up the values from all holdings using `reduce` for better performance and clarity.
+    // This avoids repeated string-to-number conversions inside a loop.
+    portfolio.totalCostBasis = String(
+      portfolio.holdings.reduce((sum, h) => sum + Number(h.totalCostBasis), 0),
+    );
+    portfolio.totalFees = String(
+      portfolio.holdings.reduce((sum, h) => sum + Number(h.fees), 0),
+    );
+    portfolio.totalRealizedGains = String(
+      portfolio.holdings.reduce((sum, h) => sum + Number(h.realizedGains), 0),
+    );
+    portfolio.totalSalesTaxes = String(
+      portfolio.holdings.reduce((sum, h) => sum + Number(h.salesTaxes), 0),
+    );
+    portfolio.totalDividends = String(
+      portfolio.holdings.reduce((sum, h) => sum + Number(h.dividends), 0),
+    );
+    portfolio.totalDividendTaxes = String(
+      portfolio.holdings.reduce(
+        (sum, h) => sum + Number(h.totalDividendTaxes),
+        0,
+      ),
+    );
 
     await manager.save(portfolio);
   }
@@ -145,12 +151,12 @@ export class PortfolioService {
       name,
       description,
       summary: {
-        totalCostBasis,
-        totalFees,
-        totalRealizedGains,
-        totalTaxFromSoldShares: totalSalesTaxes,
-        totalDividends,
-        totalTaxFromDividends: totalDividendTaxes,
+        totalCostBasis: Number(totalCostBasis),
+        totalFees: Number(totalFees),
+        totalRealizedGains: Number(totalRealizedGains),
+        totalTaxFromSoldShares: Number(totalSalesTaxes),
+        totalDividends: Number(totalDividends),
+        totalTaxFromDividends: Number(totalDividendTaxes),
       },
       holdings: portfolio.holdings.map((holding) => ({
         id: holding.id,
@@ -161,14 +167,14 @@ export class PortfolioService {
           name: holding.stockMetadata.name,
         },
         summary: {
-          averagePricePerShare: holding.averagePricePerShare,
-          totalShares: holding.shares,
-          totalCostBasis: holding.totalCostBasis,
-          totalFees: holding.fees,
-          totalRealizedGains: holding.realizedGains,
-          totalTaxFromSoldShares: holding.salesTaxes,
-          totalDividends: holding.dividends,
-          totalTaxFromDividends: holding.totalDividendTaxes,
+          averagePricePerShare: Number(holding.averagePricePerShare),
+          totalShares: Number(holding.shares),
+          totalCostBasis: Number(holding.totalCostBasis),
+          totalFees: Number(holding.fees),
+          totalRealizedGains: Number(holding.realizedGains),
+          totalTaxFromSoldShares: Number(holding.salesTaxes),
+          totalDividends: Number(holding.dividends),
+          totalTaxFromDividends: Number(holding.totalDividendTaxes),
         },
       })),
     } satisfies PortfolioResponseDTO;

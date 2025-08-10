@@ -1,1 +1,1 @@
-export * from "./table-schemas/index.js";
+export * from "./table-schemas";

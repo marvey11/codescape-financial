@@ -2,8 +2,8 @@ import { FormButtonsComponent } from "@codescape-financial/core-ui";
 import { CreateCountryDTO } from "@codescape-financial/portfolio-data-models";
 import { FormEvent, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAxios } from "../../hooks/index.js";
-import { CountryForm, CountryFormData } from "./CountryForm.js";
+import { useAxios } from "../../hooks";
+import { CountryForm, CountryFormData } from "./CountryForm";
 
 export const AddCountryPage = () => {
   const navigate = useNavigate();

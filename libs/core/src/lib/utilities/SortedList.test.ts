@@ -1,5 +1,5 @@
-import { formatNormalizedDate } from "./formatters.js";
-import { CompareFunction, SortedList } from "./SortedList.js";
+import { formatNormalizedDate } from "./formatters";
+import { CompareFunction, SortedList } from "./SortedList";
 
 describe("Test Suite for the SortedList class", () => {
   describe("Using numbers as list elements", () => {

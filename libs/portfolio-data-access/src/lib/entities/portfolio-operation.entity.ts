@@ -1,4 +1,4 @@
-import { IsDate, IsEnum, IsNumber, IsOptional, IsUUID } from "class-validator";
+import { IsDate, IsDecimal, IsEnum, IsOptional, IsUUID } from "class-validator";
 import {
   Column,
   CreateDateColumn,
@@ -61,88 +61,88 @@ export class PortfolioOperation {
   /**
    * The number of shares involved in the transaction.
    * Nullable, as it is not applicable for a stock split.
-   * @type {number | null}
+   * @type {string | null}
    */
   @Column({ type: "decimal", precision: 12, scale: 4, nullable: true })
   @IsOptional()
-  @IsNumber()
-  numberOfShares?: number;
+  @IsDecimal()
+  numberOfShares?: string;
 
   /**
    * The price per share at the time of the transaction.
    * Nullable, as it is not applicable for a stock split or dividend.
-   * @type {number | null}
+   * @type {string | null}
    */
   @Column({ type: "decimal", precision: 12, scale: 4, nullable: true })
   @IsOptional()
-  @IsNumber()
-  pricePerShare?: number;
+  @IsDecimal()
+  pricePerShare?: string;
 
   /**
    * Fees associated with the transaction (buy or sell).
    * Nullable for operations that do not have fees.
-   * @type {number | null}
+   * @type {string | null}
    */
   @Column({ type: "decimal", precision: 12, scale: 4, nullable: true })
   @IsOptional()
-  @IsNumber()
-  fees?: number;
+  @IsDecimal()
+  fees?: string;
 
   // --- Parameters for SELL Transactions and DIVIDENDS ---
 
   /**
    * Taxes applied to the transaction (sell) or dividend.
    * Nullable for operations that do not have taxes.
-   * @type {number | null}
+   * @type {string | null}
    */
   @Column({ type: "decimal", precision: 12, scale: 4, nullable: true })
   @IsOptional()
-  @IsNumber()
-  taxes?: number;
+  @IsDecimal()
+  taxes?: string;
 
   // --- Parameters for STOCK SPLITS ---
 
   /**
    * The ratio of the stock split (e.g., 2 for a 2-for-1 split).
    * Nullable, as it is only applicable for stock splits.
-   * @type {number | null}
+   * @type {string | null}
    */
   @Column({ type: "decimal", precision: 12, scale: 4, nullable: true })
   @IsOptional()
-  @IsNumber()
-  splitRatio?: number;
+  @IsDecimal()
+  splitRatio?: string;
 
   // --- Parameters for DIVIDEND Payments ---
 
   /**
    * The dividend amount per share.
    * Nullable, as it is only applicable for dividends.
-   * @type {number | null}
+   * @type {string | null}
    */
   @Column({ type: "decimal", precision: 12, scale: 4, nullable: true })
   @IsOptional()
-  @IsNumber()
-  dividendPerShare?: number;
+  @IsDecimal()
+  dividendPerShare?: string;
 
   /**
    * The number of shares applicable for the dividend payment.
    * Nullable, as it is only applicable for dividends.
-   * @type {number | null}
+   * @type {string | null}
    */
   @Column({ type: "decimal", precision: 12, scale: 4, nullable: true })
   @IsOptional()
-  @IsNumber()
-  applicableShares?: number;
+  @IsDecimal()
+  applicableShares?: string;
 
   /**
    * The exchange rate if the dividend is in a different currency.
    * Nullable, as it is only applicable for dividends.
-   * @type {number | null}
+   * @type {string | null}
    */
   @Column({ type: "decimal", precision: 12, scale: 4, nullable: true })
   @IsOptional()
-  @IsNumber()
-  exchangeRate?: number;
+  @IsDecimal()
+  exchangeRate?: string;
 
   /**
    * The timestamp of when this operation was created.

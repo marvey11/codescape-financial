@@ -6,9 +6,9 @@ import {
 import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import * as path from "path";
-import { CsvQuoteParserService } from "../csv-parser/index";
-import { CsvQuoteProcessingService } from "../csv-processing/index";
-import { QuoteDataIngestionService } from "../data-ingestion/index";
+import { CsvQuoteParserService } from "../csv-parser";
+import { CsvQuoteProcessingService } from "../csv-processing";
+import { QuoteDataIngestionService } from "../data-ingestion";
 
 @Module({
   imports: [

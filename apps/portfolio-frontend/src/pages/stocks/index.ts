@@ -1,5 +1,5 @@
-export { AddStockMetadataPage } from "./AddStockMetadataPage.js";
-export { EditStockMetadataPage } from "./EditStockMetadataPage.js";
-export { StockMetadataDetailsPage } from "./StockMetadataDetailsPage.js";
-export { StockMetadataLayout } from "./StockMetadataLayout.js";
-export { StockMetadataListPage } from "./StockMetadataListPage.js";
+export { AddStockMetadataPage } from "./AddStockMetadataPage";
+export { EditStockMetadataPage } from "./EditStockMetadataPage";
+export { StockMetadataDetailsPage } from "./StockMetadataDetailsPage";
+export { StockMetadataLayout } from "./StockMetadataLayout";
+export { StockMetadataListPage } from "./StockMetadataListPage";

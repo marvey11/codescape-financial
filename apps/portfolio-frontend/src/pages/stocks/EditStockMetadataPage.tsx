@@ -1,3 +1,4 @@
+import { sortDataArray } from "@codescape-financial/core";
 import { FormButtonsComponent } from "@codescape-financial/core-ui";
 import {
   CountryResponseDTO,
@@ -6,9 +7,9 @@ import {
 } from "@codescape-financial/portfolio-data-models";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { DataPageContainer } from "../../components/index.js";
-import { useAxios, useOutletContextData } from "../../hooks/index.js";
-import { StockFormData, StockMetadataForm } from "./StockMetadataForm.js";
+import { DataPageContainer } from "../../components";
+import { useAxios, useOutletContextData } from "../../hooks";
+import { StockFormData, StockMetadataForm } from "./StockMetadataForm";
 
 export const EditStockMetadataPage = () => {
   const navigate = useNavigate();
@@ -39,11 +40,7 @@ export const EditStockMetadataPage = () => {
 
   useEffect(() => {
     if (countries) {
-      const countryArray = [...countries];
-      countryArray.sort((a, b) =>
-        a.name.toLowerCase().localeCompare(b.name.toLowerCase()),
-      );
-      setCountryList(countryArray);
+      setCountryList(sortDataArray(countries, "name"));
     }
   }, [countries]);
 

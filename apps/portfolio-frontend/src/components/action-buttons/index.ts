@@ -1,3 +1,3 @@
-export { ViewCountryDetailsButton } from "./ViewCountryDetailsButton.js";
-export { ViewPortfolioDetailsButton } from "./ViewPortfolioDetailsButton.js";
-export { ViewStockDetailsButton } from "./ViewStockDetailsButton.js";
+export { ViewCountryDetailsButton } from "./ViewCountryDetailsButton";
+export { ViewPortfolioDetailsButton } from "./ViewPortfolioDetailsButton";
+export { ViewStockDetailsButton } from "./ViewStockDetailsButton";

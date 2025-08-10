@@ -1,4 +1,4 @@
-export { FormButtonsComponent } from "./FormButtonsComponent.js";
-export { FormCancelButton } from "./FormCancelButton.js";
-export { FormRow } from "./FormRow.js";
-export { FormSubmitButton } from "./FormSubmitButton.js";
+export { FormButtonsComponent } from "./FormButtonsComponent";
+export { FormCancelButton } from "./FormCancelButton";
+export { FormRow } from "./FormRow";
+export { FormSubmitButton } from "./FormSubmitButton";

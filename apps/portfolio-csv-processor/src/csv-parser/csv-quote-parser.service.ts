@@ -15,8 +15,8 @@ import * as readline from "node:readline";
 import { Writable } from "node:stream";
 import { pipeline } from "node:stream/promises";
 import { Repository } from "typeorm";
-import { RawQuoteDataRow } from "./parser-types.js";
-import { transformRawCsvToPartialHistoricalQuote } from "./parser-utils.js";
+import { RawQuoteDataRow } from "./parser-types";
+import { transformRawCsvToPartialHistoricalQuote } from "./parser-utils";
 
 @Injectable()
 export class CsvQuoteParserService {

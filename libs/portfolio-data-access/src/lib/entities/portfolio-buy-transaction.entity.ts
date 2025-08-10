@@ -1,4 +1,4 @@
-import { IsDate, IsNumber, IsUUID } from "class-validator";
+import { IsDate, IsDecimal, IsUUID } from "class-validator";
 import {
   Column,
   Entity,
@@ -50,36 +50,36 @@ export class PortfolioBuyTransaction {
   /**
    * The number of shares purchased in this transaction.
    *
-   * @type {number}
+   * @type {string}
    */
   @Column({ type: "decimal", precision: 12, scale: 4 })
-  @IsNumber()
-  shares!: number;
+  @IsDecimal()
+  shares!: string;
 
   /**
    * The price per share at the time of purchase.
    *
-   * @type {number}
+   * @type {string}
    */
   @Column({ type: "decimal", precision: 12, scale: 4 })
-  @IsNumber()
-  pricePerShare!: number;
+  @IsDecimal()
+  pricePerShare!: string;
 
   /**
    * The original number of shares purchased in this transaction.
    * This field is immutable and used for accurate cost basis calculations on partial sales.
-   * @type {number}
+   * @type {string}
    */
   @Column({ type: "decimal", precision: 12, scale: 4 })
-  @IsNumber()
-  originalShares!: number;
+  @IsDecimal()
+  originalShares!: string;
 
   /**
    * The fees associated with this transaction.
    *
-   * @type {number}
+   * @type {string}
    */
   @Column({ type: "decimal", precision: 12, scale: 4, default: 0 })
-  @IsNumber()
-  fees!: number;
+  @IsDecimal()
+  fees!: string;
 }

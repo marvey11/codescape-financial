@@ -1,4 +1,4 @@
-import { parseLocaleNumber, parseNumberWithAutoLocale } from "./numberutils.js";
+import { parseLocaleNumber, parseNumberWithAutoLocale } from "./numberutils";
 
 describe("Test Suite for numberutils", () => {
   describe("Test Suite for parseNumberWithAutoLocale", () => {
@@ -7,10 +7,10 @@ describe("Test Suite for numberutils", () => {
       expect(parseNumberWithAutoLocale("1.300,00")).toStrictEqual(1300);
 
       expect(parseNumberWithAutoLocale("1.300.000,50")).toStrictEqual(
-        1300000.5
+        1300000.5,
       );
       expect(parseNumberWithAutoLocale("1,300,000.50")).toStrictEqual(
-        1300000.5
+        1300000.5,
       );
 
       expect(parseNumberWithAutoLocale("123,45")).toStrictEqual(123.45);
@@ -34,10 +34,10 @@ describe("Test Suite for numberutils", () => {
       expect(parseLocaleNumber("1,300.00", "en-GB")).toStrictEqual(1300);
 
       expect(parseLocaleNumber("1.300.000,50", "de-DE")).toStrictEqual(
-        1300000.5
+        1300000.5,
       );
       expect(parseLocaleNumber("1,300,000.50", "en-GB")).toStrictEqual(
-        1300000.5
+        1300000.5,
       );
 
       expect(parseLocaleNumber("123,45", "de-DE")).toStrictEqual(123.45);

@@ -1,9 +1,9 @@
-import { getDateObject, normalizeDate } from "./dateutils.js";
+import { getDateObject, normalizeDate } from "./dateutils";
 import {
   formatCurrency,
   formatNormalizedDate,
   formatPercent,
-} from "./formatters.js";
+} from "./formatters";
 
 describe("Test Suite for formatters", () => {
   describe("Test Suite for formatCurrency", () => {
@@ -37,19 +37,19 @@ describe("Test Suite for formatters", () => {
   describe("Test Suite for formatNormalizedDate", () => {
     it("should format correctly when no locale is given", () => {
       expect(formatNormalizedDate(getDateObject("2025-07-13"))).toStrictEqual(
-        "2025-07-13"
+        "2025-07-13",
       );
       expect(
-        formatNormalizedDate(getDateObject(new Date("2025-07-13")))
+        formatNormalizedDate(getDateObject(new Date("2025-07-13"))),
       ).toStrictEqual("2025-07-13");
     });
 
     it("should format correctly with a locale given", () => {
       expect(
-        formatNormalizedDate(normalizeDate(new Date("2025-07-13")), "de-DE")
+        formatNormalizedDate(normalizeDate(new Date("2025-07-13")), "de-DE"),
       ).toStrictEqual("13.07.2025");
       expect(
-        formatNormalizedDate(normalizeDate(new Date("2025-07-13")), "en-GB")
+        formatNormalizedDate(normalizeDate(new Date("2025-07-13")), "en-GB"),
       ).toStrictEqual("13/07/2025");
     });
   });
