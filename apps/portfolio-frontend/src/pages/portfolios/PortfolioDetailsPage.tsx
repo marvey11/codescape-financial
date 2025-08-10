@@ -9,7 +9,11 @@ import { AxiosRequestConfig } from "axios";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../../api/axios";
-import { DataPageContainer, DetailsPageHeader } from "../../components";
+import {
+  AddOperationButton,
+  DataPageContainer,
+  DetailsPageHeader,
+} from "../../components";
 import { useAxios, useOutletContextData } from "../../hooks";
 import { buildPortfolioHoldingColumnSchema } from "../../utils";
 
@@ -79,7 +83,10 @@ export const PortfolioDetailsPage = () => {
             <>
               <h2 className="text-2xl font-extrabold">Active Holdings</h2>
               <div className="overflow-x-auto rounded-md border border-gray-300 shadow-sm">
-                <PortfolioActiveHoldingsTable data={sortedActiveHoldings} />
+                <PortfolioActiveHoldingsTable
+                  data={sortedActiveHoldings}
+                  portfolioId={activePortfolioData.id}
+                />
               </div>
             </>
           ) : (
@@ -108,48 +115,10 @@ export const PortfolioDetailsPage = () => {
 
 const PortfolioActiveHoldingsTable = ({
   data,
+  portfolioId,
 }: {
   data: PortfolioHoldingEmbeddedDTO[];
-}) => {
-  const [latestPrices, setLatestPrices] =
-    useState<AllLatestQuotesTransformedDTO>({});
-
-  useEffect(() => {
-    const isins = data.map((holding) => holding.stock.isin);
-    if (isins.length > 0) {
-      axiosInstance
-        .post<AllLatestQuotesTransformedDTO>(
-          "/historical-quotes/latest-batch",
-          {
-            isins,
-          },
-        )
-        .then((response) => {
-          setLatestPrices(response.data);
-        })
-        .catch(console.error);
-    }
-  }, [data]);
-
-  const columns = useMemo(
-    () => buildPortfolioHoldingColumnSchema({}, latestPrices),
-    // Add `latestPrices` as a dependency to re-calculate columns when prices are fetched.
-    [latestPrices],
-  );
-
-  return (
-    <DataTable<PortfolioHoldingEmbeddedDTO>
-      columns={columns}
-      data={data}
-      keyExtractor={(item) => item.id}
-    />
-  );
-};
-
-const PortfolioHistoricalHoldingsTable = ({
-  data,
-}: {
-  data: PortfolioHoldingEmbeddedDTO[];
+  portfolioId: string;
 }) => {
   const [latestPrices, setLatestPrices] =
     useState<AllLatestQuotesTransformedDTO>({});
@@ -175,6 +144,33 @@ const PortfolioHistoricalHoldingsTable = ({
     () =>
       buildPortfolioHoldingColumnSchema(
         {
+          actionsComponent: (item) => (
+            <AddOperationButton portfolioId={portfolioId} holding={item} />
+          ),
+        },
+        latestPrices,
+      ),
+    [latestPrices, portfolioId],
+  );
+
+  return (
+    <DataTable<PortfolioHoldingEmbeddedDTO>
+      columns={columns}
+      data={data}
+      keyExtractor={(item) => item.id}
+    />
+  );
+};
+
+const PortfolioHistoricalHoldingsTable = ({
+  data,
+}: {
+  data: PortfolioHoldingEmbeddedDTO[];
+}) => {
+  const columns = useMemo(
+    () =>
+      buildPortfolioHoldingColumnSchema(
+        {
           columnKeys: [
             "isin",
             "name",
@@ -186,10 +182,9 @@ const PortfolioHistoricalHoldingsTable = ({
             "totalTaxes",
           ],
         },
-        latestPrices,
+        {}, // latest prices are not needed for historical holding data
       ),
-    // Add `latestPrices` as a dependency to re-calculate columns when prices are fetched.
-    [latestPrices],
+    [],
   );
 
   return (
