@@ -279,6 +279,11 @@ export class PortfolioOperationService {
     const transactionsToDelete: PortfolioBuyTransaction[] = [];
     const transactionsToUpdate: PortfolioBuyTransaction[] = [];
 
+    // Ensure buy transactions are sorted by date for correct FIFO calculation.
+    holding.buyTransactions.sort(
+      (a, b) => a.transactionDate.getTime() - b.transactionDate.getTime(),
+    );
+
     for (const buyTx of holding.buyTransactions) {
       if (isEffectivelyZero(sharesToSell)) {
         break;
@@ -388,6 +393,9 @@ export class PortfolioOperationService {
     const buyTxRepo = manager.getRepository(PortfolioBuyTransaction);
     for (const tx of holding.buyTransactions) {
       tx.shares = String(Number(tx.shares) * Number(splitRatio));
+      tx.originalShares = String(
+        Number(tx.originalShares) * Number(splitRatio),
+      );
       tx.pricePerShare = String(Number(tx.pricePerShare) / Number(splitRatio));
     }
 
