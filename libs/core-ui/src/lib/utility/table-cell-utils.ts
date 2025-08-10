@@ -9,5 +9,5 @@ export const createNumberValueCellClassNames = (cellValue: CellValue) => {
       return "text-red-500";
     }
   }
-  return "";
+  return undefined;
 };

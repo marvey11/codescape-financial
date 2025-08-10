@@ -27,6 +27,11 @@ export class PortfolioController {
     return this.portfolioService.findOne(id);
   }
 
+  @Get(":id/historical")
+  async getHistoricalData(@Param("id") id: string) {
+    return this.portfolioService.getHistoricalPortfolioData(id);
+  }
+
   @Post()
   async createPortfolio(@Body() dto: CreatePortfolioDTO) {
     return this.portfolioService.create(dto);

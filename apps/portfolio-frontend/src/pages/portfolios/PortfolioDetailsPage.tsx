@@ -10,7 +10,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../../api/axios";
 import { DataPageContainer, DetailsPageHeader } from "../../components";
-import { useOutletContextData } from "../../hooks";
+import { useAxios, useOutletContextData } from "../../hooks";
 import { buildPortfolioHoldingColumnSchema } from "../../utils";
 
 export const PortfolioDetailsPage = () => {
@@ -19,22 +19,46 @@ export const PortfolioDetailsPage = () => {
   const {
     loading,
     error,
-    data: portfolio,
-    sendRequest,
+    data: activePortfolioData,
+    sendRequest: sendActiveDataRequest,
   } = useOutletContextData<PortfolioResponseDTO>();
 
-  const sortedHoldings = useMemo(
+  const {
+    data: historicalPortfolioData,
+    sendRequest: sendHistoricalDataRequest,
+  } = useAxios<PortfolioResponseDTO>();
+
+  useEffect(() => {
+    activePortfolioData &&
+      sendHistoricalDataRequest({
+        url: `/portfolios/${activePortfolioData.id}/historical`,
+        method: "get",
+      });
+  }, [activePortfolioData, sendHistoricalDataRequest]);
+
+  const sortedActiveHoldings = useMemo(
     () =>
-      portfolio?.holdings
-        ? sortDataArray(portfolio.holdings, (item) => item.stock.name)
+      activePortfolioData?.holdings
+        ? sortDataArray(activePortfolioData.holdings, (item) => item.stock.name)
         : undefined,
-    [portfolio?.holdings],
+    [activePortfolioData?.holdings],
+  );
+
+  const sortedHistoricalHoldings = useMemo(
+    () =>
+      historicalPortfolioData?.holdings
+        ? sortDataArray(
+            historicalPortfolioData.holdings,
+            (item) => item.stock.name,
+          )
+        : undefined,
+    [historicalPortfolioData?.holdings],
   );
 
   const handleDelete = () => {
-    portfolio &&
-      sendRequest({
-        url: `/portfolios/${portfolio.id}`,
+    activePortfolioData &&
+      sendActiveDataRequest({
+        url: `/portfolios/${activePortfolioData.id}`,
         method: "delete",
       } satisfies AxiosRequestConfig).then(() => {
         navigate("/portfolios");
@@ -43,23 +67,38 @@ export const PortfolioDetailsPage = () => {
 
   return (
     <DataPageContainer isLoading={loading} error={error}>
-      {portfolio && (
+      {activePortfolioData && (
         <div className="flex flex-col gap-3">
           <DetailsPageHeader
-            title={portfolio.name}
-            editPath={`/portfolios/${portfolio.id}/edit`}
+            title={activePortfolioData.name}
+            editPath={`/portfolios/${activePortfolioData.id}/edit`}
             onDelete={handleDelete}
           />
 
-          {sortedHoldings && sortedHoldings.length > 0 ? (
+          {sortedActiveHoldings && sortedActiveHoldings.length > 0 ? (
             <>
-              <h2 className="text-2xl font-extrabold">Holdings</h2>
+              <h2 className="text-2xl font-extrabold">Active Holdings</h2>
               <div className="overflow-x-auto rounded-md border border-gray-300 shadow-sm">
-                <PortfolioHoldingsTable data={sortedHoldings} />
+                <PortfolioActiveHoldingsTable data={sortedActiveHoldings} />
               </div>
             </>
           ) : (
-            <span>No holdings found for this portfolio.</span>
+            <span>No active holdings found for this portfolio.</span>
+          )}
+
+          {sortedHistoricalHoldings && sortedHistoricalHoldings.length > 0 ? (
+            <>
+              <h2 className="text-2xl font-extrabold">Historical Holdings</h2>
+              <div className="overflow-x-auto rounded-md border border-gray-300 shadow-sm">
+                <PortfolioHistoricalHoldingsTable
+                  data={sortedHistoricalHoldings}
+                />
+              </div>
+            </>
+          ) : (
+            <span>
+              No historical data found for holdings in this portfolio.
+            </span>
           )}
         </div>
       )}
@@ -67,7 +106,7 @@ export const PortfolioDetailsPage = () => {
   );
 };
 
-const PortfolioHoldingsTable = ({
+const PortfolioActiveHoldingsTable = ({
   data,
 }: {
   data: PortfolioHoldingEmbeddedDTO[];
@@ -94,6 +133,61 @@ const PortfolioHoldingsTable = ({
 
   const columns = useMemo(
     () => buildPortfolioHoldingColumnSchema({}, latestPrices),
+    // Add `latestPrices` as a dependency to re-calculate columns when prices are fetched.
+    [latestPrices],
+  );
+
+  return (
+    <DataTable<PortfolioHoldingEmbeddedDTO>
+      columns={columns}
+      data={data}
+      keyExtractor={(item) => item.id}
+    />
+  );
+};
+
+const PortfolioHistoricalHoldingsTable = ({
+  data,
+}: {
+  data: PortfolioHoldingEmbeddedDTO[];
+}) => {
+  const [latestPrices, setLatestPrices] =
+    useState<AllLatestQuotesTransformedDTO>({});
+
+  useEffect(() => {
+    const isins = data.map((holding) => holding.stock.isin);
+    if (isins.length > 0) {
+      axiosInstance
+        .post<AllLatestQuotesTransformedDTO>(
+          "/historical-quotes/latest-batch",
+          {
+            isins,
+          },
+        )
+        .then((response) => {
+          setLatestPrices(response.data);
+        })
+        .catch(console.error);
+    }
+  }, [data]);
+
+  const columns = useMemo(
+    () =>
+      buildPortfolioHoldingColumnSchema(
+        {
+          columnKeys: [
+            "isin",
+            "name",
+            "realizedGains",
+            "taxesFromSales",
+            "dividends",
+            "taxesFromDividends",
+            "totalGains",
+            "totalTaxes",
+          ],
+        },
+        latestPrices,
+      ),
     // Add `latestPrices` as a dependency to re-calculate columns when prices are fetched.
     [latestPrices],
   );

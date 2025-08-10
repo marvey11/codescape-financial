@@ -53,6 +53,30 @@ export class PortfolioService {
     return this.mapEntityToDto(portfolio);
   }
 
+  async getHistoricalPortfolioData(
+    portfolioId: string,
+  ): Promise<PortfolioResponseDTO> {
+    const portfolio = await this.portfolioRepository
+      .createQueryBuilder("portfolio")
+      .leftJoinAndSelect(
+        "portfolio.holdings",
+        "holding",
+        "abs(holding.realizedGains) > :minGains",
+        { minGains: FLOATING_POINT_TOLERANCE },
+      )
+      .leftJoinAndSelect("holding.stockMetadata", "stockMetadata")
+      .where("portfolio.id = :portfolioId", { portfolioId })
+      .getOne();
+
+    if (!portfolio) {
+      throw new NotFoundException(
+        `Portfolio with ID "${portfolioId}" not found`,
+      );
+    }
+
+    return this.mapEntityToDto(portfolio);
+  }
+
   async create(dto: CreatePortfolioDTO): Promise<PortfolioResponseDTO> {
     const portfolio = this.portfolioRepository.create(dto);
     return this.portfolioRepository.save(portfolio).then(this.mapEntityToDto);

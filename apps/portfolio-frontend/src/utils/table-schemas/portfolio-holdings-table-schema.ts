@@ -4,6 +4,7 @@ import {
   formatPercent,
 } from "@codescape-financial/core";
 import {
+  cn,
   ColumnSchema,
   createNumberValueCellClassNames,
 } from "@codescape-financial/core-ui";
@@ -14,7 +15,7 @@ import {
 import { ReactNode } from "react";
 import { BuildTableSchemaOptions } from "./types";
 
-const allColumnKeys = [
+const defaultColumnKeys = [
   "isin",
   "name",
   "shares",
@@ -24,17 +25,27 @@ const allColumnKeys = [
   "currentValue",
   "absoluteGainLoss",
   "relativeGainLoss",
+  "dividends",
 ] as const;
-type PortfolioHoldingColumnKey = (typeof allColumnKeys)[number];
+type PortfolioHoldingDefaultColumnKey = (typeof defaultColumnKeys)[number];
+
+type PortfolioHoldingEveryColumnKey =
+  | PortfolioHoldingDefaultColumnKey
+  | "realizedGains"
+  | "taxesFromSales"
+  | "dividends"
+  | "taxesFromDividends"
+  | "totalGains"
+  | "totalTaxes";
 
 const buildPortfolioHoldingColumnSchema = (
   options: BuildTableSchemaOptions<
     PortfolioHoldingEmbeddedDTO,
-    PortfolioHoldingColumnKey
+    PortfolioHoldingEveryColumnKey
   > = {},
   latestPrices: AllLatestQuotesTransformedDTO,
 ): ColumnSchema<PortfolioHoldingEmbeddedDTO>[] => {
-  const { columnKeys = [...allColumnKeys], actionsComponent } = options;
+  const { columnKeys = [...defaultColumnKeys], actionsComponent } = options;
 
   const schema = columnKeys.map((key) => getColumnMapping(latestPrices)[key]);
 
@@ -142,10 +153,8 @@ const getAbsoluteGainLossColumnSchema = (
           absoluteGainLoss != null ? formatCurrency(absoluteGainLoss) : "--",
       };
     },
-    cellClassNames: (item, cellValue) => {
-      const colorClasses = createNumberValueCellClassNames(cellValue);
-      return ["text-xs", ...(colorClasses ? [colorClasses] : [])].join(" ");
-    },
+    cellClassNames: (_, cell) =>
+      cn("text-xs", createNumberValueCellClassNames(cell)),
     footer: (data) => {
       const totalAbsoluteGainLoss = calculateTotalAbsoluteGainLoss(
         data,
@@ -156,10 +165,8 @@ const getAbsoluteGainLossColumnSchema = (
         display: formatCurrency(totalAbsoluteGainLoss),
       };
     },
-    footerClassNames: (data, cellValue) => {
-      const colorClasses = createNumberValueCellClassNames(cellValue);
-      return ["text-xs", ...(colorClasses ? [colorClasses] : [])].join(" ");
-    },
+    footerClassNames: (_, cell) =>
+      cn("text-xs", createNumberValueCellClassNames(cell)),
   }) satisfies ColumnSchema<PortfolioHoldingEmbeddedDTO>;
 
 const getRelativeGainLossColumnSchema = (
@@ -180,10 +187,8 @@ const getRelativeGainLossColumnSchema = (
           relativeGainLoss != null ? formatPercent(relativeGainLoss) : "--",
       };
     },
-    cellClassNames: (_, cellValue) => {
-      const colorClasses = createNumberValueCellClassNames(cellValue);
-      return ["text-xs", ...(colorClasses ? [colorClasses] : [])].join(" ");
-    },
+    cellClassNames: (_, cell) =>
+      cn("text-xs", createNumberValueCellClassNames(cell)),
     footer: (data) => {
       const totalCostBasis = calculateTotalCostBasis(data);
       const totalAbsoluteGainLoss = calculateTotalAbsoluteGainLoss(
@@ -202,16 +207,139 @@ const getRelativeGainLossColumnSchema = (
           relativeGainLoss != null ? formatPercent(relativeGainLoss) : "--",
       };
     },
-    footerClassNames: (_, cellValue) => {
-      const colorClasses = createNumberValueCellClassNames(cellValue);
-      return ["text-xs", ...(colorClasses ? [colorClasses] : [])].join(" ");
+    footerClassNames: (_, cell) =>
+      cn("text-xs", createNumberValueCellClassNames(cell)),
+  }) satisfies ColumnSchema<PortfolioHoldingEmbeddedDTO>;
+
+const getRealizedGainsColumnSchema = () =>
+  ({
+    id: "colid-holding-realized-gains",
+    header: "Realized Gains",
+    headerClassNames: "text-xs",
+    value: (item) => {
+      const realizedGains = item.summary.totalRealizedGains;
+      return {
+        cellValue: realizedGains,
+        display: realizedGains != null ? formatCurrency(realizedGains) : "--",
+      };
     },
+    cellClassNames: (_, cell) =>
+      cn("text-xs", createNumberValueCellClassNames(cell)),
+    footer: (data) => {
+      const totalRealizedGains = calculateTotalRealizedGains(data);
+      return {
+        cellValue: totalRealizedGains,
+        display: formatCurrency(totalRealizedGains),
+      };
+    },
+    footerClassNames: (_, cell) =>
+      cn("text-xs", createNumberValueCellClassNames(cell)),
+  }) satisfies ColumnSchema<PortfolioHoldingEmbeddedDTO>;
+
+const getTaxesFromSalesColumnSchema = () =>
+  ({
+    id: "colid-holding-taxes-from-sales",
+    header: "Taxes From Sales",
+    headerClassNames: "text-xs",
+    value: (item) => {
+      const taxesFromSales = item.summary.totalTaxFromSoldShares;
+      return {
+        cellValue: taxesFromSales,
+        display: taxesFromSales != null ? formatCurrency(taxesFromSales) : "--",
+      };
+    },
+    cellClassNames: "text-xs",
+    footer: (data) => formatCurrency(calculateTotalTaxesFromSales(data)),
+    footerClassNames: "text-xs",
+  }) satisfies ColumnSchema<PortfolioHoldingEmbeddedDTO>;
+
+const getDividendsColumnSchema = () =>
+  ({
+    id: "colid-holding-dividends",
+    header: "Dividends",
+    headerClassNames: "text-xs",
+    value: (item) => {
+      const dividends = item.summary.totalDividends;
+      return {
+        cellValue: dividends,
+        display: dividends != null ? formatCurrency(dividends) : "--",
+      };
+    },
+    cellClassNames: "text-xs",
+    footer: (data) => formatCurrency(calculateTotalDividends(data)),
+    footerClassNames: "text-xs",
+  }) satisfies ColumnSchema<PortfolioHoldingEmbeddedDTO>;
+
+const getTaxesFromDividendsColumnSchema = () =>
+  ({
+    id: "colid-holding-taxes-from-dividends",
+    header: "Taxes From Dividends",
+    headerClassNames: "text-xs",
+    value: (item) => {
+      const taxesFromDividends = calculateHoldingTaxesFromDividends(item);
+      return {
+        cellValue: taxesFromDividends,
+        display:
+          taxesFromDividends != null
+            ? formatCurrency(taxesFromDividends)
+            : "--",
+      };
+    },
+    cellClassNames: "text-xs",
+    footer: (data) => formatCurrency(calculateTotalTaxesFromDividends(data)),
+    footerClassNames: "text-xs",
+  }) satisfies ColumnSchema<PortfolioHoldingEmbeddedDTO>;
+
+const getTotalGainsColumnSchema = () =>
+  ({
+    id: "colid-holding-total-gains",
+    header: "Total Gains",
+    headerClassNames: "text-xs",
+    value: (item) => {
+      const gains =
+        (item.summary.totalRealizedGains ?? 0) +
+        (item.summary.totalDividends ?? 0);
+      return {
+        cellValue: gains,
+        display: gains != null ? formatCurrency(gains) : "--",
+      };
+    },
+    cellClassNames: (_, cell) =>
+      cn("text-xs", createNumberValueCellClassNames(cell)),
+    footer: (data) => {
+      const totalGains = calculateTotalGains(data);
+      return {
+        cellValue: totalGains,
+        display: formatCurrency(totalGains),
+      };
+    },
+    footerClassNames: (_, cell) =>
+      cn("text-xs", createNumberValueCellClassNames(cell)),
+  }) satisfies ColumnSchema<PortfolioHoldingEmbeddedDTO>;
+
+const getTotalTaxesColumnSchema = () =>
+  ({
+    id: "colid-holding-total-taxes",
+    header: "Total Taxes",
+    headerClassNames: "text-xs",
+    value: (item) => {
+      const taxes =
+        (item.summary.totalTaxFromSoldShares ?? 0) +
+        (item.summary.totalTaxFromDividends ?? 0);
+      return {
+        cellValue: taxes,
+        display: taxes != null ? formatCurrency(taxes) : "--",
+      };
+    },
+    cellClassNames: "text-xs",
+    footer: (data) => formatCurrency(calculateTotalTaxes(data)),
+    footerClassNames: "text-xs",
   }) satisfies ColumnSchema<PortfolioHoldingEmbeddedDTO>;
 
 const getColumnMapping = (
   latestPrices: AllLatestQuotesTransformedDTO,
 ): {
-  [key in PortfolioHoldingColumnKey]: ColumnSchema<PortfolioHoldingEmbeddedDTO>;
+  [key in PortfolioHoldingEveryColumnKey]: ColumnSchema<PortfolioHoldingEmbeddedDTO>;
 } => ({
   isin: isinColumnSchema,
   name: nameColumnSchema,
@@ -222,6 +350,12 @@ const getColumnMapping = (
   currentValue: getCurrentValueColumnSchema(latestPrices),
   absoluteGainLoss: getAbsoluteGainLossColumnSchema(latestPrices),
   relativeGainLoss: getRelativeGainLossColumnSchema(latestPrices),
+  realizedGains: getRealizedGainsColumnSchema(),
+  taxesFromSales: getTaxesFromSalesColumnSchema(),
+  dividends: getDividendsColumnSchema(),
+  taxesFromDividends: getTaxesFromDividendsColumnSchema(),
+  totalGains: getTotalGainsColumnSchema(),
+  totalTaxes: getTotalTaxesColumnSchema(),
 });
 
 const createActionsComponent = (
@@ -333,6 +467,44 @@ const calculateTotalRelativeGainLoss = (
   return totalAbsoluteGainLoss / totalCostBasis;
 };
 
+const calculateTotalRealizedGains = (data: PortfolioHoldingEmbeddedDTO[]) =>
+  data.reduce(
+    (total, { summary: { totalRealizedGains } }) =>
+      total + (totalRealizedGains ?? 0),
+    0,
+  );
+
+const calculateTotalTaxesFromSales = (data: PortfolioHoldingEmbeddedDTO[]) =>
+  data.reduce(
+    (total, { summary: { totalTaxFromSoldShares } }) =>
+      total + (totalTaxFromSoldShares ?? 0),
+    0,
+  );
+
+const calculateTotalDividends = (data: PortfolioHoldingEmbeddedDTO[]) =>
+  data.reduce(
+    (total, { summary: { totalDividends } }) => total + (totalDividends ?? 0),
+    0,
+  );
+
+const calculateHoldingTaxesFromDividends = ({
+  summary: { totalTaxFromDividends },
+}: PortfolioHoldingEmbeddedDTO) => totalTaxFromDividends ?? 0;
+
+const calculateTotalTaxesFromDividends = (
+  data: PortfolioHoldingEmbeddedDTO[],
+) =>
+  data.reduce(
+    (total, item) => total + calculateHoldingTaxesFromDividends(item),
+    0,
+  );
+
+const calculateTotalGains = (data: PortfolioHoldingEmbeddedDTO[]) =>
+  calculateTotalRealizedGains(data) + calculateTotalDividends(data);
+
+const calculateTotalTaxes = (data: PortfolioHoldingEmbeddedDTO[]) =>
+  calculateTotalTaxesFromSales(data) + calculateTotalTaxesFromDividends(data);
+
 const constructLastUpdated = (
   obj: { date: Date; price: number } | undefined,
 ) =>
@@ -341,4 +513,7 @@ const constructLastUpdated = (
     : undefined;
 
 export { buildPortfolioHoldingColumnSchema };
-export type { PortfolioHoldingColumnKey };
+export type {
+  PortfolioHoldingDefaultColumnKey,
+  PortfolioHoldingEveryColumnKey,
+};
