@@ -5,11 +5,11 @@ import {
 import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import * as path from "path";
-import { CountryModule } from "../country/index";
-import { HistoricalQuoteModule } from "../historical-quote/index";
-import { PortfolioOperationModule } from "../portfolio-operation/index";
-import { PortfolioModule } from "../portfolio/index";
-import { StockMetadataModule } from "../stock-metadata/index";
+import { CountryModule } from "../country";
+import { HistoricalQuoteModule } from "../historical-quote";
+import { PortfolioModule } from "../portfolio";
+import { PortfolioOperationModule } from "../portfolio-operation";
+import { StockMetadataModule } from "../stock-metadata";
 
 @Module({
   imports: [

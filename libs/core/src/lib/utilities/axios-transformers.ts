@@ -1,4 +1,4 @@
-import { isValidISODateString } from "./dateutils.js";
+import { isValidISODateString } from "./dateutils";
 
 const transformDateStringsToDates = (input: unknown): unknown => {
   // Base case: if not an object or is null, return as is.

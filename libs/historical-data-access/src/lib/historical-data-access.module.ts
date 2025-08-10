@@ -1,6 +1,6 @@
 import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
-import { Country, HistoricalQuote, StockMetadata } from "./entities/index";
+import { Country, HistoricalQuote, StockMetadata } from "./entities";
 import { HistoricalQuoteService } from "./services/historical-quote.service";
 
 @Module({

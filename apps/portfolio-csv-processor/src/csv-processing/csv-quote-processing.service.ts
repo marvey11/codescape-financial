@@ -1,6 +1,6 @@
 import { Injectable, Logger } from "@nestjs/common";
-import { CsvQuoteParserService } from "../csv-parser/index.js";
-import { QuoteDataIngestionService } from "../data-ingestion/index.js";
+import { CsvQuoteParserService } from "../csv-parser";
+import { QuoteDataIngestionService } from "../data-ingestion";
 
 @Injectable()
 export class CsvQuoteProcessingService {

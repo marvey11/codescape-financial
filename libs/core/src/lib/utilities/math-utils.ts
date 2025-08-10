@@ -1,4 +1,4 @@
-import { FLOATING_POINT_TOLERANCE } from "../constants.js";
+import { FLOATING_POINT_TOLERANCE } from "../constants";
 
 const areEffectivelyEqual = (
   a: number,

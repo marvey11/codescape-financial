@@ -1,2 +1,2 @@
-export * from "./lib/constants.js";
-export * from "./lib/utilities/index.js";
+export * from "./lib/constants";
+export * from "./lib/utilities";

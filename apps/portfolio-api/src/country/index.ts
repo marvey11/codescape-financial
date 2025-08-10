@@ -1,1 +1,1 @@
-export { CountryModule } from "./country.module.js";
+export { CountryModule } from "./country.module";

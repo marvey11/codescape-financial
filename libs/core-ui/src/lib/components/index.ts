@@ -1,8 +1,8 @@
-export { ActionButton } from "./ActionButton.js";
-export { Button } from "./Button.js";
-export * from "./data-table/index.js";
-export * from "./forms/index.js";
-export { Input } from "./Input.js";
-export { Select } from "./Select.js";
-export { Spinner } from "./Spinner.js";
-export { Tag } from "./Tag.js";
+export { ActionButton } from "./ActionButton";
+export { Button } from "./Button";
+export * from "./data-table";
+export * from "./forms";
+export { Input } from "./Input";
+export { Select } from "./Select";
+export { Spinner } from "./Spinner";
+export { Tag } from "./Tag";

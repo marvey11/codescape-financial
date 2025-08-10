@@ -4,8 +4,8 @@ import { NestFactory } from "@nestjs/core";
 import * as chokidar from "chokidar";
 import * as fs from "fs/promises";
 import * as path from "path";
-import { AppModule } from "./app/app.module.js";
-import { CsvQuoteProcessingService } from "./csv-processing/csv-quote-processing.service.js";
+import { AppModule } from "./app/app.module";
+import { CsvQuoteProcessingService } from "./csv-processing/csv-quote-processing.service";
 
 const logger = new Logger("Portfolio CSV Processor Worker");
 

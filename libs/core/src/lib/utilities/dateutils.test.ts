@@ -4,14 +4,14 @@ import {
   isValidFormattedString,
   isValidISODateString,
   normalizeDate,
-} from "./dateutils.js";
-import { formatNormalizedDate } from "./formatters.js";
+} from "./dateutils";
+import { formatNormalizedDate } from "./formatters";
 
 describe("Test suite for dateutils", () => {
   describe("Test suite for normalizeDate", () => {
     it("should pass basic tests", () => {
       expect(normalizeDate(new Date("2025-07-13")).toISOString()).toStrictEqual(
-        "2025-07-13T00:00:00.000Z"
+        "2025-07-13T00:00:00.000Z",
       );
     });
   });
@@ -120,16 +120,16 @@ describe("Test suite for dateutils", () => {
   describe("Test suite for formatNormalizedDate", () => {
     it("should pass basic tests when not providing a locale", () => {
       expect(formatNormalizedDate(getDateObject("2025-07-13"))).toStrictEqual(
-        "2025-07-13"
+        "2025-07-13",
       );
     });
 
     it("should pass basic tests when providing a locale", () => {
       expect(
-        formatNormalizedDate(getDateObject("2025-07-13"), "de-DE")
+        formatNormalizedDate(getDateObject("2025-07-13"), "de-DE"),
       ).toStrictEqual("13.07.2025");
       expect(
-        formatNormalizedDate(getDateObject("2025-07-13"), "en-GB")
+        formatNormalizedDate(getDateObject("2025-07-13"), "en-GB"),
       ).toStrictEqual("13/07/2025");
     });
   });

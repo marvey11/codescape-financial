@@ -5,12 +5,12 @@ import {
   PortfolioBuyTransaction,
   PortfolioHolding,
   PortfolioOperation,
-} from "./entities/index";
+} from "./entities";
 import {
   PortfolioOperationService,
   PortfolioService,
   TaxCalculationService,
-} from "./services/index";
+} from "./services";
 
 @Module({
   imports: [

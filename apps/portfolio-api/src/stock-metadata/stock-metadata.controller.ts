@@ -14,7 +14,7 @@ import {
   Put,
   Query,
 } from "@nestjs/common";
-import { StockMetadataService } from "./stock-metadata.service.js";
+import { StockMetadataService } from "./stock-metadata.service";
 
 @Controller("stock-metadata")
 export class StockMetadataController {

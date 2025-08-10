@@ -1,4 +1,4 @@
-import { areEffectivelyEqual, isEffectivelyZero } from "./math-utils.js";
+import { areEffectivelyEqual, isEffectivelyZero } from "./math-utils";
 
 describe("Test Suite for math-utils", () => {
   describe("Test Suite for areEffectivelyEqual", () => {

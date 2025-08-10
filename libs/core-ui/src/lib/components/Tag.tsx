@@ -1,6 +1,6 @@
 import { cva, type VariantProps } from "class-variance-authority";
 import React from "react";
-import { cn } from "../utility/index.js";
+import { cn } from "../utility";
 
 const tagVariants = cva(
   "inline-flex items-center rounded-full px-3 py-1 text-sm font-medium",

@@ -1,4 +1,4 @@
-export * from "./action-buttons/index.js";
-export { DataPageContainer } from "./DataPageContainer.js";
-export { DetailsPageHeader } from "./DetailsPageHeader.js";
-export { Navigation } from "./Navigation.js";
+export * from "./action-buttons";
+export { DataPageContainer } from "./DataPageContainer";
+export { DetailsPageHeader } from "./DetailsPageHeader";
+export { Navigation } from "./Navigation";

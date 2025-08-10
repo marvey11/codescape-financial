@@ -1,5 +1,5 @@
 import { Outlet } from "react-router-dom";
-import { Navigation } from "../components/index.js";
+import { Navigation } from "../components";
 
 export function App() {
   return (

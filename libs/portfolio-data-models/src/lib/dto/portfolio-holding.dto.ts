@@ -1,4 +1,4 @@
-import { StockEmbeddedDTO } from "./stock.dto.js";
+import { StockEmbeddedDTO } from "./stock.dto";
 
 export interface PortfolioHoldingEmbeddedDTO {
   id: string;

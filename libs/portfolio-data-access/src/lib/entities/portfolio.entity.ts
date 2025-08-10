@@ -1,4 +1,4 @@
-import { IsNumber, IsString } from "class-validator";
+import { IsDecimal, IsString } from "class-validator";
 import {
   Column,
   CreateDateColumn,
@@ -26,28 +26,28 @@ export class Portfolio {
   holdings!: PortfolioHolding[];
 
   @Column({ type: "decimal", precision: 12, scale: 4, default: 0 })
-  @IsNumber()
-  totalCostBasis!: number;
+  @IsDecimal()
+  totalCostBasis!: string;
 
   @Column({ type: "decimal", precision: 12, scale: 4, default: 0 })
-  @IsNumber()
-  totalFees!: number;
+  @IsDecimal()
+  totalFees!: string;
 
   @Column({ type: "decimal", precision: 12, scale: 4, default: 0 })
-  @IsNumber()
-  totalRealizedGains!: number;
+  @IsDecimal()
+  totalRealizedGains!: string;
 
   @Column({ type: "decimal", precision: 12, scale: 4, default: 0 })
-  @IsNumber()
-  totalSalesTaxes!: number;
+  @IsDecimal()
+  totalSalesTaxes!: string;
 
   @Column({ type: "decimal", precision: 12, scale: 4, default: 0 })
-  @IsNumber()
-  totalDividends!: number;
+  @IsDecimal()
+  totalDividends!: string;
 
   @Column({ type: "decimal", precision: 12, scale: 4, default: 0 })
-  @IsNumber()
-  totalDividendTaxes!: number;
+  @IsDecimal()
+  totalDividendTaxes!: string;
 
   /**
    * The timestamp of the last time this portfolio was updated.

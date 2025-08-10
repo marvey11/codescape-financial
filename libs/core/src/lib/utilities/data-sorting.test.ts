@@ -1,4 +1,4 @@
-import { sortDataArray } from "./data-sorting.js";
+import { sortDataArray } from "./data-sorting";
 
 describe("Test Suite for sortDataArray", () => {
   interface TestItem {

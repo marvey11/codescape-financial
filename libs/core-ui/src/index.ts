@@ -1,2 +1,2 @@
-export * from "./lib/components/index.js";
-export * from "./lib/utility/index.js";
+export * from "./lib/components";
+export * from "./lib/utility";

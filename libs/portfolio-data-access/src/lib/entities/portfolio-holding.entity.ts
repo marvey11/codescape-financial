@@ -1,5 +1,5 @@
 import { StockMetadata } from "@codescape-financial/historical-data-access";
-import { IsNumber, IsUUID } from "class-validator";
+import { IsDecimal, IsUUID } from "class-validator";
 import {
   Column,
   CreateDateColumn,
@@ -78,20 +78,20 @@ export class PortfolioHolding {
 
   /**
    * The current number of shares held.
-   * @type {number}
+   * @type {string}
    */
   @Column({ type: "decimal", precision: 12, scale: 4, default: 0 })
-  @IsNumber()
-  shares!: number;
+  @IsDecimal()
+  shares!: string;
 
   /**
    * The total fees from all of the portfolio operations involved in this holding.
    *
-   * @type{number}
+   * @type{string}
    */
   @Column({ type: "decimal", precision: 12, scale: 4, default: 0 })
-  @IsNumber()
-  fees!: number;
+  @IsDecimal()
+  fees!: string;
 
   /**
    * The total cost basis of a holding represents the total amount of money effectively paid to
@@ -99,56 +99,56 @@ export class PortfolioHolding {
    *
    * It allows the calculation of current unrealised gains (market value - total cost basis).
    *
-   * @type{number}
+   * @type{string}
    */
   @Column({ type: "decimal", precision: 12, scale: 4, default: 0 })
-  @IsNumber()
-  totalCostBasis!: number;
+  @IsDecimal()
+  totalCostBasis!: string;
 
   /**
    * The average price per share for the current holding.
    *
-   * @type {number}
+   * @type {string}
    */
   @Column({ type: "decimal", precision: 12, scale: 4, default: 0 })
-  @IsNumber()
-  averagePricePerShare!: number;
+  @IsDecimal()
+  averagePricePerShare!: string;
 
   /**
    * The total realised gains (profits/losses from sales).
    *
-   * @type {number}
+   * @type {string}
    */
   @Column({ type: "decimal", precision: 12, scale: 4, default: 0 })
-  @IsNumber()
-  realizedGains!: number;
+  @IsDecimal()
+  realizedGains!: string;
 
   /**
    * The taxes from sales of shares in ths portfolio holding.
    *
-   * @type{number}
+   * @type{string}
    */
   @Column({ type: "decimal", precision: 12, scale: 4, default: 0 })
-  @IsNumber()
-  salesTaxes!: number;
+  @IsDecimal()
+  salesTaxes!: string;
 
   /**
    * The dividends received from shares in this portfolio holding.
    *
-   * @type{number}
+   * @type{string}
    */
   @Column({ type: "decimal", precision: 12, scale: 4, default: 0 })
-  @IsNumber()
-  dividends!: number;
+  @IsDecimal()
+  dividends!: string;
 
   /**
    * The taxes incurred from receiving dividends.
    *
-   * @type{number}
+   * @type{string}
    */
   @Column({ type: "decimal", precision: 12, scale: 4, default: 0 })
-  @IsNumber()
-  totalDividendTaxes!: number;
+  @IsDecimal()
+  totalDividendTaxes!: string;
 
   /**
    * The timestamp of the last time this holding was updated.

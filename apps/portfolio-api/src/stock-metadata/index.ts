@@ -1,1 +1,1 @@
-export { StockMetadataModule } from "./stock-metadata.module.js";
+export { StockMetadataModule } from "./stock-metadata.module";

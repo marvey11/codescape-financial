@@ -12,7 +12,7 @@ import {
   Post,
   Put,
 } from "@nestjs/common";
-import { CountryService } from "./country.service.js";
+import { CountryService } from "./country.service";
 
 @Controller("countries")
 export class CountryController {

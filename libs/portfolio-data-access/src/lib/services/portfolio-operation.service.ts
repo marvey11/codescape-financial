@@ -18,8 +18,8 @@ import {
   PortfolioBuyTransaction,
   PortfolioHolding,
   PortfolioOperation,
-} from "../entities/index";
-import { PortfolioService } from "./portfolio.service"; // Keep this
+} from "../entities";
+import { PortfolioService } from "./portfolio.service";
 import { TaxCalculationService } from "./tax-calculation.service";
 
 @Injectable()
@@ -43,7 +43,14 @@ export class PortfolioOperationService {
     data: CreateBuyTransactionDTO,
   ): Promise<PortfolioOperation> {
     return this.dataSource.transaction(async (manager) => {
-      const { portfolioId, stockId, shares, date, ...operationData } = data;
+      const {
+        portfolioId,
+        stockId,
+        shares,
+        date,
+        pricePerShare,
+        fees = 0,
+      } = data;
 
       const holding = await this.getOrCreateHolding(
         portfolioId,
@@ -55,8 +62,9 @@ export class PortfolioOperationService {
         type: OperationType.BUY,
         date: new Date(date),
         holdingId: holding.id,
-        numberOfShares: shares,
-        ...operationData,
+        numberOfShares: String(shares),
+        pricePerShare: String(pricePerShare),
+        fees: String(fees),
       });
       await manager.save(operation);
 
@@ -76,7 +84,15 @@ export class PortfolioOperationService {
     data: CreateSellTransactionDTO,
   ): Promise<PortfolioOperation> {
     return this.dataSource.transaction(async (manager) => {
-      const { portfolioId, stockId, shares, date, ...operationData } = data;
+      const {
+        portfolioId,
+        stockId,
+        shares,
+        date,
+        pricePerShare,
+        fees = 0,
+        taxes = 0,
+      } = data;
 
       const holding = await this.getOrCreateHolding(
         portfolioId,
@@ -88,8 +104,10 @@ export class PortfolioOperationService {
         type: OperationType.SELL,
         date: new Date(date),
         holdingId: holding.id,
-        numberOfShares: shares,
-        ...operationData,
+        numberOfShares: String(shares),
+        pricePerShare: String(pricePerShare),
+        fees: String(fees),
+        taxes: String(taxes),
       });
 
       // Calculate effects of the sale, including FIFO cost basis and taxes,
@@ -113,7 +131,15 @@ export class PortfolioOperationService {
     data: CreateDividendDTO,
   ): Promise<PortfolioOperation> {
     return this.dataSource.transaction(async (manager) => {
-      const { portfolioId, stockId, date, ...operationData } = data;
+      const {
+        portfolioId,
+        stockId,
+        date,
+        applicableShares,
+        dividendPerShare,
+        exchangeRate = 1,
+        taxes = 0,
+      } = data;
       const holding = await this.getOrCreateHolding(
         portfolioId,
         stockId,
@@ -124,7 +150,10 @@ export class PortfolioOperationService {
         type: OperationType.DIVIDEND,
         date: new Date(date),
         holdingId: holding.id,
-        ...operationData,
+        applicableShares: String(applicableShares),
+        dividendPerShare: String(dividendPerShare),
+        exchangeRate: String(exchangeRate),
+        taxes: String(taxes),
       });
 
       // Calculate dividend taxes and apply effects to the holding and operation.
@@ -147,7 +176,7 @@ export class PortfolioOperationService {
     data: CreateStockSplitDTO,
   ): Promise<PortfolioOperation> {
     return this.dataSource.transaction(async (manager) => {
-      const { portfolioId, stockId, date, ...operationData } = data;
+      const { portfolioId, stockId, date, splitRatio } = data;
       const holding = await this.getOrCreateHolding(
         portfolioId,
         stockId,
@@ -174,7 +203,7 @@ export class PortfolioOperationService {
         type: OperationType.STOCK_SPLIT,
         date: new Date(date),
         holdingId: holding.id,
-        ...operationData,
+        splitRatio: String(splitRatio),
       });
       await manager.save(operation);
 
@@ -195,7 +224,7 @@ export class PortfolioOperationService {
     operation: PortfolioOperation,
     manager: EntityManager,
   ): Promise<void> {
-    const { numberOfShares, pricePerShare, fees = 0 } = operation;
+    const { numberOfShares, pricePerShare, fees = "0" } = operation;
 
     if (numberOfShares == null || pricePerShare == null) {
       // should not happen due to validation in the controller
@@ -217,7 +246,7 @@ export class PortfolioOperationService {
     await buyTxRepo.save(newBuyTransaction);
 
     holding.buyTransactions.push(newBuyTransaction);
-    holding.fees = Number(holding.fees) + fees;
+    holding.fees = String(Number(holding.fees) + Number(fees));
 
     this.updateAggregatesFromInventory(holding);
   }
@@ -227,7 +256,7 @@ export class PortfolioOperationService {
     operation: PortfolioOperation,
     manager: EntityManager,
   ): Promise<void> {
-    const { numberOfShares, pricePerShare, fees: sellFees = 0 } = operation;
+    const { numberOfShares, pricePerShare, fees: sellFees = "0" } = operation;
 
     if (numberOfShares == null || pricePerShare == null) {
       // should not happen due to validation in the controller
@@ -238,9 +267,9 @@ export class PortfolioOperationService {
 
     const buyTxRepo = manager.getRepository(PortfolioBuyTransaction);
 
-    let sharesToSell = numberOfShares;
+    let sharesToSell = Number(numberOfShares);
 
-    if (sharesToSell - holding.shares > FLOATING_POINT_TOLERANCE) {
+    if (sharesToSell - Number(holding.shares) > FLOATING_POINT_TOLERANCE) {
       throw new Error(
         `Cannot sell more shares than are currently in this portfolio holding`,
       );
@@ -264,9 +293,9 @@ export class PortfolioOperationService {
       // The cost basis for this portion of the sale includes the share price and the prorated fee.
       costBasisOfSoldShares +=
         sharesSoldFromTx * Number(buyTx.pricePerShare) + buyFeeForLot;
-      buyTx.shares = Number(buyTx.shares) - sharesSoldFromTx;
+      buyTx.shares = String(Number(buyTx.shares) - sharesSoldFromTx);
 
-      if (isEffectivelyZero(buyTx.shares)) {
+      if (isEffectivelyZero(Number(buyTx.shares))) {
         transactionsToDelete.push(buyTx);
       } else {
         transactionsToUpdate.push(buyTx);
@@ -276,7 +305,8 @@ export class PortfolioOperationService {
     }
 
     // Total proceeds are the sale value minus the fees for this sale.
-    const saleProceeds = numberOfShares * pricePerShare - sellFees;
+    const saleProceeds =
+      Number(numberOfShares) * Number(pricePerShare) - Number(sellFees);
 
     // The net realized gain for this specific sale.
     const realizedGainForThisSale = saleProceeds - costBasisOfSoldShares;
@@ -288,18 +318,19 @@ export class PortfolioOperationService {
       );
 
     // Update the operation with the calculated tax.
-    operation.taxes = taxesForThisSale;
+    operation.taxes = String(taxesForThisSale);
 
-    holding.realizedGains =
-      Number(holding.realizedGains) + realizedGainForThisSale;
-    holding.fees = Number(holding.fees) + sellFees;
-    holding.salesTaxes = Number(holding.salesTaxes) + taxesForThisSale;
+    holding.realizedGains = String(
+      Number(holding.realizedGains) + realizedGainForThisSale,
+    );
+    holding.fees = String(Number(holding.fees) + Number(sellFees));
+    holding.salesTaxes = String(Number(holding.salesTaxes) + taxesForThisSale);
 
     await buyTxRepo.save(transactionsToUpdate);
     await buyTxRepo.remove(transactionsToDelete);
 
     holding.buyTransactions = holding.buyTransactions.filter(
-      (tx) => !isEffectivelyZero(tx.shares),
+      (tx) => !isEffectivelyZero(Number(tx.shares)),
     );
 
     this.updateAggregatesFromInventory(holding);
@@ -324,19 +355,22 @@ export class PortfolioOperationService {
       );
     }
 
-    const grossDividendInEur =
-      (dividendPerShare * applicableShares) / exchangeRate;
+    const grossDividendInEUR =
+      (Number(dividendPerShare) * Number(applicableShares)) /
+      Number(exchangeRate);
 
     const taxes = this.taxCalculationService.calculateDividendTaxes(
-      grossDividendInEur,
+      grossDividendInEUR,
       Number(holding.stockMetadata.country.withholdingTaxRate),
     );
 
     // Update the operation with the calculated tax before it's saved.
-    operation.taxes = taxes;
+    operation.taxes = String(taxes);
 
-    holding.dividends = Number(holding.dividends) + grossDividendInEur;
-    holding.totalDividendTaxes = Number(holding.totalDividendTaxes) + taxes;
+    holding.dividends = String(Number(holding.dividends) + grossDividendInEUR);
+    holding.totalDividendTaxes = String(
+      Number(holding.totalDividendTaxes) + taxes,
+    );
   }
 
   private async applyStockSplitOperation(
@@ -353,8 +387,8 @@ export class PortfolioOperationService {
 
     const buyTxRepo = manager.getRepository(PortfolioBuyTransaction);
     for (const tx of holding.buyTransactions) {
-      tx.shares = Number(tx.shares) * splitRatio;
-      tx.pricePerShare = Number(tx.pricePerShare) / splitRatio;
+      tx.shares = String(Number(tx.shares) * Number(splitRatio));
+      tx.pricePerShare = String(Number(tx.pricePerShare) / Number(splitRatio));
     }
 
     await buyTxRepo.save(holding.buyTransactions);
@@ -422,9 +456,10 @@ export class PortfolioOperationService {
       0,
     );
 
-    holding.shares = totalShares;
-    holding.totalCostBasis = totalCostBasis;
-    holding.averagePricePerShare =
-      totalShares > 0 ? totalCostBasis / totalShares : 0;
+    holding.shares = String(totalShares);
+    holding.totalCostBasis = String(totalCostBasis);
+    holding.averagePricePerShare = String(
+      totalShares > 0 ? totalCostBasis / totalShares : 0,
+    );
   }
 }

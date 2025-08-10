@@ -1,7 +1,7 @@
 import { HistoricalDataAccessModule } from "@codescape-financial/historical-data-access";
 import { Module } from "@nestjs/common";
-import { StockMetadataController } from "./stock-metadata.controller.js";
-import { StockMetadataService } from "./stock-metadata.service.js";
+import { StockMetadataController } from "./stock-metadata.controller";
+import { StockMetadataService } from "./stock-metadata.service";
 
 @Module({
   imports: [HistoricalDataAccessModule],
