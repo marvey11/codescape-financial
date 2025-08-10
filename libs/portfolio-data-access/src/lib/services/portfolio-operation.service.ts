@@ -8,12 +8,12 @@ import {
   CreateDividendDTO,
   CreateSellTransactionDTO,
   CreateStockSplitDTO,
+  OperationType,
 } from "@codescape-financial/portfolio-data-models";
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { DataSource, EntityManager, Repository } from "typeorm";
 import {
-  OperationType,
   Portfolio,
   PortfolioBuyTransaction,
   PortfolioHolding,

@@ -1,3 +1,4 @@
+import { OperationType } from "@codescape-financial/portfolio-data-models";
 import { IsDate, IsDecimal, IsEnum, IsOptional, IsUUID } from "class-validator";
 import {
   Column,
@@ -8,13 +9,6 @@ import {
   PrimaryGeneratedColumn,
 } from "typeorm";
 import { PortfolioHolding } from "./portfolio-holding.entity";
-
-export enum OperationType {
-  BUY = "buy",
-  SELL = "sell",
-  STOCK_SPLIT = "stock_split",
-  DIVIDEND = "dividend",
-}
 
 @Entity("portfolio_operations")
 export class PortfolioOperation {

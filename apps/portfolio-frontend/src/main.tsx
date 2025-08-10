@@ -14,6 +14,7 @@ import {
   CountryListPage,
   EditCountryPage,
 } from "./pages/countries";
+import { AddOperationPage } from "./pages/operations";
 import {
   PortfolioDetailsPage,
   PortfolioLayout,
@@ -53,6 +54,10 @@ const router = createBrowserRouter(
           <Route index element={<CountryDetailsPage />} />
           <Route path="edit" element={<EditCountryPage />} />
         </Route>
+      </Route>
+
+      <Route path="operations">
+        <Route path="add" element={<AddOperationPage />} />
       </Route>
     </Route>,
   ),
