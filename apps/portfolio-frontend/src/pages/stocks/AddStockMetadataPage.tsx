@@ -51,23 +51,21 @@ export const AddStockMetadataPage = () => {
   return (
     <div className="p-3">
       <h1 className="mb-4 text-4xl font-extrabold">Create Stock</h1>
-      {countryList && (
-        <form
-          onSubmit={handleSubmit}
-          className="grid grid-cols-[max-content_1fr] items-center gap-4 rounded-md border border-gray-300 p-6 shadow-sm"
-        >
-          <StockMetadataForm
-            availableCountries={countryList}
-            value={formData}
-            onChange={setFormData}
-          />
-          <FormButtonsComponent
-            onCancel={() => {
-              navigate("..", { replace: true });
-            }}
-          />
-        </form>
-      )}
+      <form
+        onSubmit={handleSubmit}
+        className="grid grid-cols-[max-content_1fr] items-center gap-4 rounded-md border border-gray-300 p-6 shadow-sm"
+      >
+        <StockMetadataForm
+          availableCountries={countryList}
+          value={formData}
+          onChange={setFormData}
+        />
+        <FormButtonsComponent
+          onCancel={() => {
+            navigate("..", { replace: true });
+          }}
+        />
+      </form>
     </div>
   );
 };

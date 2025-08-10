@@ -65,7 +65,7 @@ export const EditStockMetadataPage = () => {
   return (
     <DataPageContainer isLoading={isStockLoading} error={stockError}>
       <h1 className="mb-4 text-4xl font-extrabold">Update Stock</h1>
-      {formData && countryList && (
+      {formData && (
         <form
           onSubmit={handleSubmit}
           className="grid grid-cols-[max-content_1fr] items-center gap-4 rounded-md border border-gray-300 p-6 shadow-sm"
