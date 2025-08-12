@@ -8,7 +8,7 @@ import {
   ViewPortfolioDetailsButton,
 } from "../../components";
 import { useAxios } from "../../hooks";
-import { buildPortfolioTableSchema } from "../../utils";
+import { buildPortfolioColumnSchema } from "../../utils";
 
 export const PortfolioListPage = () => {
   const { loading, error, data, sendRequest } =
@@ -44,10 +44,9 @@ export const PortfolioListPage = () => {
 const PortfolioTable = ({ data }: { data: PortfolioResponseDTO[] }) => {
   const columns = useMemo(
     () =>
-      buildPortfolioTableSchema({
-        actionsComponent: (item) => (
-          <ViewPortfolioDetailsButton portfolio={item} />
-        ),
+      buildPortfolioColumnSchema({
+        actionsComponent: ({ data }) =>
+          data ? <ViewPortfolioDetailsButton portfolio={data} /> : <></>,
       }),
     [],
   );

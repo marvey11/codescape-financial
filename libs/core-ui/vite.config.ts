@@ -1,9 +1,9 @@
-import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
+import react from "@vitejs/plugin-react";
+import { defineConfig } from "vite";
 
 export default defineConfig(() => ({
   root: __dirname,
-  cacheDir: '../../node_modules/.vite/libs/core-ui',
+  cacheDir: "../../node_modules/.vite/libs/core-ui",
   plugins: [react()],
   // Uncomment this if you are using workers.
   // worker: {
@@ -12,12 +12,13 @@ export default defineConfig(() => ({
   test: {
     watch: false,
     globals: true,
-    environment: 'jsdom',
-    include: ['src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
-    reporters: ['default'],
+    environment: "jsdom",
+    include: ["src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}"],
+    reporters: ["default"],
     coverage: {
-      reportsDirectory: './test-output/vitest/coverage',
-      provider: 'v8' as const,
+      reportsDirectory: "./test-output/vitest/coverage",
+      provider: "v8" as const,
     },
+    setupFiles: ["./src/test-setup.ts"],
   },
 }));

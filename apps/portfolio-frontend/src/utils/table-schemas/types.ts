@@ -1,8 +1,8 @@
-import { ReactNode } from "react";
+import { CellRendererFunc, CellValue } from "@codescape-financial/core-ui";
 
-interface BuildTableSchemaOptions<T, U> {
+interface BuildTableSchemaOptions<TData, U> {
   columnKeys?: U[] | undefined;
-  actionsComponent?: (item: T) => ReactNode;
+  actionsComponent?: CellRendererFunc<TData, CellValue>;
   disableFooter?: boolean;
 }
 

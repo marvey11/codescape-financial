@@ -19,7 +19,7 @@ export class Country {
     default: 0,
     comment: "e.g., 0.2637 for 26.37%",
   })
-  withholdingTaxRate!: number;
+  withholdingTaxRate!: string;
 
   @OneToMany(() => StockMetadata, (stockMetadata) => stockMetadata.country)
   stocks!: StockMetadata[];
