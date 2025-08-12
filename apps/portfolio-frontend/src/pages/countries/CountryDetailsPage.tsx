@@ -13,7 +13,7 @@ import {
   ViewStockDetailsButton,
 } from "../../components";
 import { useAxios, useOutletContextData } from "../../hooks";
-import { buildStockMetadataTableSchema } from "../../utils";
+import { buildStockMetadataColumnSchema } from "../../utils";
 
 export const CountryDetailsPage = () => {
   const navigate = useNavigate();
@@ -89,9 +89,10 @@ const CountryTags = ({ country }: { country: CountryResponseDTO }) => (
 const CountryStockTable = ({ data }: { data: StockResponseDTO[] }) => {
   const columns = useMemo(
     () =>
-      buildStockMetadataTableSchema({
+      buildStockMetadataColumnSchema({
         columnKeys: ["name", "isin", "nsin", "currency"],
-        actionsComponent: (item) => <ViewStockDetailsButton stock={item} />,
+        actionsComponent: ({ data }) =>
+          data ? <ViewStockDetailsButton stock={data} /> : <></>,
       }),
     [],
   );

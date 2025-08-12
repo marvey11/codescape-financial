@@ -144,9 +144,12 @@ const PortfolioActiveHoldingsTable = ({
     () =>
       buildPortfolioHoldingColumnSchema(
         {
-          actionsComponent: (item) => (
-            <AddOperationButton portfolioId={portfolioId} holding={item} />
-          ),
+          actionsComponent: ({ data }) =>
+            data ? (
+              <AddOperationButton portfolioId={portfolioId} holding={data} />
+            ) : (
+              <></>
+            ),
         },
         latestPrices,
       ),
@@ -175,11 +178,8 @@ const PortfolioHistoricalHoldingsTable = ({
             "isin",
             "name",
             "realizedGains",
-            "taxesFromSales",
             "dividends",
-            "taxesFromDividends",
             "totalGains",
-            "totalTaxes",
           ],
         },
         {}, // latest prices are not needed for historical holding data

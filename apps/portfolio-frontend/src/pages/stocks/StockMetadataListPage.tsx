@@ -6,7 +6,7 @@ import { Link } from "react-router-dom";
 import { DataPageContainer } from "../../components";
 import { ViewStockDetailsButton } from "../../components/action-buttons";
 import { useAxios } from "../../hooks";
-import { buildStockMetadataTableSchema } from "../../utils";
+import { buildStockMetadataColumnSchema } from "../../utils";
 
 export const StockMetadataListPage = () => {
   const { loading, error, data, sendRequest } = useAxios<StockResponseDTO[]>();
@@ -41,8 +41,9 @@ export const StockMetadataListPage = () => {
 const StockMetadataTable = ({ data }: { data: StockResponseDTO[] }) => {
   const columns = useMemo(
     () =>
-      buildStockMetadataTableSchema({
-        actionsComponent: (item) => <ViewStockDetailsButton stock={item} />,
+      buildStockMetadataColumnSchema({
+        actionsComponent: ({ data }) =>
+          data ? <ViewStockDetailsButton stock={data} /> : <></>,
       }),
     [],
   );

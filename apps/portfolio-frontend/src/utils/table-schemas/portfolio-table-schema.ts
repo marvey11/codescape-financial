@@ -1,13 +1,16 @@
-import { ColumnSchema } from "@codescape-financial/core-ui";
+import {
+  CellRendererFunc,
+  CellValue,
+  ColumnSchema,
+} from "@codescape-financial/core-ui";
 import { PortfolioResponseDTO } from "@codescape-financial/portfolio-data-models";
-import { ReactNode } from "react";
 import { t } from "../i18n";
 import { BuildTableSchemaOptions } from "./types";
 
 const allColumnKeys = ["name", "description"] as const;
 type PortfolioTableColumnKey = (typeof allColumnKeys)[number];
 
-const buildPortfolioTableSchema = (
+const buildPortfolioColumnSchema = (
   options: BuildTableSchemaOptions<
     PortfolioResponseDTO,
     PortfolioTableColumnKey
@@ -29,7 +32,8 @@ const buildPortfolioTableSchema = (
     const first = schema[0] as ColumnSchema<PortfolioResponseDTO>;
     schema[0] = {
       ...first,
-      footer: (data) => t("table.footer.rows", { count: data.length }),
+      footer: ({ data }) =>
+        data ? t("table.footer.rows", { count: data.length }) : undefined,
       footerClassNames: "text-right uppercase",
       footerCellProps: {
         colSpan: schema.length,
@@ -43,13 +47,13 @@ const buildPortfolioTableSchema = (
 const nameColumnSchema: ColumnSchema<PortfolioResponseDTO> = {
   id: "colid-portfolio-name",
   header: "Name",
-  value: (item) => item.name,
+  value: ({ data }) => data?.name ?? "",
 };
 
 const descriptionColumnSchema: ColumnSchema<PortfolioResponseDTO> = {
   id: "colid-portfolio-description",
   header: "Description",
-  value: (item) => item.description ?? "",
+  value: ({ data }) => data?.description ?? "",
 };
 
 const columnMapping: {
@@ -60,23 +64,14 @@ const columnMapping: {
 };
 
 const createActionsComponent = (
-  actionsComponent: ReactNode | ((item: PortfolioResponseDTO) => ReactNode),
-) => {
-  const fn =
-    typeof actionsComponent === "function"
-      ? actionsComponent
-      : () => actionsComponent;
+  actionsComponent: CellRendererFunc<PortfolioResponseDTO, CellValue>,
+) => ({
+  id: "colid-portfolio-actions",
+  header: undefined,
+  cellRenderer: actionsComponent,
+  headerClassNames: "text-right",
+  cellClassNames: "text-right",
+});
 
-  const column: ColumnSchema<PortfolioResponseDTO> = {
-    id: "colid-portfolio-actions",
-    header: undefined,
-    value: fn,
-    headerClassNames: "text-right",
-    cellClassNames: "text-right",
-  };
-
-  return column;
-};
-
-export { buildPortfolioTableSchema };
+export { buildPortfolioColumnSchema };
 export type { PortfolioTableColumnKey };

@@ -5,7 +5,7 @@ import { useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { DataPageContainer, ViewCountryDetailsButton } from "../../components";
 import { useAxios } from "../../hooks";
-import { buildCountryTableSchema } from "../../utils";
+import { buildCountryColumnSchema } from "../../utils/table-schemas";
 
 export const CountryListPage = () => {
   const { loading, error, data, sendRequest } =
@@ -41,17 +41,14 @@ export const CountryListPage = () => {
 const CountryTable = ({ data }: { data: CountryResponseDTO[] }) => {
   const columns = useMemo(
     () =>
-      buildCountryTableSchema({
-        actionsComponent: (item) => <ViewCountryDetailsButton country={item} />,
+      buildCountryColumnSchema({
+        actionsComponent: ({ data }) =>
+          data ? <ViewCountryDetailsButton country={data} /> : <></>,
       }),
     [],
   );
 
   return (
-    <DataTable<CountryResponseDTO>
-      columns={columns}
-      data={data}
-      keyExtractor={(item) => item.id}
-    />
+    <DataTable columns={columns} data={data} keyExtractor={(item) => item.id} />
   );
 };

@@ -28,9 +28,10 @@ export class CountryService {
   }
 
   async create(countryDto: CreateCountryDTO): Promise<CountryResponseDTO> {
-    const { countryCode, ...rest } = countryDto;
+    const { countryCode, withholdingTaxRate, ...rest } = countryDto;
     const newCountry = this.countryRepository.create({
       ...rest,
+      withholdingTaxRate: String(withholdingTaxRate),
       isoCode: countryCode,
     });
     const savedCountry = await this.countryRepository.save(newCountry);
@@ -50,8 +51,11 @@ export class CountryService {
 
     // Destructure to separate `countryCode` (which requires special name mapping)
     // from the rest of the properties that can be merged directly.
-    const { countryCode, ...rest } = countryUpdate;
-    this.countryRepository.merge(countryToUpdate, rest);
+    const { countryCode, withholdingTaxRate, ...rest } = countryUpdate;
+    this.countryRepository.merge(countryToUpdate, {
+      ...rest,
+      withholdingTaxRate: String(withholdingTaxRate),
+    });
 
     // Explicitly update `isoCode` from `countryCode` only if it was provided.
     // This is safer and clearer than relying on `merge` to ignore `undefined`.
@@ -73,7 +77,7 @@ export class CountryService {
       id,
       name,
       countryCode: isoCode,
-      withholdingTaxRate,
+      withholdingTaxRate: Number(withholdingTaxRate),
     };
   }
 }

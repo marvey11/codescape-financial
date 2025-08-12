@@ -1,14 +1,17 @@
 import { formatPercent } from "@codescape-financial/core";
-import { ColumnSchema } from "@codescape-financial/core-ui";
+import {
+  CellRendererFunc,
+  CellValue,
+  ColumnSchema,
+} from "@codescape-financial/core-ui";
 import { CountryResponseDTO } from "@codescape-financial/portfolio-data-models";
-import { ReactNode } from "react";
 import { t } from "../i18n";
 import { BuildTableSchemaOptions } from "./types";
 
 const allColumnKeys = ["name", "countryCode", "withholdingTaxRate"] as const;
-type CountryTableColumnKey = (typeof allColumnKeys)[number];
+export type CountryTableColumnKey = (typeof allColumnKeys)[number];
 
-const buildCountryTableSchema = (
+export const buildCountryColumnSchema = (
   options: BuildTableSchemaOptions<
     CountryResponseDTO,
     CountryTableColumnKey
@@ -34,7 +37,8 @@ const buildCountryTableSchema = (
     const first = schema[0] as ColumnSchema<CountryResponseDTO>;
     schema[0] = {
       ...first,
-      footer: (data) => t("table.footer.rows", { count: data.length }),
+      footer: ({ data }) =>
+        data ? t("table.footer.rows", { count: data.length }) : undefined,
       footerClassNames: "text-right uppercase",
       footerCellProps: {
         colSpan: schema.length,
@@ -48,19 +52,21 @@ const buildCountryTableSchema = (
 const nameColumnSchema: ColumnSchema<CountryResponseDTO> = {
   id: "colid-country-name",
   header: "Name",
-  value: (item) => item.name,
+  value: ({ data }) => data?.name,
 };
-
 const countryCodeColumnSchema: ColumnSchema<CountryResponseDTO> = {
   id: "colid-country-code",
   header: "Code",
-  value: (item) => item.countryCode,
+  value: ({ data }) => data?.countryCode,
 };
 
 const taxRateColumnSchema: ColumnSchema<CountryResponseDTO> = {
   id: "colid-country-withholding-tax-rate",
   header: "Withholding Tax Rate",
-  value: (item) => formatPercent(item.withholdingTaxRate),
+  value: ({ data }) => data?.withholdingTaxRate ?? 0,
+  valueFormatter: ({ value }) => {
+    return typeof value === "number" ? formatPercent(value) : "";
+  },
 };
 
 const columnMapping: {
@@ -72,23 +78,11 @@ const columnMapping: {
 };
 
 const createActionsComponent = (
-  actionsComponent: ReactNode | ((item: CountryResponseDTO) => ReactNode),
-) => {
-  const fn =
-    typeof actionsComponent === "function"
-      ? actionsComponent
-      : () => actionsComponent;
-
-  const column: ColumnSchema<CountryResponseDTO> = {
-    id: "colid-country-actions",
-    header: undefined,
-    value: fn,
-    headerClassNames: "text-right",
-    cellClassNames: "text-right",
-  };
-
-  return column;
-};
-
-export { buildCountryTableSchema };
-export type { CountryTableColumnKey };
+  actionsComponent: CellRendererFunc<CountryResponseDTO, CellValue>,
+) => ({
+  id: "colid-country-actions",
+  header: undefined,
+  headerClassNames: "text-right",
+  cellRenderer: actionsComponent,
+  cellClassNames: "text-right",
+});

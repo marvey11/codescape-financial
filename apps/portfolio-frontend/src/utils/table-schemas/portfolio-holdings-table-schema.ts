@@ -4,6 +4,8 @@ import {
   formatPercent,
 } from "@codescape-financial/core";
 import {
+  CellRendererFunc,
+  CellValue,
   cn,
   ColumnSchema,
   createNumberValueCellClassNames,
@@ -12,8 +14,13 @@ import {
   AllLatestQuotesTransformedDTO,
   PortfolioHoldingEmbeddedDTO,
 } from "@codescape-financial/portfolio-data-models";
-import { ReactNode } from "react";
 import { BuildTableSchemaOptions } from "./types";
+
+const currencyFormatter = (value: CellValue) =>
+  typeof value === "number" ? formatCurrency(value) : "--";
+
+const percentFormatter = (value: CellValue) =>
+  typeof value === "number" ? formatPercent(value) : "--";
 
 const defaultColumnKeys = [
   "isin",
@@ -32,11 +39,8 @@ type PortfolioHoldingDefaultColumnKey = (typeof defaultColumnKeys)[number];
 type PortfolioHoldingEveryColumnKey =
   | PortfolioHoldingDefaultColumnKey
   | "realizedGains"
-  | "taxesFromSales"
   | "dividends"
-  | "taxesFromDividends"
-  | "totalGains"
-  | "totalTaxes";
+  | "totalGains";
 
 const buildPortfolioHoldingColumnSchema = (
   options: BuildTableSchemaOptions<
@@ -60,7 +64,7 @@ const isinColumnSchema = {
   id: "colid-holding-stock-isin",
   header: "ISIN",
   headerClassNames: "text-xs",
-  value: ({ stock: { isin } }) => isin,
+  value: ({ data }) => data?.stock.isin ?? null,
   cellClassNames: "font-mono text-xs",
 } satisfies ColumnSchema<PortfolioHoldingEmbeddedDTO>;
 
@@ -68,7 +72,7 @@ const nameColumnSchema = {
   id: "colid-holding-stock-name",
   header: "Name",
   headerClassNames: "text-xs",
-  value: ({ stock: { name } }) => name,
+  value: ({ data }) => data?.stock.name ?? null,
   cellClassNames: "text-xs",
 } satisfies ColumnSchema<PortfolioHoldingEmbeddedDTO>;
 
@@ -76,7 +80,7 @@ const sharesColumnSchema = {
   id: "colid-holding-shares",
   header: "Shares",
   headerClassNames: "text-xs",
-  value: ({ summary: { totalShares } }) => totalShares ?? "--",
+  value: ({ data }) => data?.summary.totalShares ?? null,
   cellClassNames: "text-xs",
 } satisfies ColumnSchema<PortfolioHoldingEmbeddedDTO>;
 
@@ -84,10 +88,11 @@ const costBasisColumnSchema = {
   id: "colid-holding-cost-basis",
   header: "Cost Basis",
   headerClassNames: "text-xs",
-  value: ({ summary: { totalCostBasis } }) =>
-    totalCostBasis != null ? formatCurrency(totalCostBasis) : "--",
+  value: ({ data }) => data?.summary.totalCostBasis,
+  valueFormatter: ({ value }) => currencyFormatter(value),
   cellClassNames: "text-xs",
-  footer: (data) => formatCurrency(calculateTotalCostBasis(data)),
+  footer: ({ data }) => (data ? calculateTotalCostBasis(data) : null),
+  footerFormatter: ({ value }) => currencyFormatter(value),
   footerClassNames: "text-xs",
 } satisfies ColumnSchema<PortfolioHoldingEmbeddedDTO>;
 
@@ -95,8 +100,8 @@ const averagePriceColumnSchema = {
   id: "colid-holding-average-price",
   header: "Average Price",
   headerClassNames: "text-xs",
-  value: ({ summary: { averagePricePerShare } }) =>
-    averagePricePerShare != null ? formatCurrency(averagePricePerShare) : "--",
+  value: ({ data }) => data?.summary.averagePricePerShare,
+  valueFormatter: ({ value }) => currencyFormatter(value),
   cellClassNames: "text-xs",
 } satisfies ColumnSchema<PortfolioHoldingEmbeddedDTO>;
 
@@ -107,12 +112,10 @@ const getLatestPriceColumnSchema = (
     id: "colid-holding-stock-latest-price",
     header: "Latest Price",
     headerClassNames: "text-xs",
-    value: ({ stock: { isin } }) =>
-      latestPrices[isin] != null
-        ? formatCurrency(latestPrices[isin].price)
-        : "--",
-    cellTitle: ({ stock: { isin } }) =>
-      constructLastUpdated(latestPrices[isin]),
+    value: ({ data }) => (data ? latestPrices?.[data.stock.isin]?.price : null),
+    valueFormatter: ({ value }) => currencyFormatter(value),
+    cellTitle: ({ data }) =>
+      data ? constructLastUpdated(latestPrices[data.stock.isin]) : undefined,
     cellClassNames: "text-xs",
   }) satisfies ColumnSchema<PortfolioHoldingEmbeddedDTO>;
 
@@ -123,15 +126,15 @@ const getCurrentValueColumnSchema = (
     id: "colid-holding-current-value",
     header: "Current Value",
     headerClassNames: "text-xs",
-    value: (item) => {
-      const current = calculateCurrentHoldingValue(item, latestPrices);
-      return current != null ? formatCurrency(current) : "--";
-    },
-    cellTitle: ({ stock: { isin } }) =>
-      constructLastUpdated(latestPrices[isin]),
+    value: ({ data }) =>
+      data ? calculateCurrentHoldingValue(data, latestPrices) : null,
+    valueFormatter: ({ value }) => currencyFormatter(value),
+    cellTitle: ({ data }) =>
+      data ? constructLastUpdated(latestPrices[data.stock.isin]) : undefined,
     cellClassNames: "text-xs",
-    footer: (data) =>
-      formatCurrency(calculateTotalCurrentValue(data, latestPrices)),
+    footer: ({ data }) =>
+      data ? calculateTotalCurrentValue(data, latestPrices) : null,
+    footerFormatter: ({ value }) => currencyFormatter(value),
     footerClassNames: "text-xs",
   }) satisfies ColumnSchema<PortfolioHoldingEmbeddedDTO>;
 
@@ -142,31 +145,16 @@ const getAbsoluteGainLossColumnSchema = (
     id: "colid-holding-absolute-gain-loss",
     header: "G/L",
     headerClassNames: "text-xs",
-    value: (item) => {
-      const absoluteGainLoss = calculateAbsoluteHoldingGainLoss(
-        item,
-        latestPrices,
-      );
-      return {
-        cellValue: absoluteGainLoss,
-        display:
-          absoluteGainLoss != null ? formatCurrency(absoluteGainLoss) : "--",
-      };
-    },
-    cellClassNames: (_, cell) =>
-      cn("text-xs", createNumberValueCellClassNames(cell)),
-    footer: (data) => {
-      const totalAbsoluteGainLoss = calculateTotalAbsoluteGainLoss(
-        data,
-        latestPrices,
-      );
-      return {
-        cellValue: totalAbsoluteGainLoss,
-        display: formatCurrency(totalAbsoluteGainLoss),
-      };
-    },
-    footerClassNames: (_, cell) =>
-      cn("text-xs", createNumberValueCellClassNames(cell)),
+    value: ({ data }) =>
+      data ? calculateAbsoluteHoldingGainLoss(data, latestPrices) : null,
+    valueFormatter: ({ value }) => currencyFormatter(value),
+    cellClassNames: ({ value }) =>
+      cn("text-xs", createNumberValueCellClassNames(value)),
+    footer: ({ data }) =>
+      data ? calculateTotalAbsoluteGainLoss(data, latestPrices) : null,
+    footerFormatter: ({ value }) => currencyFormatter(value),
+    footerClassNames: ({ value }) =>
+      cn("text-xs", createNumberValueCellClassNames(value)),
   }) satisfies ColumnSchema<PortfolioHoldingEmbeddedDTO>;
 
 const getRelativeGainLossColumnSchema = (
@@ -176,39 +164,21 @@ const getRelativeGainLossColumnSchema = (
     id: "colid-holding-relative-gain-loss",
     header: "G/L [%]",
     headerClassNames: "text-xs",
-    value: (item) => {
-      const relativeGainLoss = calculateRelativeHoldingGainLoss(
-        item,
-        latestPrices,
-      );
-      return {
-        cellValue: relativeGainLoss,
-        display:
-          relativeGainLoss != null ? formatPercent(relativeGainLoss) : "--",
-      };
-    },
-    cellClassNames: (_, cell) =>
-      cn("text-xs", createNumberValueCellClassNames(cell)),
-    footer: (data) => {
-      const totalCostBasis = calculateTotalCostBasis(data);
-      const totalAbsoluteGainLoss = calculateTotalAbsoluteGainLoss(
-        data,
-        latestPrices,
-      );
-
-      const relativeGainLoss = calculateTotalRelativeGainLoss(
-        totalCostBasis,
-        totalAbsoluteGainLoss,
-      );
-
-      return {
-        cellValue: relativeGainLoss,
-        display:
-          relativeGainLoss != null ? formatPercent(relativeGainLoss) : "--",
-      };
-    },
-    footerClassNames: (_, cell) =>
-      cn("text-xs", createNumberValueCellClassNames(cell)),
+    value: ({ data }) =>
+      data ? calculateRelativeHoldingGainLoss(data, latestPrices) : null,
+    valueFormatter: ({ value }) => percentFormatter(value),
+    cellClassNames: ({ value }) =>
+      cn("text-xs", createNumberValueCellClassNames(value)),
+    footer: ({ data }) =>
+      data
+        ? calculateTotalRelativeGainLoss(
+            calculateTotalCostBasis(data),
+            calculateTotalAbsoluteGainLoss(data, latestPrices),
+          )
+        : null,
+    footerFormatter: ({ value }) => percentFormatter(value),
+    footerClassNames: ({ value }) =>
+      cn("text-xs", createNumberValueCellClassNames(value)),
   }) satisfies ColumnSchema<PortfolioHoldingEmbeddedDTO>;
 
 const getRealizedGainsColumnSchema = () =>
@@ -216,41 +186,14 @@ const getRealizedGainsColumnSchema = () =>
     id: "colid-holding-realized-gains",
     header: "Realized Gains",
     headerClassNames: "text-xs",
-    value: (item) => {
-      const realizedGains = item.summary.totalRealizedGains;
-      return {
-        cellValue: realizedGains,
-        display: realizedGains != null ? formatCurrency(realizedGains) : "--",
-      };
-    },
-    cellClassNames: (_, cell) =>
-      cn("text-xs", createNumberValueCellClassNames(cell)),
-    footer: (data) => {
-      const totalRealizedGains = calculateTotalRealizedGains(data);
-      return {
-        cellValue: totalRealizedGains,
-        display: formatCurrency(totalRealizedGains),
-      };
-    },
-    footerClassNames: (_, cell) =>
-      cn("text-xs", createNumberValueCellClassNames(cell)),
-  }) satisfies ColumnSchema<PortfolioHoldingEmbeddedDTO>;
-
-const getTaxesFromSalesColumnSchema = () =>
-  ({
-    id: "colid-holding-taxes-from-sales",
-    header: "Taxes From Sales",
-    headerClassNames: "text-xs",
-    value: (item) => {
-      const taxesFromSales = item.summary.totalTaxFromSoldShares;
-      return {
-        cellValue: taxesFromSales,
-        display: taxesFromSales != null ? formatCurrency(taxesFromSales) : "--",
-      };
-    },
-    cellClassNames: "text-xs",
-    footer: (data) => formatCurrency(calculateTotalTaxesFromSales(data)),
-    footerClassNames: "text-xs",
+    value: ({ data }) => data?.summary.totalRealizedGains,
+    valueFormatter: ({ value }) => currencyFormatter(value),
+    cellClassNames: ({ value }) =>
+      cn("text-xs", createNumberValueCellClassNames(value)),
+    footer: ({ data }) => (data ? calculateTotalRealizedGains(data) : null),
+    footerFormatter: ({ value }) => currencyFormatter(value),
+    footerClassNames: ({ value }) =>
+      cn("text-xs", createNumberValueCellClassNames(value)),
   }) satisfies ColumnSchema<PortfolioHoldingEmbeddedDTO>;
 
 const getDividendsColumnSchema = () =>
@@ -258,35 +201,50 @@ const getDividendsColumnSchema = () =>
     id: "colid-holding-dividends",
     header: "Dividends",
     headerClassNames: "text-xs",
-    value: (item) => {
-      const dividends = item.summary.totalDividends;
-      return {
-        cellValue: dividends,
-        display: dividends != null ? formatCurrency(dividends) : "--",
-      };
+    value: ({ data }) => {
+      if (!data) {
+        return null;
+      }
+      const { holdingDividends, holdingTaxesFromDividends } =
+        getHoldingDividends(data);
+      return holdingDividends - holdingTaxesFromDividends;
+    },
+    valueFormatter: ({ value }) => currencyFormatter(value),
+    cellTitle: ({ data }) => {
+      if (!data) {
+        return undefined;
+      }
+      const { holdingDividends, holdingTaxesFromDividends } =
+        getHoldingDividends(data);
+      if (holdingDividends === 0 && holdingTaxesFromDividends === 0) {
+        return undefined;
+      }
+      return (
+        `Nominal Dividends: ${formatCurrency(holdingDividends)}, ` +
+        `Taxes: ${formatCurrency(holdingTaxesFromDividends)}`
+      );
     },
     cellClassNames: "text-xs",
-    footer: (data) => formatCurrency(calculateTotalDividends(data)),
-    footerClassNames: "text-xs",
-  }) satisfies ColumnSchema<PortfolioHoldingEmbeddedDTO>;
-
-const getTaxesFromDividendsColumnSchema = () =>
-  ({
-    id: "colid-holding-taxes-from-dividends",
-    header: "Taxes From Dividends",
-    headerClassNames: "text-xs",
-    value: (item) => {
-      const taxesFromDividends = calculateHoldingTaxesFromDividends(item);
-      return {
-        cellValue: taxesFromDividends,
-        display:
-          taxesFromDividends != null
-            ? formatCurrency(taxesFromDividends)
-            : "--",
-      };
+    footer: ({ data }) => {
+      if (!data) {
+        return null;
+      }
+      const { totalDividends, totalTaxesFromDividends } =
+        calculateTotalDividends(data);
+      return totalDividends - totalTaxesFromDividends;
     },
-    cellClassNames: "text-xs",
-    footer: (data) => formatCurrency(calculateTotalTaxesFromDividends(data)),
+    footerFormatter: ({ value }) => currencyFormatter(value),
+    footerTitle: ({ data }) => {
+      if (!data) {
+        return undefined;
+      }
+      const { totalDividends, totalTaxesFromDividends } =
+        calculateTotalDividends(data);
+      return (
+        `Nominal Dividends: ${formatCurrency(totalDividends)}, ` +
+        `Taxes: ${formatCurrency(totalTaxesFromDividends)}`
+      );
+    },
     footerClassNames: "text-xs",
   }) satisfies ColumnSchema<PortfolioHoldingEmbeddedDTO>;
 
@@ -295,45 +253,16 @@ const getTotalGainsColumnSchema = () =>
     id: "colid-holding-total-gains",
     header: "Total Gains",
     headerClassNames: "text-xs",
-    value: (item) => {
-      const gains =
-        (item.summary.totalRealizedGains ?? 0) +
-        (item.summary.totalDividends ?? 0);
-      return {
-        cellValue: gains,
-        display: gains != null ? formatCurrency(gains) : "--",
-      };
-    },
-    cellClassNames: (_, cell) =>
-      cn("text-xs", createNumberValueCellClassNames(cell)),
-    footer: (data) => {
-      const totalGains = calculateTotalGains(data);
-      return {
-        cellValue: totalGains,
-        display: formatCurrency(totalGains),
-      };
-    },
-    footerClassNames: (_, cell) =>
-      cn("text-xs", createNumberValueCellClassNames(cell)),
-  }) satisfies ColumnSchema<PortfolioHoldingEmbeddedDTO>;
-
-const getTotalTaxesColumnSchema = () =>
-  ({
-    id: "colid-holding-total-taxes",
-    header: "Total Taxes",
-    headerClassNames: "text-xs",
-    value: (item) => {
-      const taxes =
-        (item.summary.totalTaxFromSoldShares ?? 0) +
-        (item.summary.totalTaxFromDividends ?? 0);
-      return {
-        cellValue: taxes,
-        display: taxes != null ? formatCurrency(taxes) : "--",
-      };
-    },
-    cellClassNames: "text-xs",
-    footer: (data) => formatCurrency(calculateTotalTaxes(data)),
-    footerClassNames: "text-xs",
+    value: ({ data }) =>
+      (data?.summary.totalRealizedGains ?? 0) +
+      (data?.summary.totalDividends ?? 0),
+    valueFormatter: ({ value }) => currencyFormatter(value),
+    cellClassNames: ({ value }) =>
+      cn("text-xs", createNumberValueCellClassNames(value)),
+    footer: ({ data }) => (data ? calculateTotalGains(data) : null),
+    footerFormatter: ({ value }) => currencyFormatter(value),
+    footerClassNames: ({ value }) =>
+      cn("text-xs", createNumberValueCellClassNames(value)),
   }) satisfies ColumnSchema<PortfolioHoldingEmbeddedDTO>;
 
 const getColumnMapping = (
@@ -351,31 +280,20 @@ const getColumnMapping = (
   absoluteGainLoss: getAbsoluteGainLossColumnSchema(latestPrices),
   relativeGainLoss: getRelativeGainLossColumnSchema(latestPrices),
   realizedGains: getRealizedGainsColumnSchema(),
-  taxesFromSales: getTaxesFromSalesColumnSchema(),
   dividends: getDividendsColumnSchema(),
-  taxesFromDividends: getTaxesFromDividendsColumnSchema(),
   totalGains: getTotalGainsColumnSchema(),
-  totalTaxes: getTotalTaxesColumnSchema(),
 });
 
 const createActionsComponent = (
-  actionsComponent:
-    | ReactNode
-    | ((item: PortfolioHoldingEmbeddedDTO) => ReactNode),
-) => {
-  const fn =
-    typeof actionsComponent === "function"
-      ? actionsComponent
-      : () => actionsComponent;
-
-  return {
+  actionsComponent: CellRendererFunc<PortfolioHoldingEmbeddedDTO, CellValue>,
+) =>
+  ({
     id: "colid-holding-actions",
     header: undefined,
-    value: fn,
     headerClassNames: "text-right",
+    cellRenderer: actionsComponent,
     cellClassNames: "text-right",
-  } satisfies ColumnSchema<PortfolioHoldingEmbeddedDTO>;
-};
+  }) satisfies ColumnSchema<PortfolioHoldingEmbeddedDTO>;
 
 // Data aggregation methods
 
@@ -474,36 +392,35 @@ const calculateTotalRealizedGains = (data: PortfolioHoldingEmbeddedDTO[]) =>
     0,
   );
 
-const calculateTotalTaxesFromSales = (data: PortfolioHoldingEmbeddedDTO[]) =>
-  data.reduce(
-    (total, { summary: { totalTaxFromSoldShares } }) =>
-      total + (totalTaxFromSoldShares ?? 0),
-    0,
-  );
+const getHoldingDividends = ({
+  summary: { totalDividends, totalTaxFromDividends },
+}: PortfolioHoldingEmbeddedDTO) => ({
+  holdingDividends: totalDividends ?? 0,
+  holdingTaxesFromDividends: totalTaxFromDividends ?? 0,
+});
 
 const calculateTotalDividends = (data: PortfolioHoldingEmbeddedDTO[]) =>
   data.reduce(
-    (total, { summary: { totalDividends } }) => total + (totalDividends ?? 0),
-    0,
+    ({ totalDividends, totalTaxesFromDividends }, holding) => {
+      const { holdingDividends, holdingTaxesFromDividends } =
+        getHoldingDividends(holding);
+      return {
+        totalDividends: totalDividends + (holdingDividends ?? 0),
+        totalTaxesFromDividends:
+          totalTaxesFromDividends + (holdingTaxesFromDividends ?? 0),
+      };
+    },
+    { totalDividends: 0, totalTaxesFromDividends: 0 },
   );
 
-const calculateHoldingTaxesFromDividends = ({
-  summary: { totalTaxFromDividends },
-}: PortfolioHoldingEmbeddedDTO) => totalTaxFromDividends ?? 0;
-
-const calculateTotalTaxesFromDividends = (
-  data: PortfolioHoldingEmbeddedDTO[],
-) =>
-  data.reduce(
-    (total, item) => total + calculateHoldingTaxesFromDividends(item),
-    0,
+const calculateTotalGains = (data: PortfolioHoldingEmbeddedDTO[]) => {
+  const { totalDividends, totalTaxesFromDividends } =
+    calculateTotalDividends(data);
+  return (
+    calculateTotalRealizedGains(data) +
+    (totalDividends - totalTaxesFromDividends)
   );
-
-const calculateTotalGains = (data: PortfolioHoldingEmbeddedDTO[]) =>
-  calculateTotalRealizedGains(data) + calculateTotalDividends(data);
-
-const calculateTotalTaxes = (data: PortfolioHoldingEmbeddedDTO[]) =>
-  calculateTotalTaxesFromSales(data) + calculateTotalTaxesFromDividends(data);
+};
 
 const constructLastUpdated = (
   obj: { date: Date; price: number } | undefined,

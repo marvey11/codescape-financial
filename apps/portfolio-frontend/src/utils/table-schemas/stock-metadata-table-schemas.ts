@@ -1,13 +1,16 @@
-import { ColumnSchema } from "@codescape-financial/core-ui";
+import {
+  CellRendererFunc,
+  CellValue,
+  ColumnSchema,
+} from "@codescape-financial/core-ui";
 import { StockResponseDTO } from "@codescape-financial/portfolio-data-models";
-import { ReactNode } from "react";
 import { t } from "../i18n";
 import { BuildTableSchemaOptions } from "./types";
 
 const allColumnKeys = ["name", "isin", "nsin", "country", "currency"] as const;
-type StockTableColumnKey = (typeof allColumnKeys)[number];
+export type StockTableColumnKey = (typeof allColumnKeys)[number];
 
-const buildStockMetadataTableSchema = (
+export const buildStockMetadataColumnSchema = (
   options: BuildTableSchemaOptions<StockResponseDTO, StockTableColumnKey> = {},
 ): ColumnSchema<StockResponseDTO>[] => {
   const {
@@ -30,7 +33,8 @@ const buildStockMetadataTableSchema = (
     const first = schema[0] as ColumnSchema<StockResponseDTO>;
     schema[0] = {
       ...first,
-      footer: (data) => t("table.footer.rows", { count: data.length }),
+      footer: ({ data }) =>
+        data ? t("table.footer.rows", { count: data.length }) : undefined,
       footerClassNames: "text-right uppercase",
       footerCellProps: {
         colSpan: schema.length,
@@ -44,33 +48,33 @@ const buildStockMetadataTableSchema = (
 const nameColumnSchema: ColumnSchema<StockResponseDTO> = {
   id: "colid-stock-name",
   header: "Name",
-  value: (item) => item.name,
+  value: ({ data }) => data?.name ?? "",
 };
 
 const isinColumnSchema: ColumnSchema<StockResponseDTO> = {
   id: "colid-stock-isin",
   header: "ISIN",
-  value: (item) => item.isin,
+  value: ({ data }) => data?.isin ?? "",
   cellClassNames: "font-mono",
 };
 
 const nsinColumnSchema: ColumnSchema<StockResponseDTO> = {
   id: "colid-stock-nsin",
   header: "NSIN",
-  value: (item) => item.nsin,
+  value: ({ data }) => data?.nsin ?? "",
   cellClassNames: "font-mono",
 };
 
 const countryColumnSchema: ColumnSchema<StockResponseDTO> = {
   id: "colid-stock-country",
   header: "Country",
-  value: (item) => item.country.name,
+  value: ({ data }) => data?.country.name ?? "",
 };
 
 const currencyColumnSchema: ColumnSchema<StockResponseDTO> = {
   id: "colid-stock-currency",
   header: "Currency",
-  value: (item) => item.currency,
+  value: ({ data }) => data?.currency ?? "",
   cellClassNames: "font-mono",
 };
 
@@ -85,23 +89,11 @@ const columnMapping: {
 };
 
 const createActionsComponent = (
-  actionsComponent: ReactNode | ((item: StockResponseDTO) => ReactNode),
-) => {
-  const fn =
-    typeof actionsComponent === "function"
-      ? actionsComponent
-      : () => actionsComponent;
-
-  const column: ColumnSchema<StockResponseDTO> = {
-    id: "colid-stock-actions",
-    header: undefined,
-    value: fn,
-    headerClassNames: "text-right",
-    cellClassNames: "text-right",
-  };
-
-  return column;
-};
-
-export { buildStockMetadataTableSchema };
-export type { StockTableColumnKey };
+  actionsComponent: CellRendererFunc<StockResponseDTO, CellValue>,
+) => ({
+  id: "colid-stock-actions",
+  header: undefined,
+  cellRenderer: actionsComponent,
+  headerClassNames: "text-right",
+  cellClassNames: "text-right",
+});
