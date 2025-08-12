@@ -65,7 +65,7 @@ export type PortfolioHoldingExtendedColumns =
  * @param latestPrices - The latest prices for the holdings.
  * @returns The column schema for the portfolio holdings table.
  */
-const buildPortfolioHoldingColumnSchema = (
+export const buildPortfolioHoldingColumnSchema = (
   options: BuildTableSchemaOptions<
     PortfolioHoldingEmbeddedDTO,
     PortfolioHoldingExtendedColumns
@@ -759,5 +759,3 @@ const formatCompositeGainsCellTitle = (
 ) =>
   `Composite Gains: ${formatCurrency(gains.nominalValue + dividends.nominalValue)}, ` +
   `Composite Taxes: ${formatCurrency(gains.taxValue + dividends.taxValue)}`;
-
-export { buildPortfolioHoldingColumnSchema };
