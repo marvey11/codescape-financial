@@ -1,18 +1,14 @@
-import { Button } from "@codescape-financial/core-ui";
 import { ReactNode } from "react";
-import { Link } from "react-router-dom";
 
 interface DetailsPageHeaderProps {
   title: string;
-  editPath: string;
-  onDelete: () => void;
+  extraComponents?: ReactNode[];
   children?: ReactNode | undefined;
 }
 
 export const DetailsPageHeader = ({
   title,
-  editPath,
-  onDelete,
+  extraComponents = [],
   children,
 }: DetailsPageHeaderProps) => (
   <div className="flex flex-col">
@@ -24,16 +20,10 @@ export const DetailsPageHeader = ({
         {title}
       </h1>
 
-      <Link to={editPath}>
-        <Button>Edit</Button>
-      </Link>
-
-      <Button onClick={onDelete} variant="destructive">
-        Delete
-      </Button>
+      {extraComponents}
     </div>
 
-    {children != null && (
+    {children && (
       <div className="mb-3 flex flex-row flex-wrap items-center justify-start gap-1">
         {children}
       </div>

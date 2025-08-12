@@ -12,6 +12,10 @@ import {
   DetailsPageHeader,
   ViewStockDetailsButton,
 } from "../../components";
+import {
+  DetailsPageDeleteButton,
+  DetailsPageEditButton,
+} from "../../components/default-buttons";
 import { useAxios, useOutletContextData } from "../../hooks";
 import { buildStockMetadataColumnSchema } from "../../utils";
 
@@ -57,8 +61,12 @@ export const CountryDetailsPage = () => {
         <div className="flex flex-col gap-3">
           <DetailsPageHeader
             title={country.name}
-            editPath={`/countries/${country.id}/edit`}
-            onDelete={handleDelete}
+            extraComponents={[
+              <DetailsPageEditButton
+                editPath={`/countries/${country.id}/edit`}
+              />,
+              <DetailsPageDeleteButton onDelete={handleDelete} />,
+            ]}
           >
             <CountryTags country={country} />
           </DetailsPageHeader>
