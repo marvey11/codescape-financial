@@ -2,7 +2,10 @@ import {
   FLOATING_POINT_TOLERANCE,
   isEffectivelyZero,
 } from "@codescape-financial/core";
-import { StockMetadata } from "@codescape-financial/historical-data-access";
+import {
+  HistoricalQuoteService,
+  StockMetadata,
+} from "@codescape-financial/historical-data-access";
 import {
   CreateBuyTransactionDTO,
   CreateDividendDTO,
@@ -19,8 +22,10 @@ import {
   PortfolioHolding,
   PortfolioOperation,
 } from "../entities";
+import { convertOperationsToCashflow } from "../utils";
 import { PortfolioService } from "./portfolio.service";
 import { TaxCalculationService } from "./tax-calculation.service";
+import { XIRRCalculationService } from "./xirr-calculation.service";
 
 @Injectable()
 export class PortfolioOperationService {
@@ -29,6 +34,8 @@ export class PortfolioOperationService {
     private readonly operationRepository: Repository<PortfolioOperation>,
     private readonly portfolioService: PortfolioService,
     private readonly taxCalculationService: TaxCalculationService,
+    private readonly xirrCalculationService: XIRRCalculationService,
+    private readonly historicalQuoteService: HistoricalQuoteService,
     private readonly dataSource: DataSource,
   ) {}
 
@@ -217,6 +224,43 @@ export class PortfolioOperationService {
 
       return operation;
     });
+  }
+
+  async calculateXIRRForHolding(
+    portfolioId: string,
+    holdingId: string,
+  ): Promise<number> {
+    const operations = await this.operationRepository.find({
+      where: {
+        holdingId,
+        holding: {
+          portfolioId,
+        },
+      },
+      relations: ["holding", "holding.stockMetadata"],
+      order: { date: "ASC" },
+    });
+
+    if (operations.length === 0) {
+      return NaN; // No operations found for this holding
+    }
+
+    const cashflows = convertOperationsToCashflow(operations);
+
+    const holding = operations[0]?.holding;
+    if (holding && !isEffectivelyZero(Number(holding.shares))) {
+      const latestQuote = await this.historicalQuoteService.findLatestByIsin(
+        holding.stockMetadata.isin,
+      );
+      if (latestQuote) {
+        cashflows.add({
+          cashDate: new Date(),
+          cashAmount: Number(holding.shares) * latestQuote.price,
+        });
+      }
+    }
+
+    return this.xirrCalculationService.calculateXIRR(cashflows);
   }
 
   private async applyBuyOperation(
