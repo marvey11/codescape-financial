@@ -17,27 +17,16 @@ import {
 import { BuildTableSchemaOptions } from "./types";
 
 /**
- * Interface for the composition of realized gains.
- * @property context - The context of the composition, either "holding" or "total".
- * @property nominalGains - The nominal gains.
- * @property taxesFromSoldShares - The taxes from sold shares.
+ * Interface for the composition of a nominal value and its accompanying tax value.
+ *
+ * @property context - The context of the composition, either `holding` or `total`.
+ * @property nominalValue - The nominal value.
+ * @property taxValue - The tax value based on the nominal value.
  */
-interface RealizedGainsComposition {
+interface CompositionType {
   context: "holding" | "total";
-  nominalGains: number;
-  taxesFromSoldShares: number;
-}
-
-/**
- * Interface for the composition of dividends.
- * @property context - The context of the composition, either "holding" | "total".
- * @property nominalDividends - The nominal dividends.
- * @property taxesFromDividends - The taxes from dividends.
- */
-interface DividendsComposition {
-  context: "holding" | "total";
-  nominalDividends: number;
-  taxesFromDividends: number;
+  nominalValue: number;
+  taxValue: number;
 }
 
 /**
@@ -55,21 +44,23 @@ const defaultColumnKeys = [
   "relativeGainLoss",
   "dividends",
 ] as const;
+
 /**
  * The type for the default column keys for the portfolio holdings table.
  */
-type PortfolioHoldingDefaultColumnKey = (typeof defaultColumnKeys)[number];
+export type PortfolioHoldingDefaultColumns = (typeof defaultColumnKeys)[number];
 
 /**
  * The type for every column key for the portfolio holdings table.
  */
-type PortfolioHoldingEveryColumnKey =
-  | PortfolioHoldingDefaultColumnKey
+export type PortfolioHoldingExtendedColumns =
+  | PortfolioHoldingDefaultColumns
   | "realizedGains"
   | "totalGains";
 
 /**
  * Builds the column schema for the portfolio holdings table.
+ *
  * @param options - The options for building the table schema.
  * @param latestPrices - The latest prices for the holdings.
  * @returns The column schema for the portfolio holdings table.
@@ -77,7 +68,7 @@ type PortfolioHoldingEveryColumnKey =
 const buildPortfolioHoldingColumnSchema = (
   options: BuildTableSchemaOptions<
     PortfolioHoldingEmbeddedDTO,
-    PortfolioHoldingEveryColumnKey
+    PortfolioHoldingExtendedColumns
   > = {},
   latestPrices: AllLatestQuotesTransformedDTO,
 ): ColumnSchema<PortfolioHoldingEmbeddedDTO>[] => {
@@ -154,6 +145,7 @@ const averagePriceColumnSchema = {
 
 /**
  * Gets the column schema for the latest price column.
+ *
  * @param latestPrices - The latest prices for the holdings.
  * @returns The column schema for the latest price column.
  */
@@ -172,6 +164,7 @@ const getLatestPriceColumnSchema = (
 
 /**
  * Gets the column schema for the current value column.
+ *
  * @param latestPrices - The latest prices for the holdings.
  * @returns The column schema for the current value column.
  */
@@ -193,6 +186,7 @@ const getCurrentValueColumnSchema = (
 
 /**
  * Gets the column schema for the absolute gain/loss column.
+ *
  * @param latestPrices - The latest prices for the holdings.
  * @returns The column schema for the absolute gain/loss column.
  */
@@ -215,6 +209,7 @@ const getAbsoluteGainLossColumnSchema = (
 
 /**
  * Gets the column schema for the relative gain/loss column.
+ *
  * @param latestPrices - The latest prices for the holdings.
  * @returns The column schema for the relative gain/loss column.
  */
@@ -237,6 +232,7 @@ const getRelativeGainLossColumnSchema = (
 
 /**
  * Gets the column schema for the realized gains column.
+ *
  * @returns The column schema for the realized gains column.
  */
 const getRealizedGainsColumnSchema = () =>
@@ -258,6 +254,7 @@ const getRealizedGainsColumnSchema = () =>
 
 /**
  * Gets the column schema for the dividends column.
+ *
  * @returns The column schema for the dividends column.
  */
 const getDividendsColumnSchema = () =>
@@ -277,6 +274,7 @@ const getDividendsColumnSchema = () =>
 
 /**
  * Gets the column schema for the total gains column.
+ *
  * @returns The column schema for the total gains column.
  */
 const getTotalGainsColumnSchema = () =>
@@ -298,13 +296,14 @@ const getTotalGainsColumnSchema = () =>
 
 /**
  * Gets the column mapping for the portfolio holdings table.
+ *
  * @param latestPrices - The latest prices for the holdings.
  * @returns The column mapping for the portfolio holdings table.
  */
 const getColumnMapping = (
   latestPrices: AllLatestQuotesTransformedDTO,
 ): {
-  [key in PortfolioHoldingEveryColumnKey]: ColumnSchema<PortfolioHoldingEmbeddedDTO>;
+  [key in PortfolioHoldingExtendedColumns]: ColumnSchema<PortfolioHoldingEmbeddedDTO>;
 } => ({
   isin: isinColumnSchema,
   name: nameColumnSchema,
@@ -322,6 +321,7 @@ const getColumnMapping = (
 
 /**
  * Creates the actions component for the portfolio holdings table.
+ *
  * @param actionsComponent - The actions component.
  * @returns The actions component for the portfolio holdings table.
  */
@@ -340,6 +340,7 @@ const createActionsComponent = (
 
 /**
  * Calculates the total cost basis for a list of holdings.
+ *
  * @param holding - The list of holdings.
  * @returns The total cost basis.
  */
@@ -353,17 +354,19 @@ const calculateTotalCostBasis = (
 
 /**
  * Gets the latest price for a holding.
- * @param data - The holding.
+ *
+ * @param holding - The holding.
  * @param latestPrices - The latest prices for the holdings.
  * @returns The latest price for the holding.
  */
 const getHoldingLatestPrice = (
-  data: PortfolioHoldingEmbeddedDTO | undefined,
+  holding: PortfolioHoldingEmbeddedDTO | undefined,
   latestPrices: AllLatestQuotesTransformedDTO,
-) => (data ? latestPrices[data.stock.isin]?.price : null);
+) => (holding ? latestPrices[holding.stock.isin]?.price : null);
 
 /**
  * Calculates the current value of a holding.
+ *
  * @param holding - The holding.
  * @param latestPrices - The latest prices for the holdings.
  * @returns The current value of the holding.
@@ -392,6 +395,7 @@ const calculateHoldingCurrentValue = (
 
 /**
  * Calculates the total current value of a list of holdings.
+ *
  * @param holdings - The list of holdings.
  * @param latestPrices - The latest prices for the holdings.
  * @returns The total current value of the list of holdings.
@@ -408,6 +412,7 @@ const calculateTotalCurrentValue = (
 
 /**
  * Calculates the absolute gain/loss for a holding.
+ *
  * @param holding - The holding.
  * @param latestPrices - The latest prices for the holdings.
  * @returns The absolute gain/loss for the holding.
@@ -428,6 +433,7 @@ const calculateHoldingAbsoluteGainLoss = (
 
 /**
  * Calculates the total absolute gain/loss for a list of holdings.
+ *
  * @param holdings - The list of holdings.
  * @param latestPrices - The latest prices for the holdings.
  * @returns The total absolute gain/loss for the list of holdings.
@@ -444,6 +450,7 @@ const calculateTotalAbsoluteGainLoss = (
 
 /**
  * Calculates the relative gain/loss for a holding.
+ *
  * @param holding - The holding.
  * @param latestPrices - The latest prices for the holdings.
  * @returns The relative gain/loss for the holding.
@@ -465,6 +472,7 @@ const calculateHoldingRelativeGainLoss = (
 
 /**
  * Calculates the total relative gain/loss for a list of holdings.
+ *
  * @param holdings - The list of holdings.
  * @param latestPrices - The latest prices for the holdings.
  * @returns The total relative gain/loss for the list of holdings.
@@ -486,32 +494,31 @@ const calculateTotalRelativeGainLoss = (
 
 /**
  * Gets the components of the realized gains for a holding or a list of holdings.
+ *
  * @param oneOrMany - The holding or list of holdings.
  * @returns The components of the realized gains.
  */
 const getRealizedGainsComponents = (
   oneOrMany: PortfolioHoldingEmbeddedDTO | PortfolioHoldingEmbeddedDTO[],
-): RealizedGainsComposition => {
+): CompositionType => {
   const getComponentsForHolding = (holding: PortfolioHoldingEmbeddedDTO) =>
     ({
       context: "holding",
-      nominalGains: holding.summary.totalRealizedGains ?? 0,
-      taxesFromSoldShares: holding.summary.totalTaxFromSoldShares ?? 0,
-    }) satisfies RealizedGainsComposition;
+      nominalValue: holding.summary.totalRealizedGains ?? 0,
+      taxValue: holding.summary.totalTaxFromSoldShares ?? 0,
+    }) satisfies CompositionType;
 
   if (Array.isArray(oneOrMany)) {
     return oneOrMany.reduce(
       (composite, holding) => {
-        const { nominalGains, taxesFromSoldShares } =
-          getComponentsForHolding(holding);
+        const { nominalValue, taxValue } = getComponentsForHolding(holding);
         return {
           ...composite,
-          nominalGains: composite.nominalGains + nominalGains,
-          taxesFromSoldShares:
-            composite.taxesFromSoldShares + taxesFromSoldShares,
+          nominalValue: composite.nominalValue + nominalValue,
+          taxValue: composite.taxValue + taxValue,
         };
       },
-      { context: "total", nominalGains: 0, taxesFromSoldShares: 0 },
+      { context: "total", nominalValue: 0, taxValue: 0 },
     );
   }
 
@@ -520,6 +527,7 @@ const getRealizedGainsComponents = (
 
 /**
  * Calculates the realized gains for a holding or a list of holdings.
+ *
  * @param oneOrMany - The holding or list of holdings.
  * @returns The realized gains.
  */
@@ -532,38 +540,38 @@ const calculateRealizedGains = (
   if (!oneOrMany) {
     return null;
   }
-  const { nominalGains, taxesFromSoldShares } =
+  const { nominalValue: nominalGains, taxValue: taxesFromSoldShares } =
     getRealizedGainsComponents(oneOrMany);
   return nominalGains - taxesFromSoldShares;
 };
 
 /**
  * Gets the components of the dividends for a holding or a list of holdings.
+ *
  * @param oneOrMany - The holding or list of holdings.
  * @returns The components of the dividends.
  */
 const getDividendComponents = (
   oneOrMany: PortfolioHoldingEmbeddedDTO | PortfolioHoldingEmbeddedDTO[],
-): DividendsComposition => {
+): CompositionType => {
   const getComponentsForHolding = (holding: PortfolioHoldingEmbeddedDTO) =>
     ({
       context: "holding",
-      nominalDividends: holding.summary.totalDividends ?? 0,
-      taxesFromDividends: holding.summary.totalTaxFromDividends ?? 0,
-    }) satisfies DividendsComposition;
+      nominalValue: holding.summary.totalDividends ?? 0,
+      taxValue: holding.summary.totalTaxFromDividends ?? 0,
+    }) satisfies CompositionType;
 
   if (Array.isArray(oneOrMany)) {
     return oneOrMany.reduce(
       (composite, holding) => {
-        const { nominalDividends, taxesFromDividends } =
-          getComponentsForHolding(holding);
+        const { nominalValue, taxValue } = getComponentsForHolding(holding);
         return {
           ...composite,
-          nominalDividends: composite.nominalDividends + nominalDividends,
-          taxesFromDividends: composite.taxesFromDividends + taxesFromDividends,
+          nominalValue: composite.nominalValue + nominalValue,
+          taxValue: composite.taxValue + taxValue,
         };
       },
-      { context: "total", nominalDividends: 0, taxesFromDividends: 0 },
+      { context: "total", nominalValue: 0, taxValue: 0 },
     );
   }
 
@@ -572,6 +580,7 @@ const getDividendComponents = (
 
 /**
  * Calculates the dividends for a holding or a list of holdings.
+ *
  * @param oneOrMany - The holding or list of holdings.
  * @returns The dividends.
  */
@@ -584,13 +593,13 @@ const calculateDividends = (
   if (!oneOrMany) {
     return null;
   }
-  const { nominalDividends, taxesFromDividends } =
-    getDividendComponents(oneOrMany);
-  return nominalDividends - taxesFromDividends;
+  const { nominalValue, taxValue } = getDividendComponents(oneOrMany);
+  return nominalValue - taxValue;
 };
 
 /**
  * Calculates the composite gains for a holding.
+ *
  * @param holding - The holding.
  * @returns The composite gains for the holding.
  */
@@ -604,6 +613,7 @@ const calculateHoldingCompositeGains = (
 
 /**
  * Calculates the total composite gains for a list of holdings.
+ *
  * @param holdings - The list of holdings.
  * @returns The total composite gains for the list of holdings.
  */
@@ -620,6 +630,7 @@ const calculateTotalCompositeGains = (
 
 /**
  * Constructs the cell title for the last updated date.
+ *
  * @param holding - The holding.
  * @param latestPrices - The latest prices for the holdings.
  * @returns The cell title for the last updated date.
@@ -636,6 +647,7 @@ const constructLastUpdatedCellTitle = (
 
 /**
  * Constructs the cell title for the realized gains.
+ *
  * @param oneOrMany - The holding or list of holdings.
  * @returns The cell title for the realized gains.
  */
@@ -651,6 +663,7 @@ const constructRealizedGainsCellTitle = (
 
 /**
  * Constructs the cell title for the dividends.
+ *
  * @param oneOrMany - The holding or list of holdings.
  * @returns The cell title for the dividends.
  */
@@ -666,6 +679,7 @@ const constructDividendsCellTitle = (
 
 /**
  * Constructs the cell title for the composite gains.
+ *
  * @param oneOrMany - The holding or list of holdings.
  * @returns The cell title for the composite gains.
  */
@@ -686,6 +700,7 @@ const constructCompositeGainsCellTitle = (
 
 /**
  * Formats a value as a currency.
+ *
  * @param value - The value to format.
  * @returns The formatted value.
  */
@@ -694,6 +709,7 @@ const currencyFormatter = (value: CellValue) =>
 
 /**
  * Formats a value as a percentage.
+ *
  * @param value - The value to format.
  * @returns The formatted value.
  */
@@ -702,49 +718,46 @@ const percentFormatter = (value: CellValue) =>
 
 /**
  * Formats the cell title for the realized gains.
- * @param nominalGains - The nominal gains.
- * @param taxesFromSoldShares - The taxes from sold shares.
+ *
+ * @param nominalValue - The nominal gains.
+ * @param taxValue - The taxes from sold shares.
  * @returns The formatted cell title.
  */
 const formatRealizedGainsCellTitle = ({
-  nominalGains,
-  taxesFromSoldShares,
-}: RealizedGainsComposition) =>
-  `Nominal Realised Gains: ${formatCurrency(nominalGains)}, ` +
-  `Taxes from Sold Shares: ${formatCurrency(taxesFromSoldShares)}`;
+  nominalValue,
+  taxValue,
+}: CompositionType) =>
+  `Nominal Realised Gains: ${formatCurrency(nominalValue)}, ` +
+  `Taxes from Sold Shares: ${formatCurrency(taxValue)}`;
 
 /**
  * Formats the cell title for the dividends.
- * @param nominalDividends - The nominal dividends.
- * @param taxesFromDividends - The taxes from dividends.
+ *
+ * @param nominalValue - The nominal dividends.
+ * @param taxValue - The taxes from dividends.
  * @returns The formatted cell title.
  */
 const formatDividendsCellTitle = ({
-  nominalDividends,
-  taxesFromDividends,
-}: DividendsComposition) =>
-  nominalDividends > 0
-    ? `Nominal Dividends: ${formatCurrency(nominalDividends)}, ` +
-      `Taxes from Dividends: ${formatCurrency(taxesFromDividends)}`
+  nominalValue,
+  taxValue,
+}: CompositionType) =>
+  nominalValue > 0
+    ? `Nominal Dividends: ${formatCurrency(nominalValue)}, ` +
+      `Taxes from Dividends: ${formatCurrency(taxValue)}`
     : undefined;
 
 /**
  * Formats the cell title for the composite gains.
- * @param nominalGains - The nominal gains.
- * @param taxesFromSoldShares - The taxes from sold shares.
- * @param nominalDividends - The nominal dividends.
- * @param taxesFromDividends - The taxes from dividends.
+ *
+ * @param gains - The composite object for gains.
+ * @param dividends - The composite object for dividends.
  * @returns The formatted cell title.
  */
 const formatCompositeGainsCellTitle = (
-  { nominalGains, taxesFromSoldShares }: RealizedGainsComposition,
-  { nominalDividends, taxesFromDividends }: DividendsComposition,
+  gains: CompositionType,
+  dividends: CompositionType,
 ) =>
-  `Composite Gains: ${formatCurrency(nominalGains + nominalDividends)}, ` +
-  `Composite Taxes: ${formatCurrency(taxesFromSoldShares + taxesFromDividends)}`;
+  `Composite Gains: ${formatCurrency(gains.nominalValue + dividends.nominalValue)}, ` +
+  `Composite Taxes: ${formatCurrency(gains.taxValue + dividends.taxValue)}`;
 
 export { buildPortfolioHoldingColumnSchema };
-export type {
-  PortfolioHoldingDefaultColumnKey,
-  PortfolioHoldingEveryColumnKey,
-};
