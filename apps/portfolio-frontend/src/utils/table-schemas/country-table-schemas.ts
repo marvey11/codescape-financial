@@ -52,12 +52,12 @@ export const buildCountryColumnSchema = (
 const nameColumnSchema: ColumnSchema<CountryResponseDTO> = {
   id: "colid-country-name",
   header: "Name",
-  value: ({ data }) => data?.name ?? "",
+  value: ({ data }) => data?.name,
 };
 const countryCodeColumnSchema: ColumnSchema<CountryResponseDTO> = {
   id: "colid-country-code",
   header: "Code",
-  value: ({ data }) => data?.countryCode ?? "",
+  value: ({ data }) => data?.countryCode,
 };
 
 const taxRateColumnSchema: ColumnSchema<CountryResponseDTO> = {
