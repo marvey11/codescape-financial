@@ -71,12 +71,14 @@ export const CountryDetailsPage = () => {
             <CountryTags country={country} />
           </DetailsPageHeader>
 
-          <>
-            <h2 className="text-2xl font-extrabold">Stock List</h2>
-            <div className="overflow-x-auto rounded-md border border-gray-300 shadow-sm">
-              <CountryStockTable data={sortedStocks ?? []} />
-            </div>
-          </>
+          {sortedStocks && (
+            <>
+              <h2 className="text-2xl font-extrabold">Stock List</h2>
+              <div className="overflow-x-auto rounded-md border border-gray-300 shadow-sm">
+                <CountryStockTable data={sortedStocks} />
+              </div>
+            </>
+          )}
         </div>
       )}
     </DataPageContainer>

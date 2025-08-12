@@ -1,59 +1,63 @@
 import { FormButtonsComponent } from "@codescape-financial/core-ui";
 import {
-  CountryResponseDTO,
-  UpdateCountryDTO,
+  PortfolioResponseDTO,
+  UpdatePortfolioDTO,
 } from "@codescape-financial/portfolio-data-models";
 import { FormEvent, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { DataPageContainer } from "../../components";
 import { useOutletContextData } from "../../hooks";
-import { CountryForm, CountryFormData } from "./CountryForm";
+import { PortfolioForm, PortfolioFormData } from "./PortfolioForm";
 
-export const EditCountryPage = () => {
+export const EditPortfolioPage = () => {
   const navigate = useNavigate();
 
   const {
     loading,
     error,
-    data: country,
+    data: portfolio,
     sendRequest,
-  } = useOutletContextData<CountryResponseDTO>();
+  } = useOutletContextData<PortfolioResponseDTO>();
 
-  const [formData, setFormData] = useState<CountryFormData | undefined>();
+  const [formData, setFormData] = useState<PortfolioFormData | undefined>();
 
   useEffect(() => {
-    country && setFormData(country satisfies CountryFormData);
-  }, [country]);
+    portfolio &&
+      setFormData({
+        ...portfolio,
+        description: portfolio.description ?? "",
+      } satisfies PortfolioFormData);
+  }, [portfolio]);
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (country && formData) {
-      const payload: UpdateCountryDTO = {
+    if (portfolio && formData) {
+      const payload: UpdatePortfolioDTO = {
         ...formData,
       };
 
       sendRequest({
-        url: `/countries/${country.id}`,
+        url: `/portfolios/${portfolio.id}`,
         method: "put",
         data: payload,
       }).then(() => {
-        navigate("/countries");
+        navigate("/portfolios");
       });
     }
   };
 
   return (
     <DataPageContainer isLoading={loading} error={error}>
-      <h1 className="mb-4 text-4xl font-extrabold">Update Country</h1>
+      <h1 className="mb-4 text-4xl font-extrabold">Update Portfolio</h1>
       {formData && (
         <form
           onSubmit={handleSubmit}
           className="grid grid-cols-[max-content_1fr] items-center gap-4 rounded-md border border-gray-300 p-6 shadow-sm"
         >
-          <CountryForm value={formData} onChange={setFormData} />
+          <PortfolioForm value={formData} onChange={setFormData} />
           <FormButtonsComponent
-            onCancel={() => navigate("..", { replace: true })}
+            onCancel={() => navigate("/portfolios", { replace: true })}
           />
         </form>
       )}

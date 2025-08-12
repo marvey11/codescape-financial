@@ -12,6 +12,7 @@ import {
   DataPageContainer,
   DetailsPageHeader,
 } from "../../components";
+import { DetailsPageEditButton } from "../../components/default-buttons";
 import { useAxios, useOutletContextData } from "../../hooks";
 import { buildPortfolioHoldingColumnSchema } from "../../utils";
 
@@ -58,7 +59,14 @@ export const PortfolioDetailsPage = () => {
     <DataPageContainer isLoading={loading} error={error}>
       {activePortfolioData && (
         <div className="flex flex-col gap-3">
-          <DetailsPageHeader title={activePortfolioData.name} />
+          <DetailsPageHeader
+            title={activePortfolioData.name}
+            extraComponents={[
+              <DetailsPageEditButton
+                editPath={`/portfolios/${activePortfolioData.id}/edit`}
+              />,
+            ]}
+          />
 
           {sortedActiveHoldings && sortedActiveHoldings.length > 0 ? (
             <>
