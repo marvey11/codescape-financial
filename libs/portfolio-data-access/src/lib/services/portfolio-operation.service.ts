@@ -467,7 +467,7 @@ export class PortfolioOperationService {
     holding.shares = String(totalShares);
     holding.totalCostBasis = String(totalCostBasis);
     holding.averagePricePerShare = String(
-      totalShares > 0 ? totalCostBasis / totalShares : 0,
+      !isEffectivelyZero(totalShares) ? 0 : totalCostBasis / totalShares,
     );
   }
 }

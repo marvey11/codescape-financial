@@ -48,33 +48,33 @@ export const buildStockMetadataColumnSchema = (
 const nameColumnSchema: ColumnSchema<StockResponseDTO> = {
   id: "colid-stock-name",
   header: "Name",
-  value: ({ data }) => data?.name ?? "",
+  value: ({ data }) => data?.name,
 };
 
 const isinColumnSchema: ColumnSchema<StockResponseDTO> = {
   id: "colid-stock-isin",
   header: "ISIN",
-  value: ({ data }) => data?.isin ?? "",
+  value: ({ data }) => data?.isin,
   cellClassNames: "font-mono",
 };
 
 const nsinColumnSchema: ColumnSchema<StockResponseDTO> = {
   id: "colid-stock-nsin",
   header: "NSIN",
-  value: ({ data }) => data?.nsin ?? "",
+  value: ({ data }) => data?.nsin,
   cellClassNames: "font-mono",
 };
 
 const countryColumnSchema: ColumnSchema<StockResponseDTO> = {
   id: "colid-stock-country",
   header: "Country",
-  value: ({ data }) => data?.country.name ?? "",
+  value: ({ data }) => data?.country.name,
 };
 
 const currencyColumnSchema: ColumnSchema<StockResponseDTO> = {
   id: "colid-stock-currency",
   header: "Currency",
-  value: ({ data }) => data?.currency ?? "",
+  value: ({ data }) => data?.currency,
   cellClassNames: "font-mono",
 };
 
