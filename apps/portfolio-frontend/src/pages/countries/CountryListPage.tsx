@@ -31,14 +31,14 @@ export const CountryListPage = () => {
 
       {sortedCountries && (
         <div className="overflow-x-auto rounded-md border border-gray-300 shadow-sm">
-          <UpgradedCountryTable data={sortedCountries} />
+          <CountryTable data={sortedCountries} />
         </div>
       )}
     </DataPageContainer>
   );
 };
 
-const UpgradedCountryTable = ({ data }: { data: CountryResponseDTO[] }) => {
+const CountryTable = ({ data }: { data: CountryResponseDTO[] }) => {
   const columns = useMemo(
     () =>
       buildCountryColumnSchema({
