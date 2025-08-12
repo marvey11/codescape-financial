@@ -5,9 +5,7 @@ import {
   PortfolioHoldingEmbeddedDTO,
   PortfolioResponseDTO,
 } from "@codescape-financial/portfolio-data-models";
-import { AxiosRequestConfig } from "axios";
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import axiosInstance from "../../api/axios";
 import {
   AddOperationButton,
@@ -18,13 +16,10 @@ import { useAxios, useOutletContextData } from "../../hooks";
 import { buildPortfolioHoldingColumnSchema } from "../../utils";
 
 export const PortfolioDetailsPage = () => {
-  const navigate = useNavigate();
-
   const {
     loading,
     error,
     data: activePortfolioData,
-    sendRequest: sendActiveDataRequest,
   } = useOutletContextData<PortfolioResponseDTO>();
 
   const {
@@ -59,25 +54,11 @@ export const PortfolioDetailsPage = () => {
     [historicalPortfolioData?.holdings],
   );
 
-  const handleDelete = () => {
-    activePortfolioData &&
-      sendActiveDataRequest({
-        url: `/portfolios/${activePortfolioData.id}`,
-        method: "delete",
-      } satisfies AxiosRequestConfig).then(() => {
-        navigate("/portfolios");
-      });
-  };
-
   return (
     <DataPageContainer isLoading={loading} error={error}>
       {activePortfolioData && (
         <div className="flex flex-col gap-3">
-          <DetailsPageHeader
-            title={activePortfolioData.name}
-            editPath={`/portfolios/${activePortfolioData.id}/edit`}
-            onDelete={handleDelete}
-          />
+          <DetailsPageHeader title={activePortfolioData.name} />
 
           {sortedActiveHoldings && sortedActiveHoldings.length > 0 ? (
             <>

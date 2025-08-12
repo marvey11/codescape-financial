@@ -3,6 +3,10 @@ import { StockResponseDTO } from "@codescape-financial/portfolio-data-models";
 import { AxiosRequestConfig } from "axios";
 import { useNavigate } from "react-router-dom";
 import { DataPageContainer, DetailsPageHeader } from "../../components";
+import {
+  DetailsPageDeleteButton,
+  DetailsPageEditButton,
+} from "../../components/default-buttons";
 import { useOutletContextData } from "../../hooks";
 
 export const StockMetadataDetailsPage = () => {
@@ -31,8 +35,10 @@ export const StockMetadataDetailsPage = () => {
         <div className="flex flex-col gap-3">
           <DetailsPageHeader
             title={stock.name}
-            editPath={`/stocks/${stock.id}/edit`}
-            onDelete={handleDelete}
+            extraComponents={[
+              <DetailsPageEditButton editPath={`/stocks/${stock.id}/edit`} />,
+              <DetailsPageDeleteButton onDelete={handleDelete} />,
+            ]}
           >
             <StockTags stock={stock} />
           </DetailsPageHeader>
