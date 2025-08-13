@@ -8,11 +8,11 @@ import {
   PortfolioOperation,
 } from "./entities";
 import {
+  PortfolioCalculationService,
   PortfolioHoldingService,
   PortfolioOperationService,
   PortfolioService,
   TaxCalculationService,
-  XIRRCalculationService,
 } from "./services";
 
 @Module({
@@ -26,19 +26,19 @@ import {
     HistoricalDataAccessModule,
   ],
   providers: [
+    PortfolioCalculationService,
     PortfolioHoldingService,
     PortfolioOperationService,
     PortfolioService,
     TaxCalculationService,
-    XIRRCalculationService,
   ],
   exports: [
+    PortfolioCalculationService,
     PortfolioHoldingService,
     PortfolioOperationService,
     PortfolioService,
     TaxCalculationService,
     TypeOrmModule,
-    XIRRCalculationService,
   ],
 })
 export class PortfolioDataAccessModule {}

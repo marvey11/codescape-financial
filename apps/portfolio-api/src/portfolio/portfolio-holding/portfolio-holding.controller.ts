@@ -1,14 +1,15 @@
 import {
+  PortfolioCalculationService,
   PortfolioHoldingService,
-  PortfolioOperationService,
 } from "@codescape-financial/portfolio-data-access";
-import { Controller, Get, Param } from "@nestjs/common";
+import { BatchISINRequestDTO } from "@codescape-financial/portfolio-data-models";
+import { Body, Controller, Get, Param, Post } from "@nestjs/common";
 
 @Controller("portfolios/:portfolioId/holdings")
 export class PortfolioHoldingController {
   constructor(
     private readonly portfolioHoldingService: PortfolioHoldingService,
-    private readonly portfolioOperationService: PortfolioOperationService,
+    private readonly portfolioCalculationService: PortfolioCalculationService,
   ) {}
 
   @Get()
@@ -29,9 +30,20 @@ export class PortfolioHoldingController {
     @Param("portfolioId") portfolioId: string,
     @Param("holdingId") holdingId: string,
   ) {
-    return this.portfolioOperationService.calculateXIRRForHolding(
+    return this.portfolioCalculationService.calculateXIRRForHolding(
       portfolioId,
       holdingId,
+    );
+  }
+
+  @Post("batch-xirr")
+  async batchGetHoldingXIRR(
+    @Param("portfolioId") portfolioId: string,
+    @Body() body: BatchISINRequestDTO,
+  ) {
+    return this.portfolioCalculationService.calculateBatchXIRRForHoldings(
+      portfolioId,
+      body.isins,
     );
   }
 }

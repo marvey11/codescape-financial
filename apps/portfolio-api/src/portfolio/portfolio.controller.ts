@@ -1,4 +1,7 @@
-import { PortfolioService } from "@codescape-financial/portfolio-data-access";
+import {
+  PortfolioCalculationService,
+  PortfolioService,
+} from "@codescape-financial/portfolio-data-access";
 import {
   CreatePortfolioDTO,
   UpdatePortfolioDTO,
@@ -15,7 +18,10 @@ import {
 
 @Controller("portfolios")
 export class PortfolioController {
-  constructor(private readonly portfolioService: PortfolioService) {}
+  constructor(
+    private readonly portfolioService: PortfolioService,
+    private readonly portfolioCalculationService: PortfolioCalculationService,
+  ) {}
 
   @Get()
   async getPortfolios() {
@@ -48,5 +54,12 @@ export class PortfolioController {
   @Delete(":id")
   async deletePortfolio(@Param("id") id: string) {
     return this.portfolioService.remove(id);
+  }
+
+  @Get(":id/xirr")
+  async getPortfolioXirr(@Param("id") portfolioId: string) {
+    return this.portfolioCalculationService.calculateXIRRForPortfolio(
+      portfolioId,
+    );
   }
 }

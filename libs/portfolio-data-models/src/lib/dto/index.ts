@@ -1,4 +1,5 @@
 export * from "./country.dto";
+export * from "./isin.dto";
 export * from "./operation.dto";
 export * from "./portfolio-holding.dto";
 export * from "./portfolio.dto";

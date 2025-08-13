@@ -14,3 +14,12 @@ export interface PortfolioHoldingEmbeddedDTO {
     totalTaxFromDividends?: number;
   };
 }
+
+export interface PortfolioHoldingXIRRResponseDTO {
+  isin: string;
+  xirr: number;
+}
+
+export interface PortfolioHoldingXIRRBatchResponseDTO {
+  [isin: string]: number;
+}
