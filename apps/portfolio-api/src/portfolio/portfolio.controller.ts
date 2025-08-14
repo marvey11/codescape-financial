@@ -5,6 +5,7 @@ import {
 import {
   BatchISINRequestDTO,
   CreatePortfolioDTO,
+  PortfolioViewFilterDTO,
   UpdatePortfolioDTO,
   XIRRPortfolioResponseDTO,
 } from "@codescape-financial/portfolio-data-models";
@@ -16,6 +17,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
 } from "@nestjs/common";
 
 @Controller("portfolios")
@@ -56,9 +58,12 @@ export class PortfolioController {
   @Get(":id/xirr")
   async getPortfolioXirr(
     @Param("id") portfolioId: string,
+    @Query() filter: PortfolioViewFilterDTO,
   ): Promise<XIRRPortfolioResponseDTO | null> {
-    return this.portfolioCalculationService.calculateXIRRForPortfolio(
+    console.log("CONTROLLER", filter);
+    return this.portfolioCalculationService.calculatePortfolioXIRR(
       portfolioId,
+      filter.activeOnly ?? false,
     );
   }
 

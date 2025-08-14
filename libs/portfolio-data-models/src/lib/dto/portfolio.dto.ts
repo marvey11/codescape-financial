@@ -1,4 +1,5 @@
-import { IsOptional, IsString, Length } from "class-validator";
+import { Transform } from "class-transformer";
+import { IsBoolean, IsOptional, IsString, Length } from "class-validator";
 import { PortfolioHoldingEmbeddedDTO } from "./portfolio-holding.dto";
 
 export class CreatePortfolioDTO {
@@ -37,4 +38,18 @@ export interface PortfolioResponseDTO {
     totalTaxFromDividends?: number;
   };
   holdings: PortfolioHoldingEmbeddedDTO[];
+}
+
+export class PortfolioViewFilterDTO {
+  @IsOptional()
+  @IsBoolean()
+  @Transform(({ value }) => {
+    // Check if the string value is explicitly 'true' or 'false'
+    if (value === "true") return true;
+    if (value === "false") return false;
+    // For any other value (e.g., undefined, null, or other strings),
+    // let IsBoolean validate or return the original value for IsOptional
+    return value;
+  })
+  activeOnly?: boolean;
 }

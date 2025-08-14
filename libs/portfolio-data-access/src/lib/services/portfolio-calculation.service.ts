@@ -1,4 +1,5 @@
 import {
+  FLOATING_POINT_TOLERANCE,
   formatNormalizedDate,
   getDateObject,
   isEffectivelyZero,
@@ -11,7 +12,7 @@ import {
   XIRRHoldingResponseDTO,
   XIRRPortfolioResponseDTO,
 } from "@codescape-financial/portfolio-data-models";
-import { Injectable } from "@nestjs/common";
+import { Injectable, Logger } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { In, Repository } from "typeorm";
 import { PortfolioHolding, PortfolioOperation } from "../entities";
@@ -22,6 +23,8 @@ const MAX_ITERATIONS = 100;
 
 @Injectable()
 export class PortfolioCalculationService {
+  private readonly logger = new Logger(PortfolioCalculationService.name);
+
   constructor(
     @InjectRepository(PortfolioOperation)
     private readonly operationRepository: Repository<PortfolioOperation>,
@@ -30,18 +33,26 @@ export class PortfolioCalculationService {
     private readonly historicalQuoteService: HistoricalQuoteService,
   ) {}
 
-  async calculateXIRRForPortfolio(
+  async calculatePortfolioXIRR(
     portfolioId: string,
+    activeOnly: boolean,
   ): Promise<XIRRPortfolioResponseDTO | null> {
-    const operations = await this.operationRepository.find({
-      where: {
-        holding: {
-          portfolioId,
-        },
-      },
-      relations: ["holding", "holding.stockMetadata"],
-      order: { date: "ASC" },
-    });
+    this.logger.verbose(activeOnly);
+    const queryBuilder = this.operationRepository
+      .createQueryBuilder("operation")
+      .leftJoinAndSelect("operation.holding", "holding")
+      .leftJoinAndSelect("holding.stockMetadata", "stockMetadata")
+      .where("holding.portfolioId = :portfolioId", { portfolioId });
+
+    if (activeOnly) {
+      queryBuilder.andWhere("holding.shares > :tolerance", {
+        tolerance: FLOATING_POINT_TOLERANCE,
+      });
+    }
+
+    const operations = await queryBuilder
+      .orderBy("operation.date", "ASC")
+      .getMany();
 
     if (operations.length === 0) {
       return null;
