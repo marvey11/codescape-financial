@@ -11,7 +11,9 @@ export const PortfolioLayout = () => {
     useAxios<PortfolioResponseDTO>();
 
   useEffect(() => {
-    id && sendRequest({ url: `/portfolios/${id}`, method: "get" });
+    if (id) {
+      sendRequest({ url: `/portfolios/${id}`, method: "get" });
+    }
   }, [id, sendRequest]);
 
   return (

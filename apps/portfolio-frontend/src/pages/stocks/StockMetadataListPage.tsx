@@ -43,7 +43,7 @@ const StockMetadataTable = ({ data }: { data: StockResponseDTO[] }) => {
     () =>
       buildStockMetadataColumnSchema({
         actionsComponent: ({ data }) =>
-          data ? <ViewStockDetailsButton stock={data} /> : <></>,
+          data ? <ViewStockDetailsButton stock={data} /> : null,
       }),
     [],
   );

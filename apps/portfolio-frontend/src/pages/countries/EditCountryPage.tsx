@@ -22,7 +22,9 @@ export const EditCountryPage = () => {
   const [formData, setFormData] = useState<CountryFormData | undefined>();
 
   useEffect(() => {
-    country && setFormData(country satisfies CountryFormData);
+    if (country) {
+      setFormData(country satisfies CountryFormData);
+    }
   }, [country]);
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {

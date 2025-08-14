@@ -33,11 +33,12 @@ export const CountryDetailsPage = () => {
     useAxios<StockResponseDTO[]>();
 
   useEffect(() => {
-    country &&
+    if (country) {
       sendStocksForCountryRequest({
         url: `/stock-metadata?countryId=${country.id}`,
         method: "get",
       });
+    }
   }, [country, sendStocksForCountryRequest]);
 
   const sortedStocks = useMemo(
@@ -46,13 +47,14 @@ export const CountryDetailsPage = () => {
   );
 
   const handleDelete = () => {
-    country &&
+    if (country) {
       sendRequest({
         url: `/countries/${country.id}`,
         method: "delete",
       } satisfies AxiosRequestConfig).then(() => {
         navigate("/countries");
       });
+    }
   };
 
   return (
@@ -106,7 +108,7 @@ const CountryStockTable = ({ data }: { data: StockResponseDTO[] }) => {
       buildStockMetadataColumnSchema({
         columnKeys: ["name", "isin", "nsin", "currency"],
         actionsComponent: ({ data }) =>
-          data ? <ViewStockDetailsButton stock={data} /> : <></>,
+          data ? <ViewStockDetailsButton stock={data} /> : null,
       }),
     [],
   );

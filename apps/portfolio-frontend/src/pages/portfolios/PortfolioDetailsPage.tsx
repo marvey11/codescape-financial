@@ -45,7 +45,7 @@ export const PortfolioDetailsPage = () => {
         "/historical-quotes/latest-batch",
         { isins },
       );
-      const xirrBatchRequest =
+      const xirrHoldingListRequest =
         axiosInstance.request<XIRRHoldingListTransformedDTO>({
           url: `/portfolios/${portfolioId}/holdings/xirr`,
           params: {
@@ -54,7 +54,7 @@ export const PortfolioDetailsPage = () => {
           method: "GET",
         });
 
-      Promise.all([quotesRequest, xirrBatchRequest])
+      Promise.all([quotesRequest, xirrHoldingListRequest])
         .then(([latestQuotesResponse, xirrResponse]) => {
           setlatestQuotes((prev) => {
             for (const [isin, quote] of Object.entries(
@@ -64,11 +64,12 @@ export const PortfolioDetailsPage = () => {
             }
             return prev;
           });
+          console.log(xirrResponse.data);
           setHoldingsXIRR(xirrResponse.data);
         })
         .catch(console.error);
     }
-  }, [data]);
+  }, [data, data?.id, showActiveHoldingsOnly]);
 
   const filteredHoldings = useMemo(() => {
     if (!data?.holdings) {
@@ -110,7 +111,7 @@ export const PortfolioDetailsPage = () => {
       .catch((error) => {
         console.error(error);
       });
-  }, [filteredHoldings]);
+  }, [data?.id, filteredHoldings, showActiveHoldingsOnly]);
 
   return (
     <DataPageContainer isLoading={loading} error={error}>
@@ -177,9 +178,7 @@ const PortfolioHoldingsTable = ({
         actionsComponent: ({ data }) =>
           data ? (
             <AddOperationButton portfolioId={portfolioId} holding={data} />
-          ) : (
-            <></>
-          ),
+          ) : null,
       },
       latestQuotes,
       holdingsXIRR,

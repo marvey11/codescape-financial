@@ -46,7 +46,7 @@ const PortfolioTable = ({ data }: { data: PortfolioResponseDTO[] }) => {
     () =>
       buildPortfolioColumnSchema({
         actionsComponent: ({ data }) =>
-          data ? <ViewPortfolioDetailsButton portfolio={data} /> : <></>,
+          data ? <ViewPortfolioDetailsButton portfolio={data} /> : null,
       }),
     [],
   );

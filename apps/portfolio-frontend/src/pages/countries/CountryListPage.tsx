@@ -43,7 +43,7 @@ const CountryTable = ({ data }: { data: CountryResponseDTO[] }) => {
     () =>
       buildCountryColumnSchema({
         actionsComponent: ({ data }) =>
-          data ? <ViewCountryDetailsButton country={data} /> : <></>,
+          data ? <ViewCountryDetailsButton country={data} /> : null,
       }),
     [],
   );
