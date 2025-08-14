@@ -1,3 +1,4 @@
+import type { PortfolioViewType } from "@codescape-financial/core";
 import { IsOptional, IsString, Length } from "class-validator";
 import { PortfolioHoldingEmbeddedDTO } from "./portfolio-holding.dto";
 
@@ -42,5 +43,5 @@ export interface PortfolioResponseDTO {
 export class PortfolioViewFilterDTO {
   @IsOptional()
   @IsString()
-  viewType?: "active" | "all";
+  viewType?: PortfolioViewType;
 }

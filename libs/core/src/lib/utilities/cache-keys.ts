@@ -1,14 +1,15 @@
+import { PortfolioViewType } from "../types";
 import { formatNormalizedDate } from "./formatters";
 
 export const generatePortfolioXirrKey = (
   portfolioId: string,
-  viewType: "active" | "all",
+  viewType: PortfolioViewType,
 ) =>
   `xirr:portfolio:${portfolioId}:${viewType}:${formatNormalizedDate(new Date())}`;
 
 export const generateHoldingListXirrKey = (
   portfolioId: string,
-  viewType: "active" | "all",
+  viewType: PortfolioViewType,
 ) =>
   `xirr:portfolio:${portfolioId}:holdings:${viewType}:${formatNormalizedDate(new Date())}`;
 
