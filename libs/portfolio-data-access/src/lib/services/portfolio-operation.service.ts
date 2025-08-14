@@ -293,11 +293,12 @@ export class PortfolioOperationService {
 
       // Calculate the prorated fee for the shares being sold from this specific buy transaction.
       const buyFeeForLot =
-        (Number(buyTx.fees) / Number(buyTx.originalShares)) * sharesSoldFromTx;
+        Number(buyTx.fees) * (sharesSoldFromTx / Number(buyTx.originalShares));
 
       // The cost basis for this portion of the sale includes the share price and the prorated fee.
       costBasisOfSoldShares +=
         sharesSoldFromTx * Number(buyTx.pricePerShare) + buyFeeForLot;
+
       buyTx.shares = String(Number(buyTx.shares) - sharesSoldFromTx);
 
       if (isEffectivelyZero(Number(buyTx.shares))) {

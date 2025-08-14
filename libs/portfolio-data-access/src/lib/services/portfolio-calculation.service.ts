@@ -1,8 +1,15 @@
-import { isEffectivelyZero, SortedList } from "@codescape-financial/core";
+import {
+  formatNormalizedDate,
+  getDateObject,
+  isEffectivelyZero,
+  SortedList,
+} from "@codescape-financial/core";
 import { HistoricalQuoteService } from "@codescape-financial/historical-data-access";
 import {
   OperationType,
-  PortfolioHoldingXIRRBatchResponseDTO,
+  XIRRHoldingBatchResponseDTO,
+  XIRRHoldingResponseDTO,
+  XIRRPortfolioResponseDTO,
 } from "@codescape-financial/portfolio-data-models";
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
@@ -23,7 +30,9 @@ export class PortfolioCalculationService {
     private readonly historicalQuoteService: HistoricalQuoteService,
   ) {}
 
-  async calculateXIRRForPortfolio(portfolioId: string): Promise<number> {
+  async calculateXIRRForPortfolio(
+    portfolioId: string,
+  ): Promise<XIRRPortfolioResponseDTO | null> {
     const operations = await this.operationRepository.find({
       where: {
         holding: {
@@ -35,7 +44,7 @@ export class PortfolioCalculationService {
     });
 
     if (operations.length === 0) {
-      return NaN;
+      return null;
     }
 
     const cashflows = this.convertOperationsToCashflow(operations);
@@ -55,21 +64,84 @@ export class PortfolioCalculationService {
           holding.stockMetadata.isin,
         );
         if (latestQuote) {
+          const { date, price } = latestQuote;
           cashflows.add({
-            cashDate: new Date(),
-            cashAmount: Number(holding.shares) * latestQuote.price,
+            cashDate: getDateObject(date),
+            cashAmount: Number(holding.shares) * price,
           });
         }
       }
     }
 
-    return this.calculateXIRR(cashflows);
+    const date = cashflows.get(cashflows.size - 1)?.cashDate ?? new Date();
+
+    return {
+      portfolioId,
+      date: formatNormalizedDate(date),
+      xirr: this.calculateXIRR(cashflows),
+    };
+  }
+
+  async calculateBatchXIRRForPortfolio(
+    portfolioId: string,
+    isins: string[],
+  ): Promise<XIRRPortfolioResponseDTO | null> {
+    const operations = await this.operationRepository.find({
+      where: {
+        holding: {
+          portfolioId,
+          stockMetadata: {
+            isin: In(isins),
+          },
+        },
+      },
+      relations: ["holding", "holding.stockMetadata"],
+      order: { date: "ASC" },
+    });
+
+    if (operations.length === 0) {
+      return null;
+    }
+
+    const cashflows = this.convertOperationsToCashflow(operations);
+
+    const holdingsMap = new Map<string, PortfolioHolding>();
+    for (const op of operations) {
+      if (op.holding && !holdingsMap.has(op.holding.id)) {
+        holdingsMap.set(op.holding.id, op.holding);
+      }
+    }
+
+    const holdings = Array.from(holdingsMap.values());
+
+    for (const holding of holdings) {
+      if (holding && !isEffectivelyZero(Number(holding.shares))) {
+        const latestQuote = await this.historicalQuoteService.findLatestByIsin(
+          holding.stockMetadata.isin,
+        );
+        if (latestQuote) {
+          const { date, price } = latestQuote;
+          cashflows.add({
+            cashDate: getDateObject(date),
+            cashAmount: Number(holding.shares) * price,
+          });
+        }
+      }
+    }
+
+    const date = cashflows.get(cashflows.size - 1)?.cashDate ?? new Date();
+
+    return {
+      portfolioId,
+      date: formatNormalizedDate(date),
+      xirr: this.calculateXIRR(cashflows),
+    };
   }
 
   async calculateBatchXIRRForHoldings(
     portfolioId: string,
     isins: string[],
-  ): Promise<PortfolioHoldingXIRRBatchResponseDTO> {
+  ): Promise<XIRRHoldingBatchResponseDTO> {
     const holdings = await this.holdingRepository.find({
       where: {
         portfolioId,
@@ -80,14 +152,18 @@ export class PortfolioCalculationService {
       relations: ["stockMetadata"],
     });
 
-    const result: PortfolioHoldingXIRRBatchResponseDTO = {};
+    const result: XIRRHoldingBatchResponseDTO = {};
 
     for (const holding of holdings) {
-      const xirr = await this.calculateXIRRForHolding(
+      const xirrDto = await this.calculateXIRRForHolding(
         portfolioId,
         holding.id,
       );
-      result[holding.stockMetadata.isin] = xirr;
+
+      if (xirrDto) {
+        const { xirr, date } = xirrDto;
+        result[holding.stockMetadata.isin] = { date, xirr };
+      }
     }
 
     return result;
@@ -96,7 +172,7 @@ export class PortfolioCalculationService {
   async calculateXIRRForHolding(
     portfolioId: string,
     holdingId: string,
-  ): Promise<number> {
+  ): Promise<XIRRHoldingResponseDTO | null> {
     const operations = await this.operationRepository.find({
       where: {
         holdingId,
@@ -109,7 +185,7 @@ export class PortfolioCalculationService {
     });
 
     if (operations.length === 0) {
-      return NaN; // No operations found for this holding
+      return null; // No operations found for this holding
     }
 
     const cashflows = this.convertOperationsToCashflow(operations);
@@ -120,14 +196,21 @@ export class PortfolioCalculationService {
         holding.stockMetadata.isin,
       );
       if (latestQuote) {
+        const { date, price } = latestQuote;
         cashflows.add({
-          cashDate: new Date(),
-          cashAmount: Number(holding.shares) * latestQuote.price,
+          cashDate: getDateObject(date),
+          cashAmount: Number(holding.shares) * price,
         });
       }
     }
 
-    return this.calculateXIRR(cashflows);
+    const date = cashflows.get(cashflows.size - 1)?.cashDate ?? new Date();
+
+    return {
+      isin: holding?.stockMetadata.isin ?? "",
+      date: formatNormalizedDate(date ?? new Date()),
+      xirr: this.calculateXIRR(cashflows),
+    };
   }
 
   /**

@@ -36,8 +36,14 @@ export const StockMetadataDetailsPage = () => {
           <DetailsPageHeader
             title={stock.name}
             extraComponents={[
-              <DetailsPageEditButton editPath={`/stocks/${stock.id}/edit`} />,
-              <DetailsPageDeleteButton onDelete={handleDelete} />,
+              <DetailsPageEditButton
+                key={`${stock.id}-edit-button}`}
+                editPath={`/stocks/${stock.id}/edit`}
+              />,
+              <DetailsPageDeleteButton
+                key={`${stock.id}-delete-button}`}
+                onDelete={handleDelete}
+              />,
             ]}
           >
             <StockTags stock={stock} />

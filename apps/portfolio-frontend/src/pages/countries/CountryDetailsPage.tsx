@@ -63,9 +63,13 @@ export const CountryDetailsPage = () => {
             title={country.name}
             extraComponents={[
               <DetailsPageEditButton
+                key={`${country.id}-edit-button`}
                 editPath={`/countries/${country.id}/edit`}
               />,
-              <DetailsPageDeleteButton onDelete={handleDelete} />,
+              <DetailsPageDeleteButton
+                key={`${country.id}-delete-button`}
+                onDelete={handleDelete}
+              />,
             ]}
           >
             <CountryTags country={country} />

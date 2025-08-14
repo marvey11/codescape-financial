@@ -3,8 +3,10 @@ import {
   PortfolioService,
 } from "@codescape-financial/portfolio-data-access";
 import {
+  BatchISINRequestDTO,
   CreatePortfolioDTO,
   UpdatePortfolioDTO,
+  XIRRPortfolioResponseDTO,
 } from "@codescape-financial/portfolio-data-models";
 import {
   Body,
@@ -24,18 +26,13 @@ export class PortfolioController {
   ) {}
 
   @Get()
-  async getPortfolios() {
+  async getAll() {
     return this.portfolioService.findAll();
   }
 
   @Get(":id")
   async findOne(@Param("id") id: string) {
     return this.portfolioService.findOne(id);
-  }
-
-  @Get(":id/historical")
-  async getHistoricalData(@Param("id") id: string) {
-    return this.portfolioService.getHistoricalPortfolioData(id);
   }
 
   @Post()
@@ -57,9 +54,22 @@ export class PortfolioController {
   }
 
   @Get(":id/xirr")
-  async getPortfolioXirr(@Param("id") portfolioId: string) {
+  async getPortfolioXirr(
+    @Param("id") portfolioId: string,
+  ): Promise<XIRRPortfolioResponseDTO | null> {
     return this.portfolioCalculationService.calculateXIRRForPortfolio(
       portfolioId,
+    );
+  }
+
+  @Post(":id/xirr-batch")
+  async getPortfolioFilteredXirr(
+    @Param("id") portfolioId: string,
+    @Body() body: BatchISINRequestDTO,
+  ): Promise<XIRRPortfolioResponseDTO | null> {
+    return this.portfolioCalculationService.calculateBatchXIRRForPortfolio(
+      portfolioId,
+      body.isins,
     );
   }
 }

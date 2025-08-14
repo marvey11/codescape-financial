@@ -2,7 +2,11 @@ import {
   PortfolioCalculationService,
   PortfolioHoldingService,
 } from "@codescape-financial/portfolio-data-access";
-import { BatchISINRequestDTO } from "@codescape-financial/portfolio-data-models";
+import {
+  BatchISINRequestDTO,
+  XIRRHoldingBatchResponseDTO,
+  XIRRHoldingResponseDTO,
+} from "@codescape-financial/portfolio-data-models";
 import { Body, Controller, Get, Param, Post } from "@nestjs/common";
 
 @Controller("portfolios/:portfolioId/holdings")
@@ -29,18 +33,18 @@ export class PortfolioHoldingController {
   async getHoldingXIRR(
     @Param("portfolioId") portfolioId: string,
     @Param("holdingId") holdingId: string,
-  ) {
+  ): Promise<XIRRHoldingResponseDTO | null> {
     return this.portfolioCalculationService.calculateXIRRForHolding(
       portfolioId,
       holdingId,
     );
   }
 
-  @Post("batch-xirr")
+  @Post("xirr-batch")
   async batchGetHoldingXIRR(
     @Param("portfolioId") portfolioId: string,
     @Body() body: BatchISINRequestDTO,
-  ) {
+  ): Promise<XIRRHoldingBatchResponseDTO> {
     return this.portfolioCalculationService.calculateBatchXIRRForHoldings(
       portfolioId,
       body.isins,
