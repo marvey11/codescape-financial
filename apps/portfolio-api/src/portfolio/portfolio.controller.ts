@@ -23,6 +23,8 @@ import {
 } from "@nestjs/common";
 import type { Cache } from "cache-manager";
 
+const TTL_MILLISECONDS = 8 * 60 * 60 * 1000;
+
 @Controller("portfolios")
 export class PortfolioController {
   constructor(
@@ -82,7 +84,6 @@ export class PortfolioController {
         filter.viewType ?? "all",
       );
 
-    const TTL_MILLISECONDS = 8 * 60 * 60 * 1000;
     await this.cacheManager.set(cacheKey, xirrResult, TTL_MILLISECONDS);
 
     return xirrResult;
