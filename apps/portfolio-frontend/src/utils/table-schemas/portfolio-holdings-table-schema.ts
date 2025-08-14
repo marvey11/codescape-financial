@@ -2,6 +2,7 @@ import {
   formatCurrency,
   formatNormalizedDate,
   formatPercent,
+  isEffectivelyZero,
 } from "@codescape-financial/core";
 import {
   CellRendererFunc,
@@ -11,9 +12,10 @@ import {
   createNumberValueCellClassNames,
 } from "@codescape-financial/core-ui";
 import {
-  AllLatestQuotesTransformedDTO,
   PortfolioHoldingEmbeddedDTO,
+  XIRRHoldingListTransformedDTO,
 } from "@codescape-financial/portfolio-data-models";
+import { LatestQuoteMapping } from "../../types";
 import { BuildTableSchemaOptions } from "./types";
 
 /**
@@ -43,6 +45,8 @@ const defaultColumnKeys = [
   "absoluteGainLoss",
   "relativeGainLoss",
   "dividends",
+  "realizedGains",
+  "mwrr",
 ] as const;
 
 /**
@@ -51,18 +55,18 @@ const defaultColumnKeys = [
 export type PortfolioHoldingDefaultColumns = (typeof defaultColumnKeys)[number];
 
 /**
- * The type for every column key for the portfolio holdings table.
+ * Contains any additional keys not contained in the defaults for the portfolio holdings table.
  */
 export type PortfolioHoldingExtendedColumns =
   | PortfolioHoldingDefaultColumns
-  | "realizedGains"
+  | "isin"
   | "totalGains";
 
 /**
  * Builds the column schema for the portfolio holdings table.
  *
  * @param options - The options for building the table schema.
- * @param latestPrices - The latest prices for the holdings.
+ * @param latestQuotes - The latest prices for the holdings.
  * @returns The column schema for the portfolio holdings table.
  */
 export const buildPortfolioHoldingColumnSchema = (
@@ -70,11 +74,16 @@ export const buildPortfolioHoldingColumnSchema = (
     PortfolioHoldingEmbeddedDTO,
     PortfolioHoldingExtendedColumns
   > = {},
-  latestPrices: AllLatestQuotesTransformedDTO,
+  latestQuotes: LatestQuoteMapping,
+  latestBatchXIRR: XIRRHoldingListTransformedDTO,
+  portfolioXIRR: number | undefined,
 ): ColumnSchema<PortfolioHoldingEmbeddedDTO>[] => {
   const { columnKeys = [...defaultColumnKeys], actionsComponent } = options;
 
-  const schema = columnKeys.map((key) => getColumnMapping(latestPrices)[key]);
+  const schema = columnKeys.map(
+    (key) =>
+      getColumnMapping(latestQuotes, latestBatchXIRR, portfolioXIRR)[key],
+  );
 
   if (actionsComponent) {
     schema.push(createActionsComponent(actionsComponent));
@@ -111,9 +120,10 @@ const nameColumnSchema = {
 const sharesColumnSchema = {
   id: "colid-holding-shares",
   header: "Shares",
-  headerClassNames: "text-xs",
+  headerClassNames: "text-xs text-right",
   value: ({ data }) => data?.summary.totalShares,
-  cellClassNames: "text-xs",
+  valueFormatter: ({ value }) => decimalNumberFormatter(value, 3),
+  cellClassNames: "text-xs text-right",
 } satisfies ColumnSchema<PortfolioHoldingEmbeddedDTO>;
 
 /**
@@ -122,13 +132,13 @@ const sharesColumnSchema = {
 const costBasisColumnSchema = {
   id: "colid-holding-cost-basis",
   header: "Cost Basis",
-  headerClassNames: "text-xs",
-  value: ({ data }) => data?.summary.totalCostBasis,
+  headerClassNames: "text-xs text-right",
+  value: ({ data }) => calculateHoldingCostBasis(data),
   valueFormatter: ({ value }) => currencyFormatter(value),
-  cellClassNames: "text-xs",
+  cellClassNames: "text-xs text-right",
   footer: ({ data }) => calculateTotalCostBasis(data),
   footerFormatter: ({ value }) => currencyFormatter(value),
-  footerClassNames: "text-xs",
+  footerClassNames: "text-xs text-right",
 } satisfies ColumnSchema<PortfolioHoldingEmbeddedDTO>;
 
 /**
@@ -137,171 +147,178 @@ const costBasisColumnSchema = {
 const averagePriceColumnSchema = {
   id: "colid-holding-average-price",
   header: "Average Price",
-  headerClassNames: "text-xs",
-  value: ({ data }) => data?.summary.averagePricePerShare,
+  headerClassNames: "text-xs text-right",
+  value: ({ data }) => calculateHoldingAveragePrice(data),
   valueFormatter: ({ value }) => currencyFormatter(value),
-  cellClassNames: "text-xs",
+  cellClassNames: "text-xs text-right",
 } satisfies ColumnSchema<PortfolioHoldingEmbeddedDTO>;
 
 /**
  * Gets the column schema for the latest price column.
  *
- * @param latestPrices - The latest prices for the holdings.
+ * @param latestQuotes - The latest prices for the holdings.
  * @returns The column schema for the latest price column.
  */
-const getLatestPriceColumnSchema = (
-  latestPrices: AllLatestQuotesTransformedDTO,
-) =>
+const getLatestPriceColumnSchema = (latestQuotes: LatestQuoteMapping) =>
   ({
     id: "colid-holding-stock-latest-price",
     header: "Latest Price",
-    headerClassNames: "text-xs",
-    value: ({ data }) => getHoldingLatestPrice(data, latestPrices),
+    headerClassNames: "text-xs text-right",
+    value: ({ data }) => getHoldingLatestPrice(data, latestQuotes),
     valueFormatter: ({ value }) => currencyFormatter(value),
-    cellTitle: ({ data }) => constructLastUpdatedCellTitle(data, latestPrices),
-    cellClassNames: "text-xs",
+    cellTitle: ({ data }) => constructLastUpdatedCellTitle(data, latestQuotes),
+    cellClassNames: "text-xs text-right",
   }) satisfies ColumnSchema<PortfolioHoldingEmbeddedDTO>;
 
 /**
  * Gets the column schema for the current value column.
  *
- * @param latestPrices - The latest prices for the holdings.
+ * @param latestQuotes - The latest prices for the holdings.
  * @returns The column schema for the current value column.
  */
 const getCurrentValueColumnSchema = (
-  latestPrices: AllLatestQuotesTransformedDTO,
+  latestQuotes: LatestQuoteMapping,
 ): ColumnSchema<PortfolioHoldingEmbeddedDTO> =>
   ({
     id: "colid-holding-current-value",
     header: "Current Value",
-    headerClassNames: "text-xs",
-    value: ({ data }) => calculateHoldingCurrentValue(data, latestPrices),
+    headerClassNames: "text-xs text-right",
+    value: ({ data }) => calculateHoldingCurrentValue(data, latestQuotes),
     valueFormatter: ({ value }) => currencyFormatter(value),
-    cellTitle: ({ data }) => constructLastUpdatedCellTitle(data, latestPrices),
-    cellClassNames: "text-xs",
-    footer: ({ data }) => calculateTotalCurrentValue(data, latestPrices),
+    cellTitle: ({ data }) => constructLastUpdatedCellTitle(data, latestQuotes),
+    cellClassNames: "text-xs text-right",
+    footer: ({ data }) => calculateTotalCurrentValue(data, latestQuotes),
     footerFormatter: ({ value }) => currencyFormatter(value),
-    footerClassNames: "text-xs",
+    footerClassNames: "text-xs text-right",
   }) satisfies ColumnSchema<PortfolioHoldingEmbeddedDTO>;
 
 /**
  * Gets the column schema for the absolute gain/loss column.
  *
- * @param latestPrices - The latest prices for the holdings.
+ * @param latestQuotes - The latest prices for the holdings.
  * @returns The column schema for the absolute gain/loss column.
  */
-const getAbsoluteGainLossColumnSchema = (
-  latestPrices: AllLatestQuotesTransformedDTO,
-) =>
+const getAbsoluteGainLossColumnSchema = (latestQuotes: LatestQuoteMapping) =>
   ({
     id: "colid-holding-absolute-gain-loss",
-    header: "G/L",
-    headerClassNames: "text-xs",
-    value: ({ data }) => calculateHoldingAbsoluteGainLoss(data, latestPrices),
+    header: "Unrealised Gains",
+    headerClassNames: "text-xs text-right",
+    value: ({ data }) => calculateHoldingAbsoluteGainLoss(data, latestQuotes),
     valueFormatter: ({ value }) => currencyFormatter(value),
     cellClassNames: ({ value }) =>
-      cn("text-xs", createNumberValueCellClassNames(value)),
-    footer: ({ data }) => calculateTotalAbsoluteGainLoss(data, latestPrices),
+      cn("text-xs text-right", createNumberValueCellClassNames(value)),
+    footer: ({ data }) => calculateTotalAbsoluteGainLoss(data, latestQuotes),
     footerFormatter: ({ value }) => currencyFormatter(value),
     footerClassNames: ({ value }) =>
-      cn("text-xs", createNumberValueCellClassNames(value)),
+      cn("text-xs text-right", createNumberValueCellClassNames(value)),
   }) satisfies ColumnSchema<PortfolioHoldingEmbeddedDTO>;
 
 /**
  * Gets the column schema for the relative gain/loss column.
  *
- * @param latestPrices - The latest prices for the holdings.
+ * @param latestQuotes - The latest prices for the holdings.
  * @returns The column schema for the relative gain/loss column.
  */
-const getRelativeGainLossColumnSchema = (
-  latestPrices: AllLatestQuotesTransformedDTO,
-) =>
+const getRelativeGainLossColumnSchema = (latestQuotes: LatestQuoteMapping) =>
   ({
     id: "colid-holding-relative-gain-loss",
-    header: "G/L [%]",
-    headerClassNames: "text-xs",
-    value: ({ data }) => calculateHoldingRelativeGainLoss(data, latestPrices),
+    header: "Unrealised Gains [%]",
+    headerClassNames: "text-xs text-right",
+    value: ({ data }) => calculateHoldingRelativeGainLoss(data, latestQuotes),
     valueFormatter: ({ value }) => percentFormatter(value),
     cellClassNames: ({ value }) =>
-      cn("text-xs", createNumberValueCellClassNames(value)),
-    footer: ({ data }) => calculateTotalRelativeGainLoss(data, latestPrices),
+      cn("text-xs text-right", createNumberValueCellClassNames(value)),
+    footer: ({ data }) => calculateTotalRelativeGainLoss(data, latestQuotes),
     footerFormatter: ({ value }) => percentFormatter(value),
     footerClassNames: ({ value }) =>
-      cn("text-xs", createNumberValueCellClassNames(value)),
+      cn("text-xs text-right", createNumberValueCellClassNames(value)),
   }) satisfies ColumnSchema<PortfolioHoldingEmbeddedDTO>;
 
 /**
- * Gets the column schema for the realized gains column.
- *
- * @returns The column schema for the realized gains column.
+ * The column schema for the realized gains column.
  */
-const getRealizedGainsColumnSchema = () =>
+const realizedGainsColumnSchema = {
+  id: "colid-holding-realized-gains",
+  header: "Realised Gains",
+  headerClassNames: "text-xs text-right",
+  value: ({ data }) => calculateRealizedGains(data),
+  valueFormatter: ({ value }) => currencyFormatter(value),
+  cellClassNames: ({ value }) =>
+    cn("text-xs text-right", createNumberValueCellClassNames(value)),
+  cellTitle: ({ data }) => constructRealizedGainsCellTitle(data),
+  footer: ({ data }) => calculateRealizedGains(data),
+  footerFormatter: ({ value }) => currencyFormatter(value),
+  footerClassNames: ({ value }) =>
+    cn("text-xs text-right", createNumberValueCellClassNames(value)),
+  footerTitle: ({ data }) => constructRealizedGainsCellTitle(data),
+} satisfies ColumnSchema<PortfolioHoldingEmbeddedDTO>;
+
+/**
+ * The column schema for the dividends column.
+ */
+const dividendsColumnSchema = {
+  id: "colid-holding-dividends",
+  header: "Dividends",
+  headerClassNames: "text-xs text-right",
+  value: ({ data }) => calculateDividends(data),
+  valueFormatter: ({ value }) => currencyFormatter(value),
+  cellTitle: ({ data }) => constructDividendsCellTitle(data),
+  cellClassNames: "text-xs text-right",
+  footer: ({ data }) => calculateDividends(data),
+  footerFormatter: ({ value }) => currencyFormatter(value),
+  footerTitle: ({ data }) => constructDividendsCellTitle(data),
+  footerClassNames: "text-xs text-right",
+} satisfies ColumnSchema<PortfolioHoldingEmbeddedDTO>;
+
+const getMWRRColumnSchema = (
+  latestXIRR: XIRRHoldingListTransformedDTO,
+  portfolioXIRR: number | undefined,
+) =>
   ({
-    id: "colid-holding-realized-gains",
-    header: "Realized Gains",
-    headerClassNames: "text-xs",
-    value: ({ data }) => calculateRealizedGains(data),
-    valueFormatter: ({ value }) => currencyFormatter(value),
+    id: "colid-holding-mwrr",
+    header: "MWRR",
+    headerClassNames: "text-xs text-right",
+    value: ({ data }) => getHoldingLatestXIRR(data, latestXIRR),
+    valueFormatter: ({ value }) => percentFormatter(value),
     cellClassNames: ({ value }) =>
-      cn("text-xs", createNumberValueCellClassNames(value)),
-    cellTitle: ({ data }) => constructRealizedGainsCellTitle(data),
-    footer: ({ data }) => calculateRealizedGains(data),
-    footerFormatter: ({ value }) => currencyFormatter(value),
+      cn("text-xs text-right", createNumberValueCellClassNames(value)),
+    cellTitle: ({ data }) =>
+      constructLastUpdatedCellTitleXIRR(data, latestXIRR),
+    footer: () => portfolioXIRR,
+    footerFormatter: ({ value }) => percentFormatter(value),
     footerClassNames: ({ value }) =>
-      cn("text-xs", createNumberValueCellClassNames(value)),
-    footerTitle: ({ data }) => constructRealizedGainsCellTitle(data),
+      cn("text-xs text-right", createNumberValueCellClassNames(value)),
   }) satisfies ColumnSchema<PortfolioHoldingEmbeddedDTO>;
 
 /**
- * Gets the column schema for the dividends column.
- *
- * @returns The column schema for the dividends column.
+ * The column schema for the total gains column.
  */
-const getDividendsColumnSchema = () =>
-  ({
-    id: "colid-holding-dividends",
-    header: "Dividends",
-    headerClassNames: "text-xs",
-    value: ({ data }) => calculateDividends(data),
-    valueFormatter: ({ value }) => currencyFormatter(value),
-    cellTitle: ({ data }) => constructDividendsCellTitle(data),
-    cellClassNames: "text-xs",
-    footer: ({ data }) => calculateDividends(data),
-    footerFormatter: ({ value }) => currencyFormatter(value),
-    footerTitle: ({ data }) => constructDividendsCellTitle(data),
-    footerClassNames: "text-xs",
-  }) satisfies ColumnSchema<PortfolioHoldingEmbeddedDTO>;
-
-/**
- * Gets the column schema for the total gains column.
- *
- * @returns The column schema for the total gains column.
- */
-const getTotalGainsColumnSchema = () =>
-  ({
-    id: "colid-holding-total-gains",
-    header: "Total Gains",
-    headerClassNames: "text-xs",
-    value: ({ data }) => calculateHoldingCompositeGains(data),
-    valueFormatter: ({ value }) => currencyFormatter(value),
-    cellClassNames: ({ value }) =>
-      cn("text-xs", createNumberValueCellClassNames(value)),
-    cellTitle: ({ data }) => constructCompositeGainsCellTitle(data),
-    footer: ({ data }) => calculateTotalCompositeGains(data),
-    footerFormatter: ({ value }) => currencyFormatter(value),
-    footerClassNames: ({ value }) =>
-      cn("text-xs", createNumberValueCellClassNames(value)),
-    footerTitle: ({ data }) => constructCompositeGainsCellTitle(data),
-  }) satisfies ColumnSchema<PortfolioHoldingEmbeddedDTO>;
+const totalGainsColumnSchema = {
+  id: "colid-holding-total-gains",
+  header: "Total Gains",
+  headerClassNames: "text-xs text-right",
+  value: ({ data }) => calculateHoldingCompositeGains(data),
+  valueFormatter: ({ value }) => currencyFormatter(value),
+  cellClassNames: ({ value }) =>
+    cn("text-xs text-right", createNumberValueCellClassNames(value)),
+  cellTitle: ({ data }) => constructCompositeGainsCellTitle(data),
+  footer: ({ data }) => calculateTotalCompositeGains(data),
+  footerFormatter: ({ value }) => currencyFormatter(value),
+  footerClassNames: ({ value }) =>
+    cn("text-xs text-right", createNumberValueCellClassNames(value)),
+  footerTitle: ({ data }) => constructCompositeGainsCellTitle(data),
+} satisfies ColumnSchema<PortfolioHoldingEmbeddedDTO>;
 
 /**
  * Gets the column mapping for the portfolio holdings table.
  *
- * @param latestPrices - The latest prices for the holdings.
+ * @param latestQuotes - The latest prices for the holdings.
  * @returns The column mapping for the portfolio holdings table.
  */
 const getColumnMapping = (
-  latestPrices: AllLatestQuotesTransformedDTO,
+  latestQuotes: LatestQuoteMapping,
+  latestXIRR: XIRRHoldingListTransformedDTO,
+  portfolioXIRR: number | undefined,
 ): {
   [key in PortfolioHoldingExtendedColumns]: ColumnSchema<PortfolioHoldingEmbeddedDTO>;
 } => ({
@@ -310,13 +327,14 @@ const getColumnMapping = (
   shares: sharesColumnSchema,
   costBasis: costBasisColumnSchema,
   averagePrice: averagePriceColumnSchema,
-  latestPrice: getLatestPriceColumnSchema(latestPrices),
-  currentValue: getCurrentValueColumnSchema(latestPrices),
-  absoluteGainLoss: getAbsoluteGainLossColumnSchema(latestPrices),
-  relativeGainLoss: getRelativeGainLossColumnSchema(latestPrices),
-  realizedGains: getRealizedGainsColumnSchema(),
-  dividends: getDividendsColumnSchema(),
-  totalGains: getTotalGainsColumnSchema(),
+  latestPrice: getLatestPriceColumnSchema(latestQuotes),
+  currentValue: getCurrentValueColumnSchema(latestQuotes),
+  absoluteGainLoss: getAbsoluteGainLossColumnSchema(latestQuotes),
+  relativeGainLoss: getRelativeGainLossColumnSchema(latestQuotes),
+  realizedGains: realizedGainsColumnSchema,
+  dividends: dividendsColumnSchema,
+  totalGains: totalGainsColumnSchema,
+  mwrr: getMWRRColumnSchema(latestXIRR, portfolioXIRR),
 });
 
 /**
@@ -338,6 +356,16 @@ const createActionsComponent = (
 
 // -------- DATA AGGREGATORS --------
 
+const calculateHoldingCostBasis = (
+  holding: PortfolioHoldingEmbeddedDTO | undefined,
+) => {
+  if (!holding || isInactiveHolding(holding)) {
+    return null;
+  }
+
+  return holding?.summary.totalCostBasis;
+};
+
 /**
  * Calculates the total cost basis for a list of holdings.
  *
@@ -352,61 +380,68 @@ const calculateTotalCostBasis = (
     0,
   );
 
+const calculateHoldingAveragePrice = (
+  holding: PortfolioHoldingEmbeddedDTO | undefined,
+) => {
+  if (!holding || isInactiveHolding(holding)) {
+    return null;
+  }
+
+  return holding?.summary.averagePricePerShare;
+};
+
 /**
  * Gets the latest price for a holding.
  *
  * @param holding - The holding.
- * @param latestPrices - The latest prices for the holdings.
+ * @param latestQuotes - The latest prices for the holdings.
  * @returns The latest price for the holding.
  */
 const getHoldingLatestPrice = (
   holding: PortfolioHoldingEmbeddedDTO | undefined,
-  latestPrices: AllLatestQuotesTransformedDTO,
-) => (holding ? latestPrices[holding.stock.isin]?.price : null);
+  latestQuotes: LatestQuoteMapping,
+) => (holding ? latestQuotes.get(holding.stock.isin)?.price : null);
 
 /**
  * Calculates the current value of a holding.
  *
  * @param holding - The holding.
- * @param latestPrices - The latest prices for the holdings.
+ * @param latestQuotes - The latest prices for the holdings.
  * @returns The current value of the holding.
  */
 const calculateHoldingCurrentValue = (
   holding: PortfolioHoldingEmbeddedDTO | undefined,
-  latestPrices: AllLatestQuotesTransformedDTO,
+  latestQuotes: LatestQuoteMapping,
 ) => {
-  if (!holding) {
+  if (!holding || isInactiveHolding(holding)) {
     return null;
   }
 
   const {
     stock: { isin },
-    summary: { totalShares },
+    summary: { totalShares = 0 }, // make sure that type checks don't fail
   } = holding;
 
-  const latestPrice = latestPrices[isin]?.price;
+  const latestPrice = latestQuotes.get(isin)?.price;
 
-  if (totalShares == null || latestPrice == null) {
-    return null;
-  }
-
-  return latestPrice * totalShares;
+  // we've already checked `totalShares` for `null`
+  return latestPrice != null ? latestPrice * totalShares : null;
 };
 
 /**
  * Calculates the total current value of a list of holdings.
  *
  * @param holdings - The list of holdings.
- * @param latestPrices - The latest prices for the holdings.
+ * @param latestQuotes - The latest prices for the holdings.
  * @returns The total current value of the list of holdings.
  */
 const calculateTotalCurrentValue = (
   holdings: PortfolioHoldingEmbeddedDTO[] | undefined,
-  latestPrices: AllLatestQuotesTransformedDTO,
+  latestQuotes: LatestQuoteMapping,
 ) =>
   holdings?.reduce(
     (total, item) =>
-      total + (calculateHoldingCurrentValue(item, latestPrices) ?? 0),
+      total + (calculateHoldingCurrentValue(item, latestQuotes) ?? 0),
     0,
   );
 
@@ -414,15 +449,15 @@ const calculateTotalCurrentValue = (
  * Calculates the absolute gain/loss for a holding.
  *
  * @param holding - The holding.
- * @param latestPrices - The latest prices for the holdings.
+ * @param latestQuotes - The latest prices for the holdings.
  * @returns The absolute gain/loss for the holding.
  */
 const calculateHoldingAbsoluteGainLoss = (
   holding: PortfolioHoldingEmbeddedDTO | undefined,
-  latestPrices: AllLatestQuotesTransformedDTO,
+  latestQuotes: LatestQuoteMapping,
 ) => {
   const totalCostBasis = holding?.summary.totalCostBasis;
-  const currentValue = calculateHoldingCurrentValue(holding, latestPrices);
+  const currentValue = calculateHoldingCurrentValue(holding, latestQuotes);
 
   if (totalCostBasis == null || currentValue == null) {
     return null;
@@ -435,16 +470,16 @@ const calculateHoldingAbsoluteGainLoss = (
  * Calculates the total absolute gain/loss for a list of holdings.
  *
  * @param holdings - The list of holdings.
- * @param latestPrices - The latest prices for the holdings.
+ * @param latestQuotes - The latest prices for the holdings.
  * @returns The total absolute gain/loss for the list of holdings.
  */
 const calculateTotalAbsoluteGainLoss = (
   holdings: PortfolioHoldingEmbeddedDTO[] | undefined,
-  latestPrices: AllLatestQuotesTransformedDTO,
+  latestQuotes: LatestQuoteMapping,
 ) =>
   holdings?.reduce(
     (total, item) =>
-      total + (calculateHoldingAbsoluteGainLoss(item, latestPrices) ?? 0),
+      total + (calculateHoldingAbsoluteGainLoss(item, latestQuotes) ?? 0),
     0,
   );
 
@@ -452,17 +487,17 @@ const calculateTotalAbsoluteGainLoss = (
  * Calculates the relative gain/loss for a holding.
  *
  * @param holding - The holding.
- * @param latestPrices - The latest prices for the holdings.
+ * @param latestQuotes - The latest prices for the holdings.
  * @returns The relative gain/loss for the holding.
  */
 const calculateHoldingRelativeGainLoss = (
   holding: PortfolioHoldingEmbeddedDTO | undefined,
-  latestPrices: AllLatestQuotesTransformedDTO,
+  latestQuotes: LatestQuoteMapping,
 ) => {
   const costBasis = holding?.summary.totalCostBasis;
   const absoluteGainLoss = calculateHoldingAbsoluteGainLoss(
     holding,
-    latestPrices,
+    latestQuotes,
   );
 
   return absoluteGainLoss != null && costBasis
@@ -474,16 +509,16 @@ const calculateHoldingRelativeGainLoss = (
  * Calculates the total relative gain/loss for a list of holdings.
  *
  * @param holdings - The list of holdings.
- * @param latestPrices - The latest prices for the holdings.
+ * @param latestQuotes - The latest prices for the holdings.
  * @returns The total relative gain/loss for the list of holdings.
  */
 const calculateTotalRelativeGainLoss = (
   holdings: PortfolioHoldingEmbeddedDTO[] | undefined,
-  latestPrices: AllLatestQuotesTransformedDTO,
+  latestQuotes: LatestQuoteMapping,
 ) => {
   const totalAbsoluteGainLoss = calculateTotalAbsoluteGainLoss(
     holdings,
-    latestPrices,
+    latestQuotes,
   );
   const totalCostBasis = calculateTotalCostBasis(holdings);
 
@@ -626,24 +661,34 @@ const calculateTotalCompositeGains = (
     0,
   );
 
+const getHoldingLatestXIRR = (
+  holding: PortfolioHoldingEmbeddedDTO | undefined,
+  latestXIRR: XIRRHoldingListTransformedDTO,
+) => {
+  return holding ? latestXIRR[holding.stock.isin]?.xirr : null;
+};
+
 // -------- CELL TITLE CONSTRUCTORS --------
 
 /**
  * Constructs the cell title for the last updated date.
  *
  * @param holding - The holding.
- * @param latestPrices - The latest prices for the holdings.
+ * @param latestQuotes - The latest prices for the holdings.
  * @returns The cell title for the last updated date.
  */
 const constructLastUpdatedCellTitle = (
   holding: PortfolioHoldingEmbeddedDTO | undefined,
-  latestPrices: AllLatestQuotesTransformedDTO,
-) => {
-  const latestDate = holding ? latestPrices[holding.stock.isin]?.date : null;
-  return latestDate != null
-    ? `Last updated on ${formatNormalizedDate(latestDate, "en-GB")}`
-    : undefined;
-};
+  latestQuotes: LatestQuoteMapping,
+) =>
+  latestDateFormatter(
+    holding ? latestQuotes.get(holding.stock.isin)?.date : null,
+  );
+
+const constructLastUpdatedCellTitleXIRR = (
+  holding: PortfolioHoldingEmbeddedDTO | undefined,
+  latestXIRR: XIRRHoldingListTransformedDTO,
+) => latestDateFormatter(holding ? latestXIRR[holding.stock.isin]?.date : null);
 
 /**
  * Constructs the cell title for the realized gains.
@@ -705,7 +750,9 @@ const constructCompositeGainsCellTitle = (
  * @returns The formatted value.
  */
 const currencyFormatter = (value: CellValue) =>
-  typeof value === "number" ? formatCurrency(value) : "--";
+  typeof value === "number" && !Number.isNaN(value)
+    ? formatCurrency(value)
+    : "--";
 
 /**
  * Formats a value as a percentage.
@@ -714,7 +761,19 @@ const currencyFormatter = (value: CellValue) =>
  * @returns The formatted value.
  */
 const percentFormatter = (value: CellValue) =>
-  typeof value === "number" ? formatPercent(value) : "--";
+  typeof value === "number" && !Number.isNaN(value)
+    ? formatPercent(value)
+    : "--";
+
+const decimalNumberFormatter = (value: CellValue, places: number) =>
+  typeof value === "number" && !Number.isNaN(value)
+    ? value.toFixed(places)
+    : "--";
+
+const latestDateFormatter = (latestDate: Date | null | undefined) =>
+  latestDate != null
+    ? `Last updated on ${formatNormalizedDate(latestDate, "en-GB")}`
+    : undefined;
 
 /**
  * Formats the cell title for the realized gains.
@@ -759,3 +818,9 @@ const formatCompositeGainsCellTitle = (
 ) =>
   `Composite Gains: ${formatCurrency(gains.nominalValue + dividends.nominalValue)}, ` +
   `Composite Taxes: ${formatCurrency(gains.taxValue + dividends.taxValue)}`;
+
+// -------- DATA VALIDATION --------
+
+const isInactiveHolding = (holding: PortfolioHoldingEmbeddedDTO) =>
+  holding.summary.totalShares == null ||
+  isEffectivelyZero(holding.summary.totalShares);

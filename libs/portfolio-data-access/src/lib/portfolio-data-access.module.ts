@@ -1,3 +1,4 @@
+import { HistoricalDataAccessModule } from "@codescape-financial/historical-data-access";
 import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import {
@@ -7,6 +8,8 @@ import {
   PortfolioOperation,
 } from "./entities";
 import {
+  PortfolioCalculationService,
+  PortfolioHoldingService,
   PortfolioOperationService,
   PortfolioService,
   TaxCalculationService,
@@ -20,13 +23,18 @@ import {
       PortfolioHolding,
       PortfolioOperation,
     ]),
+    HistoricalDataAccessModule,
   ],
   providers: [
+    PortfolioCalculationService,
+    PortfolioHoldingService,
     PortfolioOperationService,
     PortfolioService,
     TaxCalculationService,
   ],
   exports: [
+    PortfolioCalculationService,
+    PortfolioHoldingService,
     PortfolioOperationService,
     PortfolioService,
     TaxCalculationService,

@@ -108,6 +108,8 @@ export class PortfolioHolding {
   /**
    * The average price per share for the current holding.
    *
+   * Includes all relevant fees.
+   *
    * @type {string}
    */
   @Column({ type: "decimal", precision: 12, scale: 4, default: 0 })
@@ -116,6 +118,8 @@ export class PortfolioHolding {
 
   /**
    * The total realised gains (profits/losses from sales).
+   *
+   * Includes all relevant fees, but not the taxes.
    *
    * @type {string}
    */
@@ -134,6 +138,8 @@ export class PortfolioHolding {
 
   /**
    * The dividends received from shares in this portfolio holding.
+   *
+   * Does not include taxes.
    *
    * @type{string}
    */

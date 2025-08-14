@@ -7,7 +7,9 @@
     "@codescape-financial/portfolio-config": "*",
     "@codescape-financial/portfolio-data-models": "*",
     "@nestjs/config": "^4.0.2",
+    "@nestjs/cache-manager": "^3.0.1",
     "@nestjs/typeorm": "^11.0.0",
+    "cache-manager": "^7.1.1",
     "class-transformer": "^0.5.1",
     "pg": "^8.16.3",
     "typeorm": "^0.3.25"
