@@ -2,6 +2,7 @@ import {
   ConfigService,
   SharedConfigModule,
 } from "@codescape-financial/portfolio-config";
+import { CacheModule } from "@nestjs/cache-manager";
 import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import * as path from "path";
@@ -13,6 +14,10 @@ import { StockMetadataModule } from "../stock-metadata";
 
 @Module({
   imports: [
+    CacheModule.register({
+      ttl: 60 * 60, // default TTL in seconds (e.g., 1 hour, but you'll invalidate explicitly)
+      isGlobal: true, // Makes CacheModule available globally without importing everywhere
+    }),
     SharedConfigModule,
     TypeOrmModule.forRootAsync({
       imports: [SharedConfigModule],

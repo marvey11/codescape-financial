@@ -10,14 +10,14 @@ export interface XIRRPortfolioTransformedDTO {
   xirr: number;
 }
 
-export interface XIRRHoldingBatchResponseDTO {
+export interface XIRRHoldingListResponseDTO {
   [isin: string]: {
     date: string;
     xirr: number;
   };
 }
 
-export interface XIRRHoldingBatchTransformedDTO {
+export interface XIRRHoldingListTransformedDTO {
   [isin: string]: {
     date: Date;
     xirr: number;

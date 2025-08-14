@@ -1,30 +1,34 @@
+import { generatePortfolioXirrKey } from "@codescape-financial/core";
 import {
   PortfolioCalculationService,
   PortfolioService,
 } from "@codescape-financial/portfolio-data-access";
 import {
-  BatchISINRequestDTO,
   CreatePortfolioDTO,
   PortfolioViewFilterDTO,
   UpdatePortfolioDTO,
   XIRRPortfolioResponseDTO,
 } from "@codescape-financial/portfolio-data-models";
+import { CACHE_MANAGER } from "@nestjs/cache-manager";
 import {
   Body,
   Controller,
   Delete,
   Get,
+  Inject,
   Param,
   Post,
   Put,
   Query,
 } from "@nestjs/common";
+import type { Cache } from "cache-manager";
 
 @Controller("portfolios")
 export class PortfolioController {
   constructor(
     private readonly portfolioService: PortfolioService,
     private readonly portfolioCalculationService: PortfolioCalculationService,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache, // Inject the Cache Manager
   ) {}
 
   @Get()
@@ -60,21 +64,27 @@ export class PortfolioController {
     @Param("id") portfolioId: string,
     @Query() filter: PortfolioViewFilterDTO,
   ): Promise<XIRRPortfolioResponseDTO | null> {
-    console.log("CONTROLLER", filter);
-    return this.portfolioCalculationService.calculatePortfolioXIRR(
+    const cacheKey = generatePortfolioXirrKey(
       portfolioId,
-      filter.activeOnly ?? false,
+      filter.viewType ?? "all",
     );
-  }
 
-  @Post(":id/xirr-batch")
-  async getPortfolioFilteredXirr(
-    @Param("id") portfolioId: string,
-    @Body() body: BatchISINRequestDTO,
-  ): Promise<XIRRPortfolioResponseDTO | null> {
-    return this.portfolioCalculationService.calculateBatchXIRRForPortfolio(
-      portfolioId,
-      body.isins,
-    );
+    // Attempt to retrieve from cache
+    const cachedXIRR =
+      await this.cacheManager.get<XIRRPortfolioResponseDTO>(cacheKey);
+    if (cachedXIRR) {
+      return cachedXIRR;
+    }
+
+    const xirrResult =
+      this.portfolioCalculationService.calculateXIRRForPortfolio(
+        portfolioId,
+        filter.viewType ?? "all",
+      );
+
+    const TTL_MILLISECONDS = 8 * 60 * 60 * 1000;
+    await this.cacheManager.set(cacheKey, xirrResult, TTL_MILLISECONDS);
+
+    return xirrResult;
   }
 }

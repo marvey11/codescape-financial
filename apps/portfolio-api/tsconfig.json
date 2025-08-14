@@ -4,13 +4,16 @@
   "include": [],
   "references": [
     {
+      "path": "../../libs/core"
+    },
+    {
       "path": "../../libs/portfolio-data-access"
     },
     {
-      "path": "../../libs/portfolio-config"
+      "path": "../../libs/portfolio-data-models"
     },
     {
-      "path": "../../libs/portfolio-data-models"
+      "path": "../../libs/portfolio-config"
     },
     {
       "path": "../../libs/historical-data-access"

@@ -5,7 +5,7 @@ import {
   PortfolioHoldingEmbeddedDTO,
   PortfolioResponseDTO,
   PortfolioViewFilterDTO,
-  XIRRHoldingBatchTransformedDTO,
+  XIRRHoldingListTransformedDTO,
   XIRRPortfolioTransformedDTO,
 } from "@codescape-financial/portfolio-data-models";
 import { useEffect, useMemo, useState } from "react";
@@ -29,11 +29,8 @@ export const PortfolioDetailsPage = () => {
     new Map<string, QuoteObject>(),
   );
   const [holdingsXIRR, setHoldingsXIRR] =
-    useState<XIRRHoldingBatchTransformedDTO>({});
-
-  const [fullPortfolioXIRR, setFullPortfolioXIRR] =
-    useState<XIRRPortfolioTransformedDTO | null>(null);
-  const [activePortfolioXIRR, setActivePortfolioXIRR] =
+    useState<XIRRHoldingListTransformedDTO>({});
+  const [portfolioXIRR, setPortfolioXIRR] =
     useState<XIRRPortfolioTransformedDTO | null>(null);
 
   useEffect(() => {
@@ -49,10 +46,13 @@ export const PortfolioDetailsPage = () => {
         { isins },
       );
       const xirrBatchRequest =
-        axiosInstance.post<XIRRHoldingBatchTransformedDTO>(
-          `/portfolios/${portfolioId}/holdings/xirr-batch`,
-          { isins },
-        );
+        axiosInstance.request<XIRRHoldingListTransformedDTO>({
+          url: `/portfolios/${portfolioId}/holdings/xirr`,
+          params: {
+            viewType: showActiveHoldingsOnly ? "active" : "all",
+          } satisfies PortfolioViewFilterDTO,
+          method: "GET",
+        });
 
       Promise.all([quotesRequest, xirrBatchRequest])
         .then(([latestQuotesResponse, xirrResponse]) => {
@@ -96,32 +96,20 @@ export const PortfolioDetailsPage = () => {
       return;
     }
 
-    const isins = filteredHoldings.map((holding) => holding.stock.isin);
-
-    const requestNeeded = showActiveHoldingsOnly
-      ? !activePortfolioXIRR
-      : !fullPortfolioXIRR;
-
-    if (requestNeeded) {
-      axiosInstance
-        .request<XIRRPortfolioTransformedDTO>({
-          url: `/portfolios/${data?.id}/xirr`,
-          params: {
-            activeOnly: isins.length !== data?.holdings.length,
-          } satisfies PortfolioViewFilterDTO,
-          method: "GET",
-        })
-        .then((response) => {
-          if (showActiveHoldingsOnly) {
-            setActivePortfolioXIRR(response.data);
-          } else {
-            setFullPortfolioXIRR(response.data);
-          }
-        })
-        .catch((error) => {
-          console.error(error);
-        });
-    }
+    axiosInstance
+      .request<XIRRPortfolioTransformedDTO>({
+        url: `/portfolios/${data?.id}/xirr`,
+        params: {
+          viewType: showActiveHoldingsOnly ? "active" : "all",
+        } satisfies PortfolioViewFilterDTO,
+        method: "GET",
+      })
+      .then((response) => {
+        setPortfolioXIRR(response.data);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
   }, [filteredHoldings]);
 
   return (
@@ -154,12 +142,7 @@ export const PortfolioDetailsPage = () => {
                   data={sortedHoldings}
                   latestQuotes={latestQuotes}
                   holdingsXIRR={holdingsXIRR}
-                  portfolioXIRR={
-                    (showActiveHoldingsOnly
-                      ? activePortfolioXIRR
-                      : fullPortfolioXIRR
-                    )?.xirr
-                  }
+                  portfolioXIRR={portfolioXIRR?.xirr}
                   portfolioId={data.id}
                 />
               </div>
@@ -176,7 +159,7 @@ export const PortfolioDetailsPage = () => {
 interface PortfolioHoldingsTableProps {
   portfolioId: string;
   latestQuotes: LatestQuoteMapping;
-  holdingsXIRR: XIRRHoldingBatchTransformedDTO;
+  holdingsXIRR: XIRRHoldingListTransformedDTO;
   portfolioXIRR: number | undefined;
   data: PortfolioHoldingEmbeddedDTO[];
 }

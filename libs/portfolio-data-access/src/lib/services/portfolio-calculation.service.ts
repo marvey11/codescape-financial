@@ -8,13 +8,13 @@ import {
 import { HistoricalQuoteService } from "@codescape-financial/historical-data-access";
 import {
   OperationType,
-  XIRRHoldingBatchResponseDTO,
+  XIRRHoldingListResponseDTO,
   XIRRHoldingResponseDTO,
   XIRRPortfolioResponseDTO,
 } from "@codescape-financial/portfolio-data-models";
-import { Injectable, Logger } from "@nestjs/common";
+import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { In, Repository } from "typeorm";
+import { Repository } from "typeorm";
 import { PortfolioHolding, PortfolioOperation } from "../entities";
 import { CashFlow } from "../types";
 
@@ -23,8 +23,6 @@ const MAX_ITERATIONS = 100;
 
 @Injectable()
 export class PortfolioCalculationService {
-  private readonly logger = new Logger(PortfolioCalculationService.name);
-
   constructor(
     @InjectRepository(PortfolioOperation)
     private readonly operationRepository: Repository<PortfolioOperation>,
@@ -33,18 +31,17 @@ export class PortfolioCalculationService {
     private readonly historicalQuoteService: HistoricalQuoteService,
   ) {}
 
-  async calculatePortfolioXIRR(
+  async calculateXIRRForPortfolio(
     portfolioId: string,
-    activeOnly: boolean,
+    viewType: "all" | "active",
   ): Promise<XIRRPortfolioResponseDTO | null> {
-    this.logger.verbose(activeOnly);
     const queryBuilder = this.operationRepository
       .createQueryBuilder("operation")
       .leftJoinAndSelect("operation.holding", "holding")
       .leftJoinAndSelect("holding.stockMetadata", "stockMetadata")
       .where("holding.portfolioId = :portfolioId", { portfolioId });
 
-    if (activeOnly) {
+    if (viewType === "active") {
       queryBuilder.andWhere("holding.shares > :tolerance", {
         tolerance: FLOATING_POINT_TOLERANCE,
       });
@@ -93,77 +90,24 @@ export class PortfolioCalculationService {
     };
   }
 
-  async calculateBatchXIRRForPortfolio(
+  async calculateXIRRForHoldingList(
     portfolioId: string,
-    isins: string[],
-  ): Promise<XIRRPortfolioResponseDTO | null> {
-    const operations = await this.operationRepository.find({
-      where: {
-        holding: {
-          portfolioId,
-          stockMetadata: {
-            isin: In(isins),
-          },
-        },
-      },
-      relations: ["holding", "holding.stockMetadata"],
-      order: { date: "ASC" },
-    });
+    viewType: "all" | "active",
+  ): Promise<XIRRHoldingListResponseDTO> {
+    const queryBuilder = this.holdingRepository
+      .createQueryBuilder("holding")
+      .leftJoinAndSelect("holding.stockMetadata", "stockMetadata")
+      .where("holding.portfolioId = :portfolioId", { portfolioId });
 
-    if (operations.length === 0) {
-      return null;
+    if (viewType === "active") {
+      queryBuilder.andWhere("holding.shares > :tolerance", {
+        tolerance: FLOATING_POINT_TOLERANCE,
+      });
     }
 
-    const cashflows = this.convertOperationsToCashflow(operations);
+    const holdings = await queryBuilder.getMany();
 
-    const holdingsMap = new Map<string, PortfolioHolding>();
-    for (const op of operations) {
-      if (op.holding && !holdingsMap.has(op.holding.id)) {
-        holdingsMap.set(op.holding.id, op.holding);
-      }
-    }
-
-    const holdings = Array.from(holdingsMap.values());
-
-    for (const holding of holdings) {
-      if (holding && !isEffectivelyZero(Number(holding.shares))) {
-        const latestQuote = await this.historicalQuoteService.findLatestByIsin(
-          holding.stockMetadata.isin,
-        );
-        if (latestQuote) {
-          const { date, price } = latestQuote;
-          cashflows.add({
-            cashDate: getDateObject(date),
-            cashAmount: Number(holding.shares) * price,
-          });
-        }
-      }
-    }
-
-    const date = cashflows.get(cashflows.size - 1)?.cashDate ?? new Date();
-
-    return {
-      portfolioId,
-      date: formatNormalizedDate(date),
-      xirr: this.calculateXIRR(cashflows),
-    };
-  }
-
-  async calculateBatchXIRRForHoldings(
-    portfolioId: string,
-    isins: string[],
-  ): Promise<XIRRHoldingBatchResponseDTO> {
-    const holdings = await this.holdingRepository.find({
-      where: {
-        portfolioId,
-        stockMetadata: {
-          isin: In(isins),
-        },
-      },
-      relations: ["stockMetadata"],
-    });
-
-    const result: XIRRHoldingBatchResponseDTO = {};
+    const result: XIRRHoldingListResponseDTO = {};
 
     for (const holding of holdings) {
       const xirrDto = await this.calculateXIRRForHolding(

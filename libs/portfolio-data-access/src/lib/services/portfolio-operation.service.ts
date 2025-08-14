@@ -1,5 +1,8 @@
 import {
   FLOATING_POINT_TOLERANCE,
+  generateHoldingListXirrKey,
+  generateHoldingXirrKey,
+  generatePortfolioXirrKey,
   isEffectivelyZero,
 } from "@codescape-financial/core";
 import { StockMetadata } from "@codescape-financial/historical-data-access";
@@ -10,8 +13,10 @@ import {
   CreateStockSplitDTO,
   OperationType,
 } from "@codescape-financial/portfolio-data-models";
-import { Injectable, NotFoundException } from "@nestjs/common";
+import { CACHE_MANAGER } from "@nestjs/cache-manager";
+import { Inject, Injectable, Logger, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
+import type { Cache } from "cache-manager";
 import { DataSource, EntityManager, Repository } from "typeorm";
 import {
   Portfolio,
@@ -24,12 +29,15 @@ import { TaxCalculationService } from "./tax-calculation.service";
 
 @Injectable()
 export class PortfolioOperationService {
+  private readonly logger = new Logger(PortfolioOperationService.name);
+
   constructor(
     @InjectRepository(PortfolioOperation)
     private readonly operationRepository: Repository<PortfolioOperation>,
     private readonly portfolioService: PortfolioService,
     private readonly taxCalculationService: TaxCalculationService,
     private readonly dataSource: DataSource,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
 
   async findAll(): Promise<PortfolioOperation[]> {
@@ -57,6 +65,8 @@ export class PortfolioOperationService {
         stockId,
         manager,
       );
+
+      this.invalidateXirrCaches(portfolioId, holding.id);
 
       const operation = manager.create(PortfolioOperation, {
         type: OperationType.BUY,
@@ -99,6 +109,8 @@ export class PortfolioOperationService {
         stockId,
         manager,
       );
+
+      this.invalidateXirrCaches(portfolioId, holding.id);
 
       const operation = manager.create(PortfolioOperation, {
         type: OperationType.SELL,
@@ -145,6 +157,8 @@ export class PortfolioOperationService {
         stockId,
         manager,
       );
+
+      this.invalidateXirrCaches(portfolioId, holding.id);
 
       const operation = manager.create(PortfolioOperation, {
         type: OperationType.DIVIDEND,
@@ -198,6 +212,8 @@ export class PortfolioOperationService {
         // This makes the operation safe to call multiple times with the same data.
         return existingOperation;
       }
+
+      this.invalidateXirrCaches(portfolioId, holding.id);
 
       const operation = manager.create(PortfolioOperation, {
         type: OperationType.STOCK_SPLIT,
@@ -469,6 +485,48 @@ export class PortfolioOperationService {
     holding.totalCostBasis = String(totalCostBasis);
     holding.averagePricePerShare = String(
       !isEffectivelyZero(totalShares) ? 0 : totalCostBasis / totalShares,
+    );
+  }
+
+  /**
+   * Helper to invalidate relevant XIRR caches.
+   *
+   * @param portfolioId The portfolio ID.
+   * @param holdingId The holding ID (optional).
+   */
+  private async invalidateXirrCaches(portfolioId: string, holdingId?: string) {
+    if (holdingId) {
+      // Use the utility function for invalidation
+      const holdingCacheKey = generateHoldingXirrKey(portfolioId, holdingId);
+      await this.cacheManager.del(holdingCacheKey);
+      this.logger.debug(`Invalidated holding XIRR cache: ${holdingCacheKey}`);
+    }
+
+    const holdingListXirrAllCacheKey = generateHoldingListXirrKey(
+      portfolioId,
+      "all",
+    );
+    const holdingListXirrActiveCacheKey = generateHoldingListXirrKey(
+      portfolioId,
+      "active",
+    );
+
+    await this.cacheManager.del(holdingListXirrAllCacheKey);
+    await this.cacheManager.del(holdingListXirrActiveCacheKey);
+    this.logger.debug(
+      `Invalidated holding list XIRR caches: ${holdingListXirrAllCacheKey}, ${holdingListXirrActiveCacheKey}`,
+    );
+
+    const portfolioAllCacheKey = generatePortfolioXirrKey(portfolioId, "all");
+    const portfolioActiveCacheKey = generatePortfolioXirrKey(
+      portfolioId,
+      "active",
+    );
+
+    await this.cacheManager.del(portfolioAllCacheKey);
+    await this.cacheManager.del(portfolioActiveCacheKey);
+    this.logger.debug(
+      `Invalidated portfolio XIRR caches: ${portfolioAllCacheKey}, ${portfolioActiveCacheKey}`,
     );
   }
 }

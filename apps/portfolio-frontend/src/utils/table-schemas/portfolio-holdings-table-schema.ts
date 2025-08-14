@@ -13,7 +13,7 @@ import {
 } from "@codescape-financial/core-ui";
 import {
   PortfolioHoldingEmbeddedDTO,
-  XIRRHoldingBatchTransformedDTO,
+  XIRRHoldingListTransformedDTO,
 } from "@codescape-financial/portfolio-data-models";
 import { LatestQuoteMapping } from "../../types";
 import { BuildTableSchemaOptions } from "./types";
@@ -75,7 +75,7 @@ export const buildPortfolioHoldingColumnSchema = (
     PortfolioHoldingExtendedColumns
   > = {},
   latestQuotes: LatestQuoteMapping,
-  latestBatchXIRR: XIRRHoldingBatchTransformedDTO,
+  latestBatchXIRR: XIRRHoldingListTransformedDTO,
   portfolioXIRR: number | undefined,
 ): ColumnSchema<PortfolioHoldingEmbeddedDTO>[] => {
   const { columnKeys = [...defaultColumnKeys], actionsComponent } = options;
@@ -271,7 +271,7 @@ const dividendsColumnSchema = {
 } satisfies ColumnSchema<PortfolioHoldingEmbeddedDTO>;
 
 const getMWRRColumnSchema = (
-  latestXIRR: XIRRHoldingBatchTransformedDTO,
+  latestXIRR: XIRRHoldingListTransformedDTO,
   portfolioXIRR: number | undefined,
 ) =>
   ({
@@ -317,7 +317,7 @@ const totalGainsColumnSchema = {
  */
 const getColumnMapping = (
   latestQuotes: LatestQuoteMapping,
-  latestXIRR: XIRRHoldingBatchTransformedDTO,
+  latestXIRR: XIRRHoldingListTransformedDTO,
   portfolioXIRR: number | undefined,
 ): {
   [key in PortfolioHoldingExtendedColumns]: ColumnSchema<PortfolioHoldingEmbeddedDTO>;
@@ -663,7 +663,7 @@ const calculateTotalCompositeGains = (
 
 const getHoldingLatestXIRR = (
   holding: PortfolioHoldingEmbeddedDTO | undefined,
-  latestXIRR: XIRRHoldingBatchTransformedDTO,
+  latestXIRR: XIRRHoldingListTransformedDTO,
 ) => {
   return holding ? latestXIRR[holding.stock.isin]?.xirr : null;
 };
@@ -687,7 +687,7 @@ const constructLastUpdatedCellTitle = (
 
 const constructLastUpdatedCellTitleXIRR = (
   holding: PortfolioHoldingEmbeddedDTO | undefined,
-  latestXIRR: XIRRHoldingBatchTransformedDTO,
+  latestXIRR: XIRRHoldingListTransformedDTO,
 ) => latestDateFormatter(holding ? latestXIRR[holding.stock.isin]?.date : null);
 
 /**
