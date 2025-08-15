@@ -20,13 +20,14 @@ export const StockMetadataDetailsPage = () => {
   } = useOutletContextData<StockResponseDTO>();
 
   const handleDelete = () => {
-    stock &&
+    if (stock) {
       sendRequest({
         url: `/stock-metadata/${stock.id}`,
         method: "delete",
       } satisfies AxiosRequestConfig).then(() => {
         navigate("/stocks");
       });
+    }
   };
 
   return (

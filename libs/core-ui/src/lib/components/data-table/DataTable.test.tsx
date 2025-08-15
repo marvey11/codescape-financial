@@ -1,6 +1,6 @@
 import "@testing-library/jest-dom";
 import { render, screen } from "@testing-library/react";
-import { ColumnSchema } from "./ColumnSchema";
+import { CellValue, ColumnSchema } from "./ColumnSchema";
 import { DataTable } from "./DataTable";
 
 interface TestData {
@@ -14,7 +14,7 @@ const testData: TestData[] = [
   { id: 2, name: "Item 2", value: 200 },
 ];
 
-const columns: ColumnSchema<TestData, any>[] = [
+const columns: ColumnSchema<TestData, CellValue>[] = [
   {
     id: "name",
     header: "Name",
@@ -58,7 +58,7 @@ describe("DataTable", () => {
   });
 
   it("should render the footer", () => {
-    const columnsWithFooter: ColumnSchema<TestData, any>[] = [
+    const columnsWithFooter: ColumnSchema<TestData, CellValue>[] = [
       ...columns,
       {
         id: "total",
@@ -81,7 +81,7 @@ describe("DataTable", () => {
   });
 
   it("should use valueFormatter and cellRenderer", () => {
-    const columnsWithFormatter: ColumnSchema<TestData, any>[] = [
+    const columnsWithFormatter: ColumnSchema<TestData, CellValue>[] = [
       {
         id: "name",
         header: "Name",
@@ -109,7 +109,7 @@ describe("DataTable", () => {
   });
 
   it("should handle colSpan in the footer", () => {
-    const columnsWithColSpan: ColumnSchema<TestData, any>[] = [
+    const columnsWithColSpan: ColumnSchema<TestData, CellValue>[] = [
       {
         id: "name",
         header: "Name",

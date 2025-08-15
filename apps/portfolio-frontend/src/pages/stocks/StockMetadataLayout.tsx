@@ -10,7 +10,9 @@ export const StockMetadataLayout = () => {
   const { loading, error, data, sendRequest } = useAxios<StockResponseDTO>();
 
   useEffect(() => {
-    id && sendRequest({ url: `/stock-metadata/${id}`, method: "get" });
+    if (id) {
+      sendRequest({ url: `/stock-metadata/${id}`, method: "get" });
+    }
   }, [id, sendRequest]);
 
   return (

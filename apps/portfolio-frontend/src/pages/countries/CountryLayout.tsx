@@ -10,7 +10,9 @@ export const CountryLayout = () => {
   const { loading, error, data, sendRequest } = useAxios<CountryResponseDTO>();
 
   useEffect(() => {
-    id && sendRequest({ url: `/countries/${id}`, method: "get" });
+    if (id) {
+      sendRequest({ url: `/countries/${id}`, method: "get" });
+    }
   }, [id, sendRequest]);
 
   return (

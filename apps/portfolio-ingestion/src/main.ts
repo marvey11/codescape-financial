@@ -10,7 +10,7 @@ async function bootstrap() {
     await ingestionService.ingestAllOperations();
   } catch (error) {
     // The service already logs the specific error, so we just need to ensure the process exits with an error code.
-    console.error("The ingestion process failed. See logs for details.");
+    console.error("The ingestion process failed. See logs for details.", error);
     process.exit(1);
   } finally {
     // Ensure the application context is always closed to allow the process to exit.

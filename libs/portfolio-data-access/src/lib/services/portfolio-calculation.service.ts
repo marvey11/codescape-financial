@@ -8,6 +8,7 @@ import {
 } from "@codescape-financial/core";
 import { HistoricalQuoteService } from "@codescape-financial/historical-data-access";
 import {
+  AllLatestQuotesResponseDTO,
   OperationType,
   XIRRHoldingListResponseDTO,
   XIRRHoldingResponseDTO,
@@ -67,20 +68,16 @@ export class PortfolioCalculationService {
   // Crucial for performance optimization
   private async getLatestQuotesForIsins(
     isins: string[],
-  ): Promise<Map<string, number>> {
+  ): Promise<AllLatestQuotesResponseDTO> {
     if (isins.length === 0) {
-      return new Map();
+      return {};
     }
     // Assuming historicalQuoteService.findLatestByIsinBatch can handle an array of ISINs
     // and returns a Map<string, { date: string, price: number }> or similar.
     const latestQuotes =
       await this.historicalQuoteService.findLatestByIsins(isins);
 
-    const quoteMap = new Map<string, number>();
-    for (const [isin, quote] of Object.entries(latestQuotes)) {
-      quoteMap.set(isin, quote.price);
-    }
-    return quoteMap;
+    return latestQuotes;
   }
 
   // --- Helper to Consolidate & Get Holdings from Operations ---
@@ -133,12 +130,15 @@ export class PortfolioCalculationService {
     const latestQuotesMap = await this.getLatestQuotesForIsins(isinsToFetch);
 
     for (const holding of activeHoldings) {
-      const latestPrice = latestQuotesMap.get(holding.stockMetadata.isin);
-      if (latestPrice !== undefined) {
+      const latestQuote = latestQuotesMap[holding.stockMetadata.isin];
+
+      if (latestQuote !== undefined) {
+        const { date, price } = latestQuote;
+
         // Check if price was actually found
         cashflows.add({
-          cashDate: getDateObject(new Date()), // Use current date for market value
-          cashAmount: Number(holding.shares) * latestPrice,
+          cashDate: getDateObject(date), // Use current date for market value
+          cashAmount: Number(holding.shares) * price,
         });
       } else {
         this.logger.warn(
@@ -175,6 +175,10 @@ export class PortfolioCalculationService {
 
     const holdings = await queryBuilder.getMany();
 
+    this.logger.verbose(
+      `Found ${holdings.length} holdings for portfolio ${portfolioId}.`,
+    );
+
     if (holdings.length === 0) {
       return {};
     }
@@ -190,7 +194,7 @@ export class PortfolioCalculationService {
     // Group operations by holdingId for easy lookup
     const operationsByHoldingId = new Map<string, PortfolioOperation[]>();
     for (const op of allOperations) {
-      const holdingOps = operationsByHoldingId.get(op.holdingId) || [];
+      const holdingOps = operationsByHoldingId.get(op.holdingId) ?? [];
       holdingOps.push(op);
       operationsByHoldingId.set(op.holdingId, holdingOps);
     }
@@ -208,7 +212,7 @@ export class PortfolioCalculationService {
     // Use Promise.allSettled to ensure all calculations run and gather results,
     // even if some individual holding XIRR calculations encounter issues.
     const xirrPromises = holdings.map(async (holding) => {
-      const holdingOperations = operationsByHoldingId.get(holding.id) || [];
+      const holdingOperations = operationsByHoldingId.get(holding.id) ?? [];
       if (holdingOperations.length === 0) {
         this.logger.warn(
           `No operations for holding ${holding.id}. Skipping XIRR calculation.`,
@@ -219,11 +223,13 @@ export class PortfolioCalculationService {
       const cashflows = this.convertOperationsToCashflow(holdingOperations);
 
       if (holding && !isEffectivelyZero(Number(holding.shares))) {
-        const latestPrice = latestQuotesMap.get(holding.stockMetadata.isin);
-        if (latestPrice !== undefined) {
+        const latestQuote = latestQuotesMap[holding.stockMetadata.isin];
+        if (latestQuote !== undefined) {
+          const { date, price } = latestQuote;
+
           cashflows.add({
-            cashDate: getDateObject(new Date()), // Use current date for market value
-            cashAmount: Number(holding.shares) * latestPrice,
+            cashDate: getDateObject(date),
+            cashAmount: Number(holding.shares) * price,
           });
         } else {
           this.logger.warn(

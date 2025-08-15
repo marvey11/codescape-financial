@@ -22,11 +22,12 @@ export const EditPortfolioPage = () => {
   const [formData, setFormData] = useState<PortfolioFormData | undefined>();
 
   useEffect(() => {
-    portfolio &&
+    if (portfolio) {
       setFormData({
         ...portfolio,
         description: portfolio.description ?? "",
       } satisfies PortfolioFormData);
+    }
   }, [portfolio]);
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
