@@ -17,9 +17,18 @@ import {
 } from "../../components";
 import { DetailsPageEditButton } from "../../components/default-buttons";
 import { useOutletContextData } from "../../hooks";
-import { LatestQuoteMapping, QuoteObject } from "../../types";
+import {
+  LatestQuoteMapping,
+  QuoteObject,
+  XIRRMapping,
+  XIRRObject,
+} from "../../types";
 import { buildPortfolioHoldingColumnSchema } from "../../utils";
 
+/**
+ * Renders the portfolio details page, which displays information about a specific portfolio,
+ * including its holdings.
+ */
 export const PortfolioDetailsPage = () => {
   const { loading, error, data } = useOutletContextData<PortfolioResponseDTO>();
 
@@ -28,8 +37,9 @@ export const PortfolioDetailsPage = () => {
   const [latestQuotes, setlatestQuotes] = useState<LatestQuoteMapping>(
     new Map<string, QuoteObject>(),
   );
-  const [holdingsXIRR, setHoldingsXIRR] =
-    useState<XIRRHoldingListTransformedDTO>({});
+  const [holdingsXIRR, setHoldingsXIRR] = useState<XIRRMapping>(
+    new Map<string, XIRRObject>(),
+  );
   const [portfolioXIRR, setPortfolioXIRR] =
     useState<XIRRPortfolioTransformedDTO | null>(null);
 
@@ -40,36 +50,51 @@ export const PortfolioDetailsPage = () => {
 
     const portfolioId = data.id;
     const isins = data.holdings.map((holding) => holding.stock.isin);
-    if (isins.length) {
-      const quotesRequest = axiosInstance.post<AllLatestQuotesTransformedDTO>(
-        "/historical-quotes/latest-batch",
-        { isins },
-      );
-      const xirrHoldingListRequest =
-        axiosInstance.request<XIRRHoldingListTransformedDTO>({
-          url: `/portfolios/${portfolioId}/holdings/xirr`,
-          params: {
-            viewType: showActiveHoldingsOnly ? "active" : "all",
-          } satisfies PortfolioViewFilterDTO,
-          method: "GET",
-        });
-
-      Promise.all([quotesRequest, xirrHoldingListRequest])
-        .then(([latestQuotesResponse, xirrResponse]) => {
-          setlatestQuotes((prev) => {
-            for (const [isin, quote] of Object.entries(
-              latestQuotesResponse.data,
-            )) {
-              prev.set(isin, quote);
-            }
-            return prev;
-          });
-          console.log(xirrResponse.data);
-          setHoldingsXIRR(xirrResponse.data);
-        })
-        .catch(console.error);
+    if (isins.length === 0) {
+      return;
     }
-  }, [data, data?.id, showActiveHoldingsOnly]);
+
+    const quotesRequest = axiosInstance.post<AllLatestQuotesTransformedDTO>(
+      "/historical-quotes/latest-batch",
+      { isins },
+    );
+
+    const xirrHoldingListRequest =
+      axiosInstance.request<XIRRHoldingListTransformedDTO>({
+        url: `/portfolios/${portfolioId}/holdings/xirr`,
+        params: {
+          viewType: showActiveHoldingsOnly ? "active" : "all",
+        } satisfies PortfolioViewFilterDTO,
+        method: "GET",
+      });
+
+    const portfolioXirrRequest =
+      axiosInstance.request<XIRRPortfolioTransformedDTO>({
+        url: `/portfolios/${portfolioId}/xirr`,
+        params: {
+          viewType: showActiveHoldingsOnly ? "active" : "all",
+        } satisfies PortfolioViewFilterDTO,
+        method: "GET",
+      });
+
+    Promise.all([quotesRequest, xirrHoldingListRequest, portfolioXirrRequest])
+      .then(
+        ([
+          latestQuotesResponse,
+          xirrHoldingListResponse,
+          portfolioXirrResponse,
+        ]) => {
+          setlatestQuotes(
+            new Map(Object.entries(latestQuotesResponse.data ?? {})),
+          );
+          setHoldingsXIRR(
+            new Map(Object.entries(xirrHoldingListResponse.data ?? {})),
+          );
+          setPortfolioXIRR(portfolioXirrResponse.data);
+        },
+      )
+      .catch(console.error);
+  }, [data, showActiveHoldingsOnly]);
 
   const filteredHoldings = useMemo(() => {
     if (!data?.holdings) {
@@ -91,27 +116,6 @@ export const PortfolioDetailsPage = () => {
         : undefined,
     [filteredHoldings],
   );
-
-  useEffect(() => {
-    if (!filteredHoldings) {
-      return;
-    }
-
-    axiosInstance
-      .request<XIRRPortfolioTransformedDTO>({
-        url: `/portfolios/${data?.id}/xirr`,
-        params: {
-          viewType: showActiveHoldingsOnly ? "active" : "all",
-        } satisfies PortfolioViewFilterDTO,
-        method: "GET",
-      })
-      .then((response) => {
-        setPortfolioXIRR(response.data);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  }, [data?.id, filteredHoldings, showActiveHoldingsOnly]);
 
   return (
     <DataPageContainer isLoading={loading} error={error}>
@@ -157,14 +161,26 @@ export const PortfolioDetailsPage = () => {
   );
 };
 
+/**
+ * Props for the PortfolioHoldingsTable component.
+ */
 interface PortfolioHoldingsTableProps {
+  /** The ID of the portfolio. */
   portfolioId: string;
+  /** A map of the latest quotes for each holding. */
   latestQuotes: LatestQuoteMapping;
-  holdingsXIRR: XIRRHoldingListTransformedDTO;
+  /** A map of the XIRR for each holding. */
+  holdingsXIRR: XIRRMapping;
+  /** The XIRR of the entire portfolio. */
   portfolioXIRR: number | undefined;
+  /** The holdings to display in the table. */
   data: PortfolioHoldingEmbeddedDTO[];
 }
 
+/**
+ * Renders a table of portfolio holdings.
+ * @param {PortfolioHoldingsTableProps} props - The props for the component.
+ */
 const PortfolioHoldingsTable = ({
   portfolioId,
   latestQuotes,

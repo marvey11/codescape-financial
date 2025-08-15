@@ -11,11 +11,8 @@ import {
   ColumnSchema,
   createNumberValueCellClassNames,
 } from "@codescape-financial/core-ui";
-import {
-  PortfolioHoldingEmbeddedDTO,
-  XIRRHoldingListTransformedDTO,
-} from "@codescape-financial/portfolio-data-models";
-import { LatestQuoteMapping } from "../../types";
+import { PortfolioHoldingEmbeddedDTO } from "@codescape-financial/portfolio-data-models";
+import { LatestQuoteMapping, XIRRMapping } from "../../types";
 import { BuildTableSchemaOptions } from "./types";
 
 /**
@@ -75,7 +72,7 @@ export const buildPortfolioHoldingColumnSchema = (
     PortfolioHoldingExtendedColumns
   > = {},
   latestQuotes: LatestQuoteMapping,
-  latestBatchXIRR: XIRRHoldingListTransformedDTO,
+  latestBatchXIRR: XIRRMapping,
   portfolioXIRR: number | undefined,
 ): ColumnSchema<PortfolioHoldingEmbeddedDTO>[] => {
   const { columnKeys = [...defaultColumnKeys], actionsComponent } = options;
@@ -271,7 +268,7 @@ const dividendsColumnSchema = {
 } satisfies ColumnSchema<PortfolioHoldingEmbeddedDTO>;
 
 const getMWRRColumnSchema = (
-  latestXIRR: XIRRHoldingListTransformedDTO,
+  latestXIRR: XIRRMapping,
   portfolioXIRR: number | undefined,
 ) =>
   ({
@@ -317,7 +314,7 @@ const totalGainsColumnSchema = {
  */
 const getColumnMapping = (
   latestQuotes: LatestQuoteMapping,
-  latestXIRR: XIRRHoldingListTransformedDTO,
+  latestXIRR: XIRRMapping,
   portfolioXIRR: number | undefined,
 ): {
   [key in PortfolioHoldingExtendedColumns]: ColumnSchema<PortfolioHoldingEmbeddedDTO>;
@@ -663,9 +660,9 @@ const calculateTotalCompositeGains = (
 
 const getHoldingLatestXIRR = (
   holding: PortfolioHoldingEmbeddedDTO | undefined,
-  latestXIRR: XIRRHoldingListTransformedDTO,
+  latestXIRR: XIRRMapping,
 ) => {
-  return holding ? latestXIRR[holding.stock.isin]?.xirr : null;
+  return holding ? latestXIRR.get(holding.stock.isin)?.xirr : null;
 };
 
 // -------- CELL TITLE CONSTRUCTORS --------
@@ -687,8 +684,11 @@ const constructLastUpdatedCellTitle = (
 
 const constructLastUpdatedCellTitleXIRR = (
   holding: PortfolioHoldingEmbeddedDTO | undefined,
-  latestXIRR: XIRRHoldingListTransformedDTO,
-) => latestDateFormatter(holding ? latestXIRR[holding.stock.isin]?.date : null);
+  latestXIRR: XIRRMapping,
+) =>
+  latestDateFormatter(
+    holding ? latestXIRR.get(holding.stock.isin)?.date : null,
+  );
 
 /**
  * Constructs the cell title for the realized gains.
