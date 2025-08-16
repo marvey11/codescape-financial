@@ -15,7 +15,7 @@ import { StockMetadataModule } from "../stock-metadata";
 @Module({
   imports: [
     CacheModule.register({
-      ttl: 60 * 60, // default TTL in seconds (e.g., 1 hour, but you'll invalidate explicitly)
+      ttl: 60 * 60 * 1000, // 1 hour in milliseconds
       isGlobal: true, // Makes CacheModule available globally without importing everywhere
     }),
     SharedConfigModule,

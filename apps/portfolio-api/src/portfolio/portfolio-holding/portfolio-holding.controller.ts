@@ -15,7 +15,7 @@ import { CACHE_MANAGER } from "@nestjs/cache-manager";
 import { Controller, Get, Inject, Param, Query } from "@nestjs/common";
 import type { Cache } from "cache-manager";
 
-const TTL_MILLISECONDS = 8 * 60 * 60 * 1000;
+const TTL_MILLISECONDS = 60 * 60 * 1000;
 
 @Controller("portfolios/:portfolioId/holdings")
 export class PortfolioHoldingController {
