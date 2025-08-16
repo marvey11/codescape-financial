@@ -384,7 +384,7 @@ const calculateHoldingAveragePrice = (
     return null;
   }
 
-  return holding?.summary.averagePricePerShare;
+  return holding.summary.averagePricePerShare;
 };
 
 /**

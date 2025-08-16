@@ -4,6 +4,7 @@ import {
   SharedConfigModule,
 } from "@codescape-financial/portfolio-config";
 import { PortfolioDataAccessModule } from "@codescape-financial/portfolio-data-access";
+import { CacheModule } from "@nestjs/cache-manager";
 import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import path from "path";
@@ -17,6 +18,10 @@ import {
 @Module({
   imports: [
     SharedConfigModule,
+    CacheModule.register({
+      ttl: 60 * 60 * 1000, // 1 hour in milliseconds
+      isGlobal: true, // Making it global is usually the intent for shared services like caching
+    }),
     TypeOrmModule.forRootAsync({
       imports: [SharedConfigModule],
       useFactory: (configService: ConfigService) => ({

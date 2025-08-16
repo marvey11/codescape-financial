@@ -1,4 +1,5 @@
 import { HistoricalDataAccessModule } from "@codescape-financial/historical-data-access";
+import { CacheModule } from "@nestjs/cache-manager";
 import { Module } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import {
@@ -23,6 +24,11 @@ import {
       PortfolioHolding,
       PortfolioOperation,
     ]),
+    CacheModule.register({
+      // You don't need `isGlobal: true` here for the register options,
+      // as it's typically handled at the application root.
+      // But importing it here makes its providers available.
+    }),
     HistoricalDataAccessModule,
   ],
   providers: [
