@@ -10,6 +10,7 @@ import {
 } from "./entities";
 import {
   PortfolioCalculationService,
+  PortfolioChartService,
   PortfolioHoldingService,
   PortfolioOperationService,
   PortfolioService,
@@ -33,6 +34,7 @@ import {
   ],
   providers: [
     PortfolioCalculationService,
+    PortfolioChartService,
     PortfolioHoldingService,
     PortfolioOperationService,
     PortfolioService,
@@ -40,6 +42,7 @@ import {
   ],
   exports: [
     PortfolioCalculationService,
+    PortfolioChartService,
     PortfolioHoldingService,
     PortfolioOperationService,
     PortfolioService,

@@ -1,3 +1,4 @@
+export * from "./chart.dto";
 export * from "./country.dto";
 export * from "./operation.dto";
 export * from "./portfolio-holding.dto";

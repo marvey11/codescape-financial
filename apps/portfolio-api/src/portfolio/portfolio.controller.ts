@@ -1,9 +1,11 @@
 import { generatePortfolioXirrKey } from "@codescape-financial/core";
 import {
   PortfolioCalculationService,
+  PortfolioChartService,
   PortfolioService,
 } from "@codescape-financial/portfolio-data-access";
 import {
+  AllocationResponseDTO,
   CreatePortfolioDTO,
   PortfolioViewFilterDTO,
   UpdatePortfolioDTO,
@@ -30,6 +32,7 @@ export class PortfolioController {
   constructor(
     private readonly portfolioService: PortfolioService,
     private readonly portfolioCalculationService: PortfolioCalculationService,
+    private readonly portfolioChartService: PortfolioChartService,
     @Inject(CACHE_MANAGER) private cacheManager: Cache, // Inject the Cache Manager
   ) {}
 
@@ -87,5 +90,12 @@ export class PortfolioController {
     await this.cacheManager.set(cacheKey, xirrResult, TTL_MILLISECONDS);
 
     return xirrResult;
+  }
+
+  @Get(":id/allocations")
+  async getPortfolioSummary(
+    @Param("id") portfolioId: string,
+  ): Promise<AllocationResponseDTO> {
+    return this.portfolioChartService.getAllocationChartData(portfolioId);
   }
 }
