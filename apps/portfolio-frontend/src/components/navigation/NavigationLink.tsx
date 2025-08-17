@@ -9,13 +9,15 @@ interface NavigationLinkProps {
 
 export const NavigationLink = ({ to, children }: NavigationLinkProps) => {
   const location = useLocation();
-
-  const isActive = location.pathname === to;
+  // Ensure that if the current path is a sub-route, the parent link still appears active.
+  // This is a common UX pattern for navigation.
+  const isActive =
+    location.pathname === to || location.pathname.startsWith(`${to}/`);
 
   return (
     <NavLink
       to={to}
-      className={cn("hover:bg-slate-500 flex items-center h-full px-3", {
+      className={cn("flex h-full items-center px-3 hover:bg-slate-500", {
         "bg-slate-700": isActive,
       })}
     >
