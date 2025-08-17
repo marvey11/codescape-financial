@@ -1,0 +1,44 @@
+[
+  {
+    "label": "Portfolios",
+    "to": "/portfolios",
+    "items": [
+      {
+        "label": "View All",
+        "to": "/portfolios"
+      },
+      {
+        "label": "New Portfolio",
+        "to": "/portfolios/add"
+      }
+    ]
+  },
+  {
+    "label": "Stocks",
+    "to": "/stocks",
+    "items": [
+      {
+        "label": "Browse Stocks",
+        "to": "/stocks"
+      },
+      {
+        "label": "Add Stock",
+        "to": "/stocks/add"
+      }
+    ]
+  },
+  {
+    "label": "Countries",
+    "to": "/countries",
+    "items": [
+      {
+        "label": "Browse Countries",
+        "to": "/countries"
+      },
+      {
+        "label": "Add Country",
+        "to": "/countries/add"
+      }
+    ]
+  }
+]

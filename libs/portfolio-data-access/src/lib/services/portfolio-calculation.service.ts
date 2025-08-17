@@ -72,8 +72,6 @@ export class PortfolioCalculationService {
     if (isins.length === 0) {
       return {};
     }
-    // Assuming historicalQuoteService.findLatestByIsinBatch can handle an array of ISINs
-    // and returns a Map<string, { date: string, price: number }> or similar.
     const latestQuotes =
       await this.historicalQuoteService.findLatestByIsins(isins);
 
@@ -174,10 +172,6 @@ export class PortfolioCalculationService {
     }
 
     const holdings = await queryBuilder.getMany();
-
-    this.logger.verbose(
-      `Found ${holdings.length} holdings for portfolio ${portfolioId}.`,
-    );
 
     if (holdings.length === 0) {
       return {};
@@ -284,8 +278,6 @@ export class PortfolioCalculationService {
     return result;
   }
 
-  // --- calculateXIRRForHolding (Refactored) ---
-
   // This method is now only for a SINGLE holding and doesn't need to fetch relations if called
   // from calculateXIRRForHoldingList because relations are already eager-loaded.
   // It's also suitable for direct calls for a single holding XIRR.
@@ -354,7 +346,7 @@ export class PortfolioCalculationService {
       cashflows.get(cashflows.size - 1)?.cashDate ?? new Date();
 
     return {
-      isin: holding?.stockMetadata?.isin ?? "", // Safe access with optional chaining
+      isin: holding?.stockMetadata?.isin ?? "",
       date: formatNormalizedDate(calculationDate),
       xirr: this.calculateXIRR(cashflows),
     };
@@ -442,9 +434,9 @@ export class PortfolioCalculationService {
       }
 
       if (npv > 0) {
-        low = rate; // XIRR is higher than current 'rate'
+        low = rate; // XIRR is higher than current `rate`
       } else {
-        high = rate; // XIRR is lower than current 'rate'
+        high = rate; // XIRR is lower than current `rate`
       }
     }
 
