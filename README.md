@@ -1,6 +1,10 @@
 # Codescape Financial Portfolio
 
-## Things Still To Do
+## Things To Do
 
-- Portfolio API
-  - [ ] Configuration Module
+- Frontend
+  - [ ] Show stock/holding information on the `AddOperationPage`
+  - [ ] Add operations for stocks without holding
+  - Show details for a holding:
+    - [ ] Full summary
+    - [ ] Trade history

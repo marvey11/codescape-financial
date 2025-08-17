@@ -1,5 +1,10 @@
 import { StockEmbeddedDTO } from "./stock.dto";
 
+export interface PortfolioHoldingResponseDTO {
+  id: string;
+  stock: StockEmbeddedDTO;
+}
+
 export interface PortfolioHoldingEmbeddedDTO {
   id: string;
   stock: StockEmbeddedDTO;

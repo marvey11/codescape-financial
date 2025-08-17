@@ -8,8 +8,8 @@ import {
   OperationType,
 } from "@codescape-financial/portfolio-data-models";
 import { FormEvent, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
-import { useAxios } from "../../hooks";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { useAxios } from "../../../../hooks";
 import { OperationForm, OperationFormData } from "./OperationForm";
 
 type OperationPayloadType =
@@ -21,10 +21,10 @@ type OperationPayloadType =
 export const AddOperationPage = () => {
   const navigate = useNavigate();
 
+  const { portfolioId, holdingId } = useParams();
+
   const [searchParams] = useSearchParams();
 
-  const portfolioId = searchParams.get("portfolioId");
-  const holdingId = searchParams.get("holdingId");
   const stockId = searchParams.get("stockId");
 
   const { sendRequest: sendOperationRequest } = useAxios();
