@@ -19,9 +19,9 @@ export const EditCountryPage = () => {
 
   const handleSubmit = (data: CountryFormData) => {
     if (country && data) {
-      const payload: UpdateCountryDTO = {
+      const payload = {
         ...data,
-      };
+      } satisfies UpdateCountryDTO;
 
       sendRequest({
         url: `/countries/${country.id}`,

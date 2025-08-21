@@ -9,9 +9,10 @@ export const AddCountryPage = () => {
   const { sendRequest } = useAxios();
 
   const handleSubmit = (data: CountryFormData) => {
-    const payload: CreateCountryDTO = {
+    const payload = {
       ...data,
-    };
+    } satisfies CreateCountryDTO;
+
     sendRequest({ url: "/countries", method: "post", data: payload }).then(
       () => {
         navigate("/countries");
