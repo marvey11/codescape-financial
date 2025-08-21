@@ -1,6 +1,11 @@
-import { formatNormalizedDate } from "@codescape-financial/core";
-import { FormRow, Input, Select } from "@codescape-financial/core-ui";
+import { formatNormalizedDate, getDateObject } from "@codescape-financial/core";
+import {
+  FormButtonsComponent,
+  Input,
+  Select,
+} from "@codescape-financial/core-ui";
 import { OperationType } from "@codescape-financial/portfolio-data-models";
+import { Control, Controller, useForm, useWatch } from "react-hook-form";
 
 export interface OperationFormData {
   type: OperationType;
@@ -14,199 +19,271 @@ export interface OperationFormData {
   splitRatio: number;
 }
 
-interface Props {
-  value: OperationFormData;
-  onChange: (data: OperationFormData) => void;
+interface OperationFormProps {
+  value?: OperationFormData;
+  onSubmit: (data: OperationFormData) => void;
+  onCancel: () => void;
 }
 
-export const OperationForm = ({ value, onChange }: Props) => {
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
-  ) => {
-    const { name, value: inputValue, type } = e.target;
-
-    let processedValue: string | number | Date = inputValue;
-
-    if (type === "number") {
-      processedValue = inputValue === "" ? 0 : parseFloat(inputValue);
-    } else if (type === "date") {
-      processedValue = new Date(inputValue + "T00:00:00");
-    }
-
-    onChange({
-      ...value,
-      [name]: processedValue,
-    });
-  };
+export const OperationForm = ({
+  value,
+  onSubmit,
+  onCancel,
+}: OperationFormProps) => {
+  const {
+    handleSubmit,
+    control,
+    formState: { isSubmitting },
+  } = useForm<OperationFormData>({
+    defaultValues: value ?? {
+      type: OperationType.BUY,
+      date: new Date(),
+      shares: 0,
+      pricePerShare: 0,
+      fees: 0,
+      applicableShares: 0,
+      dividendPerShare: 0,
+      exchangeRate: 1,
+      splitRatio: 1,
+    },
+  });
 
   return (
-    <>
-      <FormRow label={<label htmlFor="operation-type">Operation Type:</label>}>
-        <Select
-          id="operation-type"
-          name="type"
-          value={value.type}
-          onChange={handleChange}
-          required
-        >
-          {Object.values(OperationType).map((type) => (
-            <option key={type} value={type}>
-              {selectLabelMapping[type]}
-            </option>
-          ))}
-        </Select>
-      </FormRow>
+    <form
+      onSubmit={handleSubmit(onSubmit)}
+      className="grid grid-cols-[max-content_1fr] items-center gap-4 rounded-lg bg-white p-4 shadow-md"
+    >
+      <Controller
+        name="type"
+        control={control}
+        rules={{ required: true }}
+        render={({ field }) => (
+          <>
+            <label
+              htmlFor="operation-type"
+              className="font-medium text-gray-700"
+            >
+              Operation Type:
+            </label>
+            <Select id="operation-type" {...field}>
+              {Object.values(OperationType).map((type) => (
+                <option key={type} value={type}>
+                  {selectLabelMapping[type]}
+                </option>
+              ))}
+            </Select>
+          </>
+        )}
+      />
 
-      <FormRow label={<label htmlFor="operation-date">Date:</label>}>
-        <Input
-          id="operation-date"
-          name="date"
-          value={formatNormalizedDate(value.date)}
-          onChange={handleChange}
-          type="date"
-        />
-      </FormRow>
+      <Controller
+        name="date"
+        control={control}
+        rules={{ required: true }}
+        render={({ field }) => (
+          <>
+            <label
+              htmlFor="operation-date"
+              className="font-medium text-gray-700"
+            >
+              Date:
+            </label>
+            <Input
+              id="operation-date"
+              type="date"
+              {...field}
+              value={formatNormalizedDate(field.value)}
+              onChange={(e) => field.onChange(getDateObject(e.target.value))}
+            />
+          </>
+        )}
+      />
 
-      {
-        {
-          [OperationType.BUY]: (
-            <TransactionFormFields value={value} handleChange={handleChange} />
-          ),
-          [OperationType.SELL]: (
-            <TransactionFormFields value={value} handleChange={handleChange} />
-          ),
-          [OperationType.DIVIDEND]: (
-            <DividendFormFields value={value} handleChange={handleChange} />
-          ),
-          [OperationType.STOCK_SPLIT]: (
-            <StockSplitFormFields value={value} handleChange={handleChange} />
-          ),
-        }[value.type]
-      }
-    </>
+      <OperationFormFields control={control} />
+
+      <FormButtonsComponent
+        submitButtonTitle={
+          isSubmitting ? "Saving..." : value ? "Save Changes" : "Add Operation"
+        }
+        disableSubmitButton={isSubmitting}
+        onCancel={onCancel}
+      />
+    </form>
   );
 };
 
 interface FormFieldProps {
-  value: OperationFormData;
-  handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  control: Control<OperationFormData>;
 }
 
-const TransactionFormFields = ({ value, handleChange }: FormFieldProps) => (
+const OperationFormFields = ({ control }: FormFieldProps) => {
+  const type = useWatch({
+    control,
+    name: "type",
+  });
+
+  switch (type) {
+    case OperationType.BUY:
+    case OperationType.SELL:
+      return <TransactionFormFields control={control} />;
+    case OperationType.DIVIDEND:
+      return <DividendFormFields control={control} />;
+    case OperationType.STOCK_SPLIT:
+      return <StockSplitFormFields control={control} />;
+    default:
+      return null;
+  }
+};
+
+const TransactionFormFields = ({ control }: FormFieldProps) => (
   <>
-    <FormRow label={<label htmlFor="operation-shares">Shares:</label>}>
-      <Input
-        id="operation-shares"
-        name="shares"
-        value={value.shares}
-        onChange={handleChange}
-        type="number"
-        min={0}
-        step={0.0001}
-        required
-      />
-    </FormRow>
-
-    <FormRow
-      label={
-        <label htmlFor="operation-price-per-share">Price Per Share:</label>
-      }
-    >
-      <Input
-        id="operation-price-per-share"
-        name="pricePerShare"
-        value={value.pricePerShare}
-        onChange={handleChange}
-        type="number"
-        min={0}
-        step={0.0001}
-        required
-      />
-    </FormRow>
-
-    <FormRow label={<label htmlFor="operation-fees">Fees:</label>}>
-      <Input
-        id="operation-fees"
-        name="fees"
-        value={value.fees}
-        onChange={handleChange}
-        type="number"
-        min={0}
-        step={0.0001}
-        required
-      />
-    </FormRow>
-  </>
-);
-
-const DividendFormFields = ({ value, handleChange }: FormFieldProps) => (
-  <>
-    <FormRow
-      label={
-        <label htmlFor="operation-dividend-per-share">
-          Dividend Per Share:
-        </label>
-      }
-    >
-      <Input
-        id="operation-dividend-per-share"
-        name="dividendPerShare"
-        value={value.dividendPerShare}
-        onChange={handleChange}
-        type="number"
-        min={0}
-        step={0.0001}
-        required
-      />
-    </FormRow>
-
-    <FormRow
-      label={
-        <label htmlFor="operation-applicable-shares">Applicable Shares:</label>
-      }
-    >
-      <Input
-        id="operation-applicable-shares"
-        name="applicableShares"
-        value={value.applicableShares}
-        onChange={handleChange}
-        type="number"
-        min={0}
-        step={0.0001}
-        required
-      />
-    </FormRow>
-
-    <FormRow
-      label={<label htmlFor="operation-exchange-rate">Exchange Rate:</label>}
-    >
-      <Input
-        id="operation-exchange-rate"
-        name="exchangeRate"
-        value={value.exchangeRate}
-        onChange={handleChange}
-        type="number"
-        min={0}
-        step={0.0001}
-        required
-      />
-    </FormRow>
-  </>
-);
-
-const StockSplitFormFields = ({ value, handleChange }: FormFieldProps) => (
-  <FormRow label={<label htmlFor="operation-split-ratio">Split Ratio:</label>}>
-    <Input
-      id="operation-split-ratio"
-      name="splitRatio"
-      value={value.splitRatio}
-      onChange={handleChange}
-      type="number"
-      min={0}
-      step={0.0001}
-      required
+    <Controller
+      name="shares"
+      control={control}
+      rules={{ required: true, min: 0 }}
+      render={({ field }) => (
+        <>
+          <label
+            htmlFor="operation-shares"
+            className="font-medium text-gray-700"
+          >
+            Shares:
+          </label>
+          <Input id="operation-shares" type="number" step={0.001} {...field} />
+        </>
+      )}
     />
-  </FormRow>
+
+    <Controller
+      name="pricePerShare"
+      control={control}
+      rules={{ required: true, min: 0 }}
+      render={({ field }) => (
+        <>
+          <label
+            htmlFor="operation-price-per-share"
+            className="font-medium text-gray-700"
+          >
+            Price Per Share:
+          </label>
+          <Input
+            id="operation-price-per-share"
+            type="number"
+            step={0.0001}
+            {...field}
+          />
+        </>
+      )}
+    />
+
+    <Controller
+      name="fees"
+      control={control}
+      rules={{ required: true, min: 0 }}
+      render={({ field }) => (
+        <>
+          <label htmlFor="operation-fees" className="font-medium text-gray-700">
+            Fees:
+          </label>
+          <Input id="operation-fees" type="number" step={0.0001} {...field} />
+        </>
+      )}
+    />
+  </>
+);
+
+const DividendFormFields = ({ control }: FormFieldProps) => (
+  <>
+    <Controller
+      name="dividendPerShare"
+      control={control}
+      rules={{ required: true, min: 0 }}
+      render={({ field }) => (
+        <>
+          <label
+            htmlFor="operation-dividend-per-share"
+            className="font-medium text-gray-700"
+          >
+            Dividend Per Share:
+          </label>
+          <Input
+            id="operation-dividend-per-share"
+            type="number"
+            step={0.0001}
+            {...field}
+          />
+        </>
+      )}
+    />
+
+    <Controller
+      name="applicableShares"
+      control={control}
+      rules={{ required: true, min: 0 }}
+      render={({ field }) => (
+        <>
+          <label
+            htmlFor="operation-applicable-shares"
+            className="font-medium text-gray-700"
+          >
+            Applicable Shares:
+          </label>
+          <Input
+            id="operation-applicable-shares"
+            type="number"
+            step={0.0001}
+            {...field}
+          />
+        </>
+      )}
+    />
+
+    <Controller
+      name="exchangeRate"
+      control={control}
+      rules={{ required: true, min: 0 }}
+      render={({ field }) => (
+        <>
+          <label
+            htmlFor="operation-exchange-rate"
+            className="font-medium text-gray-700"
+          >
+            Exchange Rate:
+          </label>
+          <Input
+            id="operation-exchange-rate"
+            type="number"
+            step={0.0001}
+            {...field}
+          />
+        </>
+      )}
+    />
+  </>
+);
+
+const StockSplitFormFields = ({ control }: FormFieldProps) => (
+  <Controller
+    name="splitRatio"
+    control={control}
+    rules={{ required: true, min: 0 }}
+    render={({ field }) => (
+      <>
+        <label
+          htmlFor="operation-split-ratio"
+          className="font-medium text-gray-700"
+        >
+          Split Ratio:
+        </label>
+        <Input
+          id="operation-split-ratio"
+          type="number"
+          step={0.0001}
+          {...field}
+        />
+      </>
+    )}
+  />
 );
 
 const selectLabelMapping: { [key in OperationType]: string } = {

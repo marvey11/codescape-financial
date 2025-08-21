@@ -2,8 +2,7 @@ import { PortfolioHoldingResponseDTO } from "@codescape-financial/portfolio-data
 import { useOutletContextData } from "../../../hooks";
 
 export const PortfolioHoldingDetailsPage = () => {
-  const { loading, error, data } =
-    useOutletContextData<PortfolioHoldingResponseDTO>();
+  useOutletContextData<PortfolioHoldingResponseDTO>();
 
   return <h1>PortfolioHoldingDetailsPage</h1>;
 };
