@@ -1,4 +1,5 @@
-import { FormRow, Input } from "@codescape-financial/core-ui";
+import { FormButtonsComponent, Input } from "@codescape-financial/core-ui";
+import { Controller, useForm } from "react-hook-form";
 
 export interface PortfolioFormData {
   name: string;
@@ -7,47 +8,71 @@ export interface PortfolioFormData {
 
 interface PortfolioFormProps {
   value?: PortfolioFormData;
-  onChange: (data: PortfolioFormData) => void;
+  onSubmit: (data: PortfolioFormData) => void;
+  onCancel: () => void;
 }
 
 export const PortfolioForm = ({
-  value = { name: "", description: "" },
-  onChange,
+  value,
+  onSubmit,
+  onCancel,
 }: PortfolioFormProps) => {
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value: rawValue } = e.target;
-    const finalValue: string = rawValue;
-
-    onChange({
-      ...value,
-      [name]: finalValue,
-    });
-  };
+  const {
+    handleSubmit,
+    control,
+    formState: { isSubmitting },
+  } = useForm<PortfolioFormData>({
+    defaultValues: value ?? {
+      name: "",
+      description: "",
+    },
+  });
 
   return (
-    <>
-      <FormRow label={<label htmlFor="portfolio-name">Name:</label>}>
-        <Input
-          id="portfolio-name"
-          name="name"
-          value={value.name}
-          onChange={handleChange}
-          type="text"
-          required
-        />
-      </FormRow>
+    <form
+      onSubmit={handleSubmit(onSubmit)}
+      className="grid grid-cols-[max-content_1fr] items-center gap-4 rounded-lg bg-white p-4 shadow-md"
+    >
+      <Controller
+        name="name"
+        control={control}
+        rules={{ required: true }}
+        render={({ field }) => (
+          <>
+            <label
+              htmlFor="portfolio-name"
+              className="font-medium text-gray-700"
+            >
+              Portfolio Name:
+            </label>
+            <Input id="portfolio-name" type="text" {...field} />
+          </>
+        )}
+      />
 
-      <FormRow
-        label={<label htmlFor="portfolio-description">Description:</label>}
-      >
-        <Input
-          id="portfolio-description"
-          name="description"
-          value={value.description}
-          onChange={handleChange}
-          type="text"
-        />
-      </FormRow>
-    </>
+      <Controller
+        name="description"
+        control={control}
+        render={({ field }) => (
+          <>
+            <label
+              htmlFor="portfolio-description"
+              className="font-medium text-gray-700"
+            >
+              Description:
+            </label>
+            <Input id="portfolio-description" type="text" {...field} />
+          </>
+        )}
+      />
+
+      <FormButtonsComponent
+        submitButtonTitle={
+          isSubmitting ? "Saving..." : value ? "Save Changes" : "Add Portfolio"
+        }
+        disableSubmitButton={isSubmitting}
+        onCancel={onCancel}
+      />
+    </form>
   );
 };

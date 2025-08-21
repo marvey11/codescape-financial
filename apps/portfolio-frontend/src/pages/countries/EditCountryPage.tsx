@@ -1,9 +1,7 @@
-import { FormButtonsComponent } from "@codescape-financial/core-ui";
 import {
   CountryResponseDTO,
   UpdateCountryDTO,
 } from "@codescape-financial/portfolio-data-models";
-import { FormEvent, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { DataPageContainer } from "../../components";
 import { useOutletContextData } from "../../hooks";
@@ -19,21 +17,11 @@ export const EditCountryPage = () => {
     sendRequest,
   } = useOutletContextData<CountryResponseDTO>();
 
-  const [formData, setFormData] = useState<CountryFormData | undefined>();
-
-  useEffect(() => {
-    if (country) {
-      setFormData(country satisfies CountryFormData);
-    }
-  }, [country]);
-
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    if (country && formData) {
-      const payload: UpdateCountryDTO = {
-        ...formData,
-      };
+  const handleSubmit = (data: CountryFormData) => {
+    if (country && data) {
+      const payload = {
+        ...data,
+      } satisfies UpdateCountryDTO;
 
       sendRequest({
         url: `/countries/${country.id}`,
@@ -48,16 +36,12 @@ export const EditCountryPage = () => {
   return (
     <DataPageContainer isLoading={loading} error={error}>
       <h1 className="mb-4 text-4xl font-extrabold">Update Country</h1>
-      {formData && (
-        <form
+      {country && (
+        <CountryForm
+          value={{ ...country } satisfies CountryFormData}
           onSubmit={handleSubmit}
-          className="grid grid-cols-[max-content_1fr] items-center gap-4 rounded-md border border-gray-300 p-6 shadow-sm"
-        >
-          <CountryForm value={formData} onChange={setFormData} />
-          <FormButtonsComponent
-            onCancel={() => navigate("..", { replace: true })}
-          />
-        </form>
+          onCancel={() => navigate("..", { replace: true })}
+        />
       )}
     </DataPageContainer>
   );
