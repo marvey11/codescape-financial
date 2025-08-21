@@ -1,13 +1,16 @@
 import { sortDataArray } from "@codescape-financial/core";
-import { FormButtonsComponent } from "@codescape-financial/core-ui";
 import {
   CountryResponseDTO,
   CreateStockDTO,
 } from "@codescape-financial/portfolio-data-models";
-import { FormEvent, useEffect, useState } from "react";
+import { useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAxios } from "../../hooks";
-import { StockFormData, StockMetadataForm } from "./StockMetadataForm";
+import {
+  CountrySelectOption,
+  StockFormData,
+  StockMetadataForm,
+} from "./StockMetadataForm";
 
 export const AddStockMetadataPage = () => {
   const navigate = useNavigate();
@@ -17,29 +20,27 @@ export const AddStockMetadataPage = () => {
   const { data: countries, sendRequest: sendCountriesRequest } =
     useAxios<CountryResponseDTO[]>();
 
-  const [formData, setFormData] = useState<StockFormData>({
-    name: "",
-    isin: "",
-    nsin: "",
-    currency: "",
-    countryId: "",
-  });
-  const [countryList, setCountryList] = useState<CountryResponseDTO[]>([]);
+  const sortedCountries = useMemo(
+    () =>
+      countries
+        ? sortDataArray(
+            countries.map(
+              ({ id, name, countryCode }) =>
+                ({ id, name, countryCode }) satisfies CountrySelectOption,
+            ),
+            "name",
+          )
+        : undefined,
+    [countries],
+  );
 
   useEffect(() => {
     sendCountriesRequest({ url: "/countries", method: "get" });
   }, [sendCountriesRequest]);
 
-  useEffect(() => {
-    if (countries) {
-      setCountryList(sortDataArray(countries, "name"));
-    }
-  }, [countries]);
-
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const handleSubmit = (data: StockFormData) => {
     const payload: CreateStockDTO = {
-      ...formData,
+      ...data,
     };
     sendRequest({ url: "/stock-metadata", method: "post", data: payload }).then(
       () => {
@@ -51,21 +52,11 @@ export const AddStockMetadataPage = () => {
   return (
     <div className="p-3">
       <h1 className="mb-4 text-4xl font-extrabold">Create Stock</h1>
-      <form
+      <StockMetadataForm
+        availableCountries={sortedCountries ?? []}
         onSubmit={handleSubmit}
-        className="grid grid-cols-[max-content_1fr] items-center gap-4 rounded-md border border-gray-300 p-6 shadow-sm"
-      >
-        <StockMetadataForm
-          availableCountries={countryList}
-          value={formData}
-          onChange={setFormData}
-        />
-        <FormButtonsComponent
-          onCancel={() => {
-            navigate("..", { replace: true });
-          }}
-        />
-      </form>
+        onCancel={() => navigate("..", { replace: true })}
+      />
     </div>
   );
 };

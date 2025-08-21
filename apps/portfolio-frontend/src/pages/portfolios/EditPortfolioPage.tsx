@@ -1,9 +1,7 @@
-import { FormButtonsComponent } from "@codescape-financial/core-ui";
 import {
   PortfolioResponseDTO,
-  UpdatePortfolioDTO,
+  UpdateCountryDTO,
 } from "@codescape-financial/portfolio-data-models";
-import { FormEvent, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { DataPageContainer } from "../../components";
 import { useOutletContextData } from "../../hooks";
@@ -19,24 +17,13 @@ export const EditPortfolioPage = () => {
     sendRequest,
   } = useOutletContextData<PortfolioResponseDTO>();
 
-  const [formData, setFormData] = useState<PortfolioFormData | undefined>();
-
-  useEffect(() => {
-    if (portfolio) {
-      setFormData({
-        ...portfolio,
-        description: portfolio.description ?? "",
-      } satisfies PortfolioFormData);
-    }
-  }, [portfolio]);
-
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    if (portfolio && formData) {
-      const payload: UpdatePortfolioDTO = {
-        ...formData,
-      };
+  const handleSubmit = (data: PortfolioFormData) => {
+    if (portfolio && data) {
+      const { name, description } = data;
+      const payload = Object.assign(
+        { name },
+        description && { description },
+      ) satisfies UpdateCountryDTO;
 
       sendRequest({
         url: `/portfolios/${portfolio.id}`,
@@ -51,16 +38,17 @@ export const EditPortfolioPage = () => {
   return (
     <DataPageContainer isLoading={loading} error={error}>
       <h1 className="mb-4 text-4xl font-extrabold">Update Portfolio</h1>
-      {formData && (
-        <form
+      {portfolio && (
+        <PortfolioForm
+          value={
+            {
+              ...portfolio,
+              description: portfolio.description ?? "",
+            } satisfies PortfolioFormData
+          }
           onSubmit={handleSubmit}
-          className="grid grid-cols-[max-content_1fr] items-center gap-4 rounded-md border border-gray-300 p-6 shadow-sm"
-        >
-          <PortfolioForm value={formData} onChange={setFormData} />
-          <FormButtonsComponent
-            onCancel={() => navigate("/portfolios", { replace: true })}
-          />
-        </form>
+          onCancel={() => navigate("..", { replace: true })}
+        />
       )}
     </DataPageContainer>
   );
