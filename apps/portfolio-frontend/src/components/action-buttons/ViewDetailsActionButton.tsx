@@ -1,5 +1,5 @@
-import { MagnifyingGlassIcon } from "@heroicons/react/16/solid";
-import { ActionButton } from "./ActionButton";
+import { ActionButton } from "@codescape-financial/core-ui";
+import { Icon } from "../icons";
 
 interface Props {
   label?: string;
@@ -11,6 +11,6 @@ export const ViewDetailsActionButton = ({
   onClick,
 }: Props) => (
   <ActionButton aria-label={label} onClick={onClick}>
-    <MagnifyingGlassIcon className="h-5 w-5 text-gray-500" aria-hidden="true" />
+    <Icon name="ViewDetails" aria-hidden="true" />
   </ActionButton>
 );

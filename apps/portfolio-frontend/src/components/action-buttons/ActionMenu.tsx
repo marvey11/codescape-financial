@@ -1,7 +1,6 @@
-import { EllipsisVerticalIcon } from "@heroicons/react/16/solid";
+import { ActionButton, cn } from "@codescape-financial/core-ui";
 import { ReactNode } from "react";
-import { cn } from "../../utility";
-import { ActionButton } from "./ActionButton";
+import { Icon } from "../icons";
 
 interface ActionMenuProps {
   children: ReactNode;
@@ -13,10 +12,7 @@ export const ActionMenu = ({ children }: ActionMenuProps) => {
     <div className="group relative inline-flex">
       {/* Main button - always visible */}
       <ActionButton aria-label="More options">
-        <EllipsisVerticalIcon
-          className="h-5 w-5 text-gray-500"
-          aria-hidden="true"
-        />
+        <Icon name="MoreOptions" aria-hidden="true" />
       </ActionButton>
 
       {/* Expanded menu container - hidden by default, visible on group hover */}

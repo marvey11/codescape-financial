@@ -1,10 +1,5 @@
 import { sortDataArray } from "@codescape-financial/core";
-import {
-  ActionMenu,
-  Checkbox,
-  DataTable,
-  ViewDetailsActionButton,
-} from "@codescape-financial/core-ui";
+import { Checkbox, DataTable } from "@codescape-financial/core-ui";
 import {
   AllLatestQuotesTransformedDTO,
   PortfolioHoldingEmbeddedDTO,
@@ -17,9 +12,11 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../../api/axios";
 import {
+  ActionMenu,
   AddOperationButton,
   DataPageContainer,
   DetailsPageHeader,
+  ViewDetailsActionButton,
 } from "../../components";
 import { DetailsPageEditButton } from "../../components/default-buttons";
 import { useOutletContextData } from "../../hooks";
