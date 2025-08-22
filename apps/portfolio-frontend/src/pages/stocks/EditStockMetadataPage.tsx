@@ -1,15 +1,18 @@
 import { sortDataArray } from "@codescape-financial/core";
-import { FormButtonsComponent } from "@codescape-financial/core-ui";
 import {
   CountryResponseDTO,
   StockResponseDTO,
   UpdateStockDTO,
 } from "@codescape-financial/portfolio-data-models";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { DataPageContainer } from "../../components";
 import { useAxios, useOutletContextData } from "../../hooks";
-import { StockFormData, StockMetadataForm } from "./StockMetadataForm";
+import {
+  CountrySelectOption,
+  StockFormData,
+  StockMetadataForm,
+} from "./StockMetadataForm";
 
 export const EditStockMetadataPage = () => {
   const navigate = useNavigate();
@@ -24,33 +27,29 @@ export const EditStockMetadataPage = () => {
   const { data: countries, sendRequest: sendCountriesRequest } =
     useAxios<CountryResponseDTO[]>();
 
-  const [formData, setFormData] = useState<StockFormData | undefined>();
-  const [countryList, setCountryList] = useState<CountryResponseDTO[]>([]);
-
-  useEffect(() => {
-    if (stock) {
-      const { country, ...rest } = stock;
-      setFormData({ ...rest, countryId: country.id });
-    }
-  }, [stock]);
+  const sortedCountries = useMemo(
+    () =>
+      countries
+        ? sortDataArray(
+            countries.map(
+              ({ id, name, countryCode }) =>
+                ({ id, name, countryCode }) satisfies CountrySelectOption,
+            ),
+            "name",
+          )
+        : undefined,
+    [countries],
+  );
 
   useEffect(() => {
     sendCountriesRequest({ url: "/countries", method: "get" });
   }, [sendCountriesRequest]);
 
-  useEffect(() => {
-    if (countries) {
-      setCountryList(sortDataArray(countries, "name"));
-    }
-  }, [countries]);
-
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    if (stock && formData) {
-      const payload: UpdateStockDTO = {
-        ...formData,
-      };
+  const handleSubmit = (data: StockFormData) => {
+    if (stock && data) {
+      const payload = {
+        ...data,
+      } satisfies UpdateStockDTO;
 
       sendStockRequest({
         url: `/stock-metadata/${stock.id}`,
@@ -65,22 +64,15 @@ export const EditStockMetadataPage = () => {
   return (
     <DataPageContainer isLoading={isStockLoading} error={stockError}>
       <h1 className="mb-4 text-4xl font-extrabold">Update Stock</h1>
-      {formData && (
-        <form
+      {stock && (
+        <StockMetadataForm
+          availableCountries={sortedCountries ?? []}
+          value={
+            { ...stock, countryId: stock.country.id } satisfies StockFormData
+          }
           onSubmit={handleSubmit}
-          className="grid grid-cols-[max-content_1fr] items-center gap-4 rounded-md border border-gray-300 p-6 shadow-sm"
-        >
-          <StockMetadataForm
-            availableCountries={countryList}
-            value={formData}
-            onChange={setFormData}
-          />
-          <FormButtonsComponent
-            onCancel={() => {
-              navigate("..", { replace: true });
-            }}
-          />
-        </form>
+          onCancel={() => navigate("..", { replace: true })}
+        />
       )}
     </DataPageContainer>
   );

@@ -2,9 +2,8 @@ import { sortDataArray } from "@codescape-financial/core";
 import { Button, DataTable } from "@codescape-financial/core-ui";
 import { StockResponseDTO } from "@codescape-financial/portfolio-data-models";
 import { useEffect, useMemo } from "react";
-import { Link } from "react-router-dom";
-import { DataPageContainer } from "../../components";
-import { ViewStockDetailsButton } from "../../components/action-buttons";
+import { Link, useNavigate } from "react-router-dom";
+import { DataPageContainer, ViewDetailsActionButton } from "../../components";
 import { useAxios } from "../../hooks";
 import { buildStockMetadataColumnSchema } from "../../utils";
 
@@ -39,13 +38,22 @@ export const StockMetadataListPage = () => {
 };
 
 const StockMetadataTable = ({ data }: { data: StockResponseDTO[] }) => {
+  const navigate = useNavigate();
+
   const columns = useMemo(
     () =>
       buildStockMetadataColumnSchema({
         actionsComponent: ({ data }) =>
-          data ? <ViewStockDetailsButton stock={data} /> : null,
+          data ? (
+            <ViewDetailsActionButton
+              label={`Show details for ${data.name}`}
+              onClick={() => {
+                navigate(`/stocks/${data.id}`);
+              }}
+            />
+          ) : null,
       }),
-    [],
+    [navigate],
   );
 
   return (

@@ -10,7 +10,7 @@ import { useNavigate } from "react-router-dom";
 import {
   DataPageContainer,
   DetailsPageHeader,
-  ViewStockDetailsButton,
+  ViewDetailsActionButton,
 } from "../../components";
 import {
   DetailsPageDeleteButton,
@@ -103,14 +103,23 @@ const CountryTags = ({ country }: { country: CountryResponseDTO }) => (
 );
 
 const CountryStockTable = ({ data }: { data: StockResponseDTO[] }) => {
+  const navigate = useNavigate();
+
   const columns = useMemo(
     () =>
       buildStockMetadataColumnSchema({
         columnKeys: ["name", "isin", "nsin", "currency"],
         actionsComponent: ({ data }) =>
-          data ? <ViewStockDetailsButton stock={data} /> : null,
+          data ? (
+            <ViewDetailsActionButton
+              label={`Show details for ${data.name}`}
+              onClick={() => {
+                navigate(`/stocks/${data.id}`);
+              }}
+            />
+          ) : null,
       }),
-    [],
+    [navigate],
   );
 
   return (

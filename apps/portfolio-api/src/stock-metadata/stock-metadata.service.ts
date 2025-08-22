@@ -1,5 +1,6 @@
 import {
   Country,
+  mapStockMetadataEntityToDto,
   StockMetadata,
 } from "@codescape-financial/historical-data-access";
 import {
@@ -33,7 +34,7 @@ export class StockMetadataService {
         relations: ["country"],
         where,
       })
-      .then((stocks) => stocks.map(this.mapEntityToDto));
+      .then((stocks) => stocks.map(mapStockMetadataEntityToDto));
   }
 
   async findOne(id: string): Promise<StockResponseDTO | null> {
@@ -42,7 +43,7 @@ export class StockMetadataService {
         where: { id },
         relations: ["country"],
       })
-      .then((stock) => (stock ? this.mapEntityToDto(stock) : null));
+      .then((stock) => (stock ? mapStockMetadataEntityToDto(stock) : null));
   }
 
   async create(newStockDto: CreateStockDTO): Promise<StockResponseDTO> {
@@ -63,7 +64,7 @@ export class StockMetadataService {
 
     const savedStock = await this.stockMetadataRepository.save(newStock);
 
-    return this.mapEntityToDto(savedStock);
+    return mapStockMetadataEntityToDto(savedStock);
   }
 
   async update(
@@ -90,26 +91,10 @@ export class StockMetadataService {
     }
 
     const savedStock = await this.stockMetadataRepository.save(stockToUpdate);
-    return this.mapEntityToDto(savedStock);
+    return mapStockMetadataEntityToDto(savedStock);
   }
 
   async remove(id: string): Promise<void> {
     await this.stockMetadataRepository.delete(id);
-  }
-
-  private mapEntityToDto(stock: StockMetadata): StockResponseDTO {
-    const { id, isin, nsin, name, currency, country } = stock;
-    return {
-      id,
-      isin,
-      nsin,
-      name,
-      currency,
-      country: {
-        id: country.id,
-        name: country.name,
-        countryCode: country.isoCode,
-      },
-    };
   }
 }

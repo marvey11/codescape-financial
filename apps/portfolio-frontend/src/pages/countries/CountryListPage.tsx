@@ -2,8 +2,8 @@ import { sortDataArray } from "@codescape-financial/core";
 import { Button, DataTable } from "@codescape-financial/core-ui";
 import { CountryResponseDTO } from "@codescape-financial/portfolio-data-models";
 import { useEffect, useMemo } from "react";
-import { Link } from "react-router-dom";
-import { DataPageContainer, ViewCountryDetailsButton } from "../../components";
+import { Link, useNavigate } from "react-router-dom";
+import { DataPageContainer, ViewDetailsActionButton } from "../../components";
 import { useAxios } from "../../hooks";
 import { buildCountryColumnSchema } from "../../utils/table-schemas";
 
@@ -39,13 +39,22 @@ export const CountryListPage = () => {
 };
 
 const CountryTable = ({ data }: { data: CountryResponseDTO[] }) => {
+  const navigate = useNavigate();
+
   const columns = useMemo(
     () =>
       buildCountryColumnSchema({
         actionsComponent: ({ data }) =>
-          data ? <ViewCountryDetailsButton country={data} /> : null,
+          data ? (
+            <ViewDetailsActionButton
+              label={`Show details for ${data.name}`}
+              onClick={() => {
+                navigate(`/countries/${data.id}`);
+              }}
+            />
+          ) : null,
       }),
-    [],
+    [navigate],
   );
 
   return (

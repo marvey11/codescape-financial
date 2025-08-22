@@ -1,6 +1,9 @@
-import { FormRow, Input, Select } from "@codescape-financial/core-ui";
-import { CountryResponseDTO } from "@codescape-financial/portfolio-data-models";
-import React from "react";
+import {
+  FormButtonsComponent,
+  Input,
+  Select,
+} from "@codescape-financial/core-ui";
+import { Controller, useForm } from "react-hook-form";
 
 /**
  * Represents all the parameters that can be modified in this form.
@@ -15,10 +18,17 @@ export interface StockFormData {
   countryId: string;
 }
 
+export interface CountrySelectOption {
+  id: string;
+  name: string;
+  countryCode: string;
+}
+
 interface StockMetadataFormProps {
-  availableCountries: CountryResponseDTO[];
+  availableCountries: CountrySelectOption[];
   value?: StockFormData;
-  onChange: (data: StockFormData) => void;
+  onSubmit: (data: StockFormData) => void;
+  onCancel: () => void;
 }
 
 const COMMON_CURRENCIES = [
@@ -36,100 +46,137 @@ const COMMON_CURRENCIES = [
 
 export const StockMetadataForm = ({
   availableCountries,
-  value = {
-    isin: "",
-    nsin: "",
-    name: "",
-    currency: "",
-    countryId: "",
-  },
-  onChange,
+  value,
+  onSubmit,
+  onCancel,
 }: StockMetadataFormProps) => {
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
-  ) => {
-    const { name, value: inputValue } = e.target;
-
-    onChange({
-      ...value,
-      [name]: name === "currency" ? inputValue.toUpperCase() : inputValue,
-    });
-  };
+  const {
+    handleSubmit,
+    control,
+    formState: { isSubmitting },
+  } = useForm<StockFormData>({
+    defaultValues: value ?? {
+      isin: "",
+      nsin: "",
+      name: "",
+      currency: "",
+      countryId: "",
+    },
+  });
 
   return (
-    <>
-      <FormRow label={<label htmlFor="stock-isin">ISIN:</label>}>
-        <Input
-          id="stock-isin"
-          name="isin"
-          value={value.isin}
-          onChange={handleChange}
-          type="text"
-          required
-        />
-      </FormRow>
+    <form
+      onSubmit={handleSubmit(onSubmit)}
+      className="grid grid-cols-[max-content_1fr] items-center gap-4 rounded-lg bg-white p-4 shadow-md"
+    >
+      <Controller
+        name="isin"
+        control={control}
+        rules={{ required: true }}
+        render={({ field }) => (
+          <>
+            <label htmlFor="stock-isin" className="font-medium text-gray-700">
+              ISIN:
+            </label>
+            <Input id="stock-isin" type="text" {...field} />
+          </>
+        )}
+      />
 
-      <FormRow label={<label htmlFor="stock-nsin">NSIN:</label>}>
-        <Input
-          id="stock-nsin"
-          name="nsin"
-          value={value.nsin}
-          onChange={handleChange}
-          type="text"
-          required
-        />
-      </FormRow>
+      <Controller
+        name="nsin"
+        control={control}
+        rules={{ required: true }}
+        render={({ field }) => (
+          <>
+            <label htmlFor="stock-nsin" className="font-medium text-gray-700">
+              NSIN:
+            </label>
+            <Input id="stock-nsin" type="text" {...field} />
+          </>
+        )}
+      />
 
-      <FormRow label={<label htmlFor="stock-name">Name:</label>}>
-        <Input
-          id="stock-name"
-          name="name"
-          value={value.name}
-          onChange={handleChange}
-          type="text"
-          required
-        />
-      </FormRow>
+      <Controller
+        name="name"
+        control={control}
+        rules={{ required: true }}
+        render={({ field }) => (
+          <>
+            <label htmlFor="stock-name" className="font-medium text-gray-700">
+              Name:
+            </label>
+            <Input id="stock-name" type="text" {...field} />
+          </>
+        )}
+      />
 
-      <FormRow label={<label htmlFor="stock-country">Country:</label>}>
-        <Select
-          id="stock-country"
-          name="countryId"
-          value={value.countryId}
-          onChange={handleChange}
-          required
-        >
-          <option value="" disabled>
-            Select a country...
-          </option>
-          {availableCountries.map(({ id, name }) => (
-            <option key={id} value={id}>
-              {name}
-            </option>
-          ))}
-        </Select>
-      </FormRow>
+      <Controller
+        name="countryId"
+        control={control}
+        rules={{ required: true }}
+        render={({ field }) => (
+          <>
+            <label
+              htmlFor="stock-country"
+              className="font-medium text-gray-700"
+            >
+              Country:
+            </label>
+            <Select id="stock-country" {...field}>
+              <option value="" disabled>
+                Select a country...
+              </option>
+              {availableCountries.map(({ id, countryCode, name }) => (
+                <option key={countryCode} value={id}>
+                  {name}
+                </option>
+              ))}
+            </Select>
+          </>
+        )}
+      />
 
-      <FormRow label={<label htmlFor="stock-currency">Currency:</label>}>
-        <Input
-          id="stock-currency"
-          name="currency"
-          value={value.currency}
-          onChange={handleChange}
-          list="currency-list"
-          type="text"
-          required
-          minLength={3}
-          maxLength={3}
-          pattern="[A-Z]{3}"
-          title="3-letter currency code (e.g., EUR, USD)"
-        />
-        <datalist id="currency-list">
-          {COMMON_CURRENCIES.map((currency) => (
-            <option key={currency} value={currency} />
-          ))}
-        </datalist>
-      </FormRow>
-    </>
+      <Controller
+        name="currency"
+        control={control}
+        rules={{
+          required: true,
+          minLength: 3,
+          maxLength: 3,
+          pattern: /^[A-Z]{3}$/,
+        }}
+        render={({ field }) => (
+          <>
+            <label
+              htmlFor="stock-currency"
+              className="font-medium text-gray-700"
+            >
+              Currency:
+            </label>
+            <Input
+              id="stock-currency"
+              type="text"
+              {...field}
+              title="3-letter currency code (e.g., EUR, USD)"
+              list="currency-list"
+            />
+            <datalist id="currency-list">
+              {COMMON_CURRENCIES.map((currency) => (
+                <option key={currency} value={currency} />
+              ))}
+            </datalist>
+          </>
+        )}
+      />
+
+      <FormButtonsComponent
+        submitButtonTitle={
+          isSubmitting ? "Saving..." : value ? "Save Changes" : "Add Stock"
+        }
+        disableSubmitButton={isSubmitting}
+        onCancel={onCancel}
+      />
+    </form>
   );
 };

@@ -5,16 +5,16 @@ import { useAxios } from "../../hooks";
 import { UseGenericContextType } from "../../types";
 
 export const PortfolioLayout = () => {
-  const { id } = useParams();
+  const { portfolioId } = useParams();
 
   const { loading, error, data, sendRequest } =
     useAxios<PortfolioResponseDTO>();
 
   useEffect(() => {
-    if (id) {
-      sendRequest({ url: `/portfolios/${id}`, method: "get" });
+    if (portfolioId) {
+      sendRequest({ url: `/portfolios/${portfolioId}`, method: "get" });
     }
-  }, [id, sendRequest]);
+  }, [portfolioId, sendRequest]);
 
   return (
     <Outlet

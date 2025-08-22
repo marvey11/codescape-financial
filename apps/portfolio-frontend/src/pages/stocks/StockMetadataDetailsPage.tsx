@@ -35,7 +35,7 @@ export const StockMetadataDetailsPage = () => {
       {stock && (
         <div className="flex flex-col gap-3">
           <DetailsPageHeader
-            title={stock.name}
+            title={`${stock.name} — Stock Details`}
             extraComponents={[
               <DetailsPageEditButton
                 key={`${stock.id}-edit-button}`}

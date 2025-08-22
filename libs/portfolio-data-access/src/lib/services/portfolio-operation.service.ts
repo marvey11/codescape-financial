@@ -188,14 +188,37 @@ export class PortfolioOperationService {
 
   async createStockSplitOperation(
     data: CreateStockSplitDTO,
-  ): Promise<PortfolioOperation> {
+  ): Promise<PortfolioOperation | null> {
     return this.dataSource.transaction(async (manager) => {
       const { portfolioId, stockId, date, splitRatio } = data;
-      const holding = await this.getOrCreateHolding(
+
+      // First, try to FIND the holding. Do NOT create it implicitly for a split.
+      const holding = await this.findPortfolioHolding(
         portfolioId,
         stockId,
         manager,
       );
+
+      if (!holding) {
+        // Edge case: No holding exists for this stock in this portfolio.
+        // In this case, do NOT create the holding and do NOT apply the split.
+        this.logger.warn(
+          `Skipping stock split operation for stock ID "${stockId}" in portfolio "${portfolioId}" because no existing holding was found.`,
+        );
+        return null; // Holding is not created, operation is not applied/recorded.
+      }
+
+      // If a holding *does* exist, then check its current shares.
+      const currentShares = Number(holding.shares);
+
+      if (isEffectivelyZero(currentShares)) {
+        // Holding exists but has effectively zero shares.
+        // As per requirement, do NOT apply the split and do NOT record the operation.
+        this.logger.warn(
+          `Skipping stock split for holding ${holding.id} (ISIN: ${holding.stockMetadata?.isin}) because shares are effectively zero (${currentShares}).`,
+        );
+        return null;
+      }
 
       // --- Idempotency Check ---
       // Check if a split operation for this holding on this exact date already exists.
@@ -210,9 +233,13 @@ export class PortfolioOperationService {
       if (existingOperation) {
         // The operation already exists, so we can just return it without doing anything.
         // This makes the operation safe to call multiple times with the same data.
+        this.logger.log(
+          `Existing stock split operation found for holding ${holding.id} on ${date}. Returning existing.`,
+        );
         return existingOperation;
       }
 
+      // If we reach here, a holding exists with non-zero shares, and no duplicate split operation exists.
       this.invalidateXirrCaches(portfolioId, holding.id);
 
       const operation = manager.create(PortfolioOperation, {
@@ -420,6 +447,19 @@ export class PortfolioOperationService {
     this.updateAggregatesFromInventory(holding);
   }
 
+  private async findPortfolioHolding(
+    portfolioId: string,
+    stockId: string,
+    manager: EntityManager,
+  ): Promise<PortfolioHolding | null> {
+    const holdingRepo = manager.getRepository(PortfolioHolding);
+    return holdingRepo.findOne({
+      where: { stockId, portfolioId },
+      // Ensure relations needed for current shares calculation or display are loaded
+      relations: ["stockMetadata"],
+    });
+  }
+
   private async getOrCreateHolding(
     portfolioId: string,
     stockId: string,
@@ -461,6 +501,7 @@ export class PortfolioOperationService {
         portfolio,
         stockId,
         stockMetadata: stock,
+        shares: "0", // New holdings start with 0 shares implicitly
         buyTransactions: [],
       });
       await holdingRepo.save(holding);
