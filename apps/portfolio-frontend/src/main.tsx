@@ -14,11 +14,13 @@ import {
   CountryListPage,
   EditCountryPage,
 } from "./pages/countries";
-import { AddOperationPage } from "./pages/operations";
 import {
+  AddOperationPage,
   AddPortfolioPage,
   EditPortfolioPage,
   PortfolioDetailsPage,
+  PortfolioHoldingDetailsPage,
+  PortfolioHoldingLayout,
   PortfolioLayout,
   PortfolioListPage,
 } from "./pages/portfolios";
@@ -36,9 +38,17 @@ const router = createBrowserRouter(
       <Route path="portfolios">
         <Route index element={<PortfolioListPage />} />
         <Route path="add" element={<AddPortfolioPage />} />
-        <Route path=":id" element={<PortfolioLayout />}>
+        <Route path=":portfolioId" element={<PortfolioLayout />}>
           <Route index element={<PortfolioDetailsPage />} />
           <Route path="edit" element={<EditPortfolioPage />} />
+          <Route path="holdings">
+            <Route path=":holdingId" element={<PortfolioHoldingLayout />}>
+              <Route index element={<PortfolioHoldingDetailsPage />} />
+              <Route path="operations">
+                <Route path="add" element={<AddOperationPage />} />
+              </Route>
+            </Route>
+          </Route>
         </Route>
       </Route>
 
@@ -58,10 +68,6 @@ const router = createBrowserRouter(
           <Route index element={<CountryDetailsPage />} />
           <Route path="edit" element={<EditCountryPage />} />
         </Route>
-      </Route>
-
-      <Route path="operations">
-        <Route path="add" element={<AddOperationPage />} />
       </Route>
     </Route>,
   ),

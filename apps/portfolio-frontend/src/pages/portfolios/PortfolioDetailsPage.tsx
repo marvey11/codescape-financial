@@ -1,5 +1,10 @@
 import { sortDataArray } from "@codescape-financial/core";
-import { Checkbox, DataTable } from "@codescape-financial/core-ui";
+import {
+  ActionMenu,
+  Checkbox,
+  DataTable,
+  ViewDetailsActionButton,
+} from "@codescape-financial/core-ui";
 import {
   AllLatestQuotesTransformedDTO,
   PortfolioHoldingEmbeddedDTO,
@@ -9,6 +14,7 @@ import {
   XIRRPortfolioTransformedDTO,
 } from "@codescape-financial/portfolio-data-models";
 import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import axiosInstance from "../../api/axios";
 import {
   AddOperationButton,
@@ -188,19 +194,29 @@ const PortfolioHoldingsTable = ({
   portfolioXIRR,
   data,
 }: PortfolioHoldingsTableProps) => {
+  const navigate = useNavigate();
+
   const columns = useMemo(() => {
     return buildPortfolioHoldingColumnSchema(
       {
         actionsComponent: ({ data }) =>
           data ? (
-            <AddOperationButton portfolioId={portfolioId} holding={data} />
+            <ActionMenu>
+              <ViewDetailsActionButton
+                label={`Show details for holding ${data.stock.name}`}
+                onClick={() => {
+                  navigate(`/portfolios/${portfolioId}/holdings/${data.id}`);
+                }}
+              />
+              <AddOperationButton portfolioId={portfolioId} holding={data} />
+            </ActionMenu>
           ) : null,
       },
       latestQuotes,
       holdingsXIRR,
       portfolioXIRR,
     );
-  }, [portfolioId, holdingsXIRR, latestQuotes, portfolioXIRR]);
+  }, [latestQuotes, holdingsXIRR, portfolioXIRR, portfolioId, navigate]);
 
   return (
     <DataTable<PortfolioHoldingEmbeddedDTO>

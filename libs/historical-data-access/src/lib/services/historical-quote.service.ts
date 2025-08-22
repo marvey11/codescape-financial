@@ -1,4 +1,3 @@
-import { formatNormalizedDate } from "@codescape-financial/core";
 import {
   AllLatestQuotesResponseDTO,
   LatestQuoteResponseDTO,
@@ -7,6 +6,7 @@ import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { HistoricalQuote } from "../entities";
+import { mapHistoricalToLatestQuoteDTO } from "../utils";
 
 @Injectable()
 export class HistoricalQuoteService {
@@ -26,7 +26,7 @@ export class HistoricalQuoteService {
         order: { date: "DESC" },
         relations: ["stock"],
       })
-      .then(this.mapToLatestQuoteDTO);
+      .then((res) => (res ? mapHistoricalToLatestQuoteDTO(res) : null));
   }
 
   async findLatestByIsins(
@@ -48,7 +48,7 @@ export class HistoricalQuoteService {
       .getMany();
 
     return latestQuotes.reduce((acc, quote) => {
-      const mapped = this.mapToLatestQuoteDTO(quote);
+      const mapped = mapHistoricalToLatestQuoteDTO(quote);
       if (mapped) {
         const { isin, date, price } = mapped;
         acc[isin] = { date, price };
@@ -81,17 +81,5 @@ export class HistoricalQuoteService {
 
   async remove(id: string): Promise<void> {
     await this.historicalQuoteRepository.delete(id);
-  }
-
-  private mapToLatestQuoteDTO(
-    quote: HistoricalQuote | null,
-  ): LatestQuoteResponseDTO | null {
-    return quote != null
-      ? {
-          isin: quote.stock.isin,
-          date: formatNormalizedDate(new Date(quote.date)),
-          price: Number(quote.close),
-        }
-      : null;
   }
 }

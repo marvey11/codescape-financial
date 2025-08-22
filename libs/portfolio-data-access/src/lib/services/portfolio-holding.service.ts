@@ -1,7 +1,9 @@
+import { PortfolioHoldingResponseDTO } from "@codescape-financial/portfolio-data-models";
 import { Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { PortfolioHolding } from "../entities";
+import { mapPortfolioHoldingEntityToDto } from "../utils";
 
 @Injectable()
 export class PortfolioHoldingService {
@@ -17,9 +19,14 @@ export class PortfolioHoldingService {
   async findOne(
     portfolioId: string,
     holdingId: string,
-  ): Promise<PortfolioHolding | null> {
-    return this.holdingRepository.findOne({
-      where: { id: holdingId, portfolioId },
-    });
+  ): Promise<PortfolioHoldingResponseDTO | null> {
+    return this.holdingRepository
+      .findOne({
+        where: { id: holdingId, portfolioId },
+        relations: ["stockMetadata", "operations"],
+      })
+      .then((res) =>
+        res ? mapPortfolioHoldingEntityToDto(res, portfolioId) : null,
+      );
   }
 }
