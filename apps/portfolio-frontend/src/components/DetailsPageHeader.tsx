@@ -2,13 +2,13 @@ import { ReactNode } from "react";
 
 interface DetailsPageHeaderProps {
   title: string;
-  extraComponents?: ReactNode[];
+  extraComponents?: ReactNode | ReactNode[];
   children?: ReactNode | undefined;
 }
 
 export const DetailsPageHeader = ({
   title,
-  extraComponents = [],
+  extraComponents,
   children,
 }: DetailsPageHeaderProps) => (
   <div className="flex flex-col">

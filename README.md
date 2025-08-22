@@ -7,4 +7,7 @@
   - [ ] Add operations for stocks without holding
   - Show details for a holding:
     - [ ] Full summary
-    - [ ] Trade history
+    - [x] Trade history
+  - [ ] Highlight outdated quotes
+- Backend
+  - [ ] Don't apply splits if the current share count is `0`

@@ -37,4 +37,7 @@ const Tag = React.forwardRef<HTMLSpanElement, TagProps>(
 );
 Tag.displayName = "Tag";
 
+type TagVariant = VariantProps<typeof tagVariants>["variant"];
+
 export { Tag, tagVariants };
+export type { TagVariant };

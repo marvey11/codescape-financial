@@ -5,6 +5,7 @@ import {
   IsUUID,
   Min,
 } from "class-validator";
+import { OperationType } from "../types";
 
 export class CreateBuyTransactionDTO {
   @IsUUID()
@@ -101,4 +102,32 @@ export class CreateDividendDTO {
   @IsNumber({ maxDecimalPlaces: 4 })
   @Min(0)
   taxes?: number = 0.0;
+}
+
+export interface PortfolioOperationEmbeddedDTO {
+  id: string;
+  type: OperationType;
+  date: string;
+  shares: number;
+  pricePerShare: number;
+  fees: number;
+  applicableShares: number;
+  dividendPerShare: number;
+  exchangeRate: number;
+  splitRatio: number;
+  taxes: number;
+}
+
+export interface PortfolioOperationTransformedDTO {
+  id: string;
+  type: OperationType;
+  date: Date;
+  shares: number;
+  pricePerShare: number;
+  fees: number;
+  applicableShares: number;
+  dividendPerShare: number;
+  exchangeRate: number;
+  splitRatio: number;
+  taxes: number;
 }

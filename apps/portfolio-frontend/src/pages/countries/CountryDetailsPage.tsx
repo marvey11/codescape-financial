@@ -1,5 +1,9 @@
 import { formatPercent, sortDataArray } from "@codescape-financial/core";
-import { DataTable, Tag } from "@codescape-financial/core-ui";
+import {
+  DataTable,
+  Tag,
+  ViewDetailsActionButton,
+} from "@codescape-financial/core-ui";
 import {
   CountryResponseDTO,
   StockResponseDTO,
@@ -7,11 +11,7 @@ import {
 import { AxiosRequestConfig } from "axios";
 import { useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  DataPageContainer,
-  DetailsPageHeader,
-  ViewStockDetailsButton,
-} from "../../components";
+import { DataPageContainer, DetailsPageHeader } from "../../components";
 import {
   DetailsPageDeleteButton,
   DetailsPageEditButton,
@@ -103,14 +103,23 @@ const CountryTags = ({ country }: { country: CountryResponseDTO }) => (
 );
 
 const CountryStockTable = ({ data }: { data: StockResponseDTO[] }) => {
+  const navigate = useNavigate();
+
   const columns = useMemo(
     () =>
       buildStockMetadataColumnSchema({
         columnKeys: ["name", "isin", "nsin", "currency"],
         actionsComponent: ({ data }) =>
-          data ? <ViewStockDetailsButton stock={data} /> : null,
+          data ? (
+            <ViewDetailsActionButton
+              label={`Show details for ${data.name}`}
+              onClick={() => {
+                navigate(`/stocks/${data.id}`);
+              }}
+            />
+          ) : null,
       }),
-    [],
+    [navigate],
   );
 
   return (

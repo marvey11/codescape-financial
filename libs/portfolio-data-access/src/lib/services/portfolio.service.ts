@@ -1,15 +1,14 @@
 import { FLOATING_POINT_TOLERANCE } from "@codescape-financial/core";
-import { StockMetadata } from "@codescape-financial/historical-data-access";
 import {
   CreatePortfolioDTO,
   PortfolioResponseDTO,
-  StockEmbeddedDTO,
   UpdatePortfolioDTO,
 } from "@codescape-financial/portfolio-data-models";
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { EntityManager, Repository } from "typeorm";
 import { Portfolio } from "../entities";
+import { mapPortfolioEntityToDto } from "../utils";
 
 @Injectable()
 export class PortfolioService {
@@ -30,7 +29,7 @@ export class PortfolioService {
       .leftJoinAndSelect("holding.stockMetadata", "stockMetadata")
       .getMany();
 
-    return portfolios.map((p) => this.mapEntityToDto(p));
+    return portfolios.map(mapPortfolioEntityToDto);
   }
 
   async findOne(portfolioId: string): Promise<PortfolioResponseDTO> {
@@ -47,14 +46,14 @@ export class PortfolioService {
       );
     }
 
-    return this.mapEntityToDto(portfolio);
+    return mapPortfolioEntityToDto(portfolio);
   }
 
   async create(dto: CreatePortfolioDTO): Promise<PortfolioResponseDTO> {
     const portfolio = this.portfolioRepository.create(dto);
     return this.portfolioRepository
       .save(portfolio)
-      .then((p) => this.mapEntityToDto(p));
+      .then(mapPortfolioEntityToDto);
   }
 
   async update(
@@ -76,7 +75,7 @@ export class PortfolioService {
 
     return this.portfolioRepository
       .save(portfolioToUpdate)
-      .then((p) => this.mapEntityToDto(p));
+      .then(mapPortfolioEntityToDto);
   }
 
   async remove(id: string): Promise<void> {
@@ -131,53 +130,5 @@ export class PortfolioService {
     );
 
     await manager.save(portfolio);
-  }
-
-  private mapEntityToDto(portfolio: Portfolio): PortfolioResponseDTO {
-    const {
-      id,
-      name,
-      description,
-      totalCostBasis,
-      totalFees,
-      totalRealizedGains,
-      totalSalesTaxes,
-      totalDividends,
-      totalDividendTaxes,
-    } = portfolio;
-    return {
-      id,
-      name,
-      description,
-      summary: {
-        totalCostBasis: Number(totalCostBasis),
-        totalFees: Number(totalFees),
-        totalRealizedGains: Number(totalRealizedGains),
-        totalTaxFromSoldShares: Number(totalSalesTaxes),
-        totalDividends: Number(totalDividends),
-        totalTaxFromDividends: Number(totalDividendTaxes),
-      },
-      holdings: portfolio.holdings.map((holding) => ({
-        id: holding.id,
-        stock: this.mapStockMetadataEntityToEmbeddedDTO(holding.stockMetadata),
-        summary: {
-          averagePricePerShare: Number(holding.averagePricePerShare),
-          totalShares: Number(holding.shares),
-          totalCostBasis: Number(holding.totalCostBasis),
-          totalFees: Number(holding.fees),
-          totalRealizedGains: Number(holding.realizedGains),
-          totalTaxFromSoldShares: Number(holding.salesTaxes),
-          totalDividends: Number(holding.dividends),
-          totalTaxFromDividends: Number(holding.totalDividendTaxes),
-        },
-      })),
-    } satisfies PortfolioResponseDTO;
-  }
-
-  private mapStockMetadataEntityToEmbeddedDTO(
-    stockMetadata: StockMetadata,
-  ): StockEmbeddedDTO {
-    const { id, isin, nsin, name } = stockMetadata;
-    return { id, isin, nsin, name };
   }
 }

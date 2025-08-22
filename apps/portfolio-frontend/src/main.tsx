@@ -21,10 +21,8 @@ import {
   PortfolioDetailsPage,
   PortfolioHoldingDetailsPage,
   PortfolioHoldingLayout,
-  PortfolioHoldingListPage,
   PortfolioLayout,
   PortfolioListPage,
-  PortfolioOperationListPage,
 } from "./pages/portfolios";
 import {
   AddStockMetadataPage,
@@ -44,11 +42,9 @@ const router = createBrowserRouter(
           <Route index element={<PortfolioDetailsPage />} />
           <Route path="edit" element={<EditPortfolioPage />} />
           <Route path="holdings">
-            <Route index element={<PortfolioHoldingListPage />} />
             <Route path=":holdingId" element={<PortfolioHoldingLayout />}>
               <Route index element={<PortfolioHoldingDetailsPage />} />
               <Route path="operations">
-                <Route index element={<PortfolioOperationListPage />} />
                 <Route path="add" element={<AddOperationPage />} />
               </Route>
             </Route>

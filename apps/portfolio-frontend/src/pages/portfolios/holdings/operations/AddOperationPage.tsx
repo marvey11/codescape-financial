@@ -91,7 +91,11 @@ export const AddOperationPage = () => {
 
       <OperationForm
         onSubmit={handleSubmit}
-        onCancel={() => navigate("..", { replace: true })}
+        onCancel={() =>
+          navigate(`/portfolios/${portfolioId}/holdings/${holdingId}`, {
+            replace: true,
+          })
+        }
       />
     </div>
   );
