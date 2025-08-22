@@ -4,12 +4,8 @@ import {
   OperationType,
   PortfolioOperationTransformedDTO,
 } from "@codescape-financial/portfolio-data-models";
-import {
-  ArrowsRightLeftIcon,
-  CurrencyEuroIcon,
-  MinusIcon,
-  PlusIcon,
-} from "@heroicons/react/16/solid";
+
+import { Icon } from "../icons";
 import { OperationCard } from "./OperationCard";
 
 const dotBorderColor: { [key in OperationType]: string } = {
@@ -20,13 +16,17 @@ const dotBorderColor: { [key in OperationType]: string } = {
 };
 
 const dotIcon = {
-  [OperationType.BUY]: <PlusIcon className="h-6 w-6 text-green-500" />,
-  [OperationType.SELL]: <MinusIcon className="h-6 w-6 text-red-500" />,
+  [OperationType.BUY]: (
+    <Icon name="BuyOperation" className="h-5 w-5 text-green-500" />
+  ),
+  [OperationType.SELL]: (
+    <Icon name="SellOperation" className="h-5 w-5 text-red-500" />
+  ),
   [OperationType.DIVIDEND]: (
-    <CurrencyEuroIcon className="h-6 w-6 text-blue-500" />
+    <Icon name="DividendOperation" className="h-5 w-5 text-blue-500" />
   ),
   [OperationType.STOCK_SPLIT]: (
-    <ArrowsRightLeftIcon className="h-5 w-5 text-orange-500" />
+    <Icon name="StockSplitOperation" className="h-5 w-5 text-orange-500" />
   ),
 };
 
@@ -53,7 +53,7 @@ export const OperationTimeline = ({
           <div
             className={cn(
               "w-1/2 px-8",
-              index % 2 === 0 ? "pr-12 text-right" : "pl-12 text-left",
+              index % 2 === 0 ? "pl-12 text-left" : "pr-12 text-right",
             )}
           >
             <OperationCard operation={op} />

@@ -1,9 +1,5 @@
 import { formatPercent, sortDataArray } from "@codescape-financial/core";
-import {
-  DataTable,
-  Tag,
-  ViewDetailsActionButton,
-} from "@codescape-financial/core-ui";
+import { DataTable, Tag } from "@codescape-financial/core-ui";
 import {
   CountryResponseDTO,
   StockResponseDTO,
@@ -11,7 +7,11 @@ import {
 import { AxiosRequestConfig } from "axios";
 import { useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { DataPageContainer, DetailsPageHeader } from "../../components";
+import {
+  DataPageContainer,
+  DetailsPageHeader,
+  ViewDetailsActionButton,
+} from "../../components";
 import {
   DetailsPageDeleteButton,
   DetailsPageEditButton,
