@@ -180,23 +180,29 @@ export const PortfolioDetailsPage = () => {
           )}
 
           <h2 className="text-2xl font-extrabold">Allocations</h2>
-          <div className="z-10 flex flex-col items-center justify-between">
+          <div className="z-10 flex w-full flex-row items-center justify-between">
             {allocationData && (
               <>
-                <ResponsiveContainer width="100%" height={600}>
-                  <StockAllocationPieChart
-                    portfolioId={allocationData.portfolioId}
-                    date={allocationData.date}
-                    assetAllocation={allocationData.assetAllocation}
-                  />
-                </ResponsiveContainer>
-                <ResponsiveContainer width="100%" height={600}>
-                  <CountryAllocationPieChart
-                    portfolioId={allocationData.portfolioId}
-                    date={allocationData.date}
-                    countryAllocation={allocationData.countryAllocation}
-                  />
-                </ResponsiveContainer>
+                <div className="h-full w-full">
+                  {/* IMPORTANT: need to specify a surrounding container with a dimension */}
+                  <ResponsiveContainer width="100%" height={600}>
+                    <StockAllocationPieChart
+                      portfolioId={allocationData.portfolioId}
+                      date={allocationData.date}
+                      assetAllocation={allocationData.assetAllocation}
+                    />
+                  </ResponsiveContainer>
+                </div>
+                <div className="h-full w-full">
+                  {/* IMPORTANT: need to specify a surrounding container with a dimension */}
+                  <ResponsiveContainer width="100%" height={600}>
+                    <CountryAllocationPieChart
+                      portfolioId={allocationData.portfolioId}
+                      date={allocationData.date}
+                      countryAllocation={allocationData.countryAllocation}
+                    />
+                  </ResponsiveContainer>
+                </div>
               </>
             )}
           </div>
