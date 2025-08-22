@@ -1,4 +1,4 @@
-import { formatPercent, sortDataArray } from "@codescape-financial/core";
+import { sortDataArray } from "@codescape-financial/core";
 import { Checkbox, DataTable } from "@codescape-financial/core-ui";
 import {
   AllLatestQuotesTransformedDTO,
@@ -11,15 +11,18 @@ import {
 } from "@codescape-financial/portfolio-data-models";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Cell, Pie, PieChart, ResponsiveContainer } from "recharts";
+import { ResponsiveContainer } from "recharts";
 import axiosInstance from "../../api/axios";
+import { DataPageContainer, DetailsPageHeader } from "../../components";
 import {
   ActionMenu,
   AddOperationButton,
-  DataPageContainer,
-  DetailsPageHeader,
   ViewDetailsActionButton,
-} from "../../components";
+} from "../../components/action-buttons";
+import {
+  CountryAllocationPieChart,
+  StockAllocationPieChart,
+} from "../../components/charts";
 import { DetailsPageEditButton } from "../../components/default-buttons";
 import { useOutletContextData } from "../../hooks";
 import {
@@ -181,52 +184,18 @@ export const PortfolioDetailsPage = () => {
             {allocationData && (
               <>
                 <ResponsiveContainer width="100%" height={600}>
-                  <PieChart>
-                    <Pie
-                      data={allocationData.assetAllocation}
-                      dataKey="value" // Ensure dataKey maps to numerical value (e.g., 'value')
-                      nameKey="name"
-                      outerRadius={200} // Adjust radius as needed
-                      labelLine={true} // Hide lines for cleaner look with custom labels
-                      label={renderCustomizedLabel} // Pass the custom render function here
-                      isAnimationActive={true} // Disable animation during development if it's distracting
-                    >
-                      {/* Assign colors to slices using Cell components */}
-                      {allocationData.assetAllocation.map((entry, index) => (
-                        <Cell
-                          key={`cell-${entry.isin}`}
-                          fill={COLORS[index % COLORS.length]}
-                        />
-                      ))}
-                    </Pie>
-                    {/* You might also want a Tooltip and Legend */}
-                    {/* <Tooltip /> */}
-                    {/* <Legend /> */}
-                  </PieChart>
+                  <StockAllocationPieChart
+                    portfolioId={allocationData.portfolioId}
+                    date={allocationData.date}
+                    assetAllocation={allocationData.assetAllocation}
+                  />
                 </ResponsiveContainer>
                 <ResponsiveContainer width="100%" height={600}>
-                  <PieChart>
-                    <Pie
-                      data={allocationData.countryAllocation}
-                      dataKey="value" // Ensure dataKey maps to numerical value (e.g., 'value')
-                      nameKey="name"
-                      outerRadius={200} // Adjust radius as needed
-                      labelLine={true} // Hide lines for cleaner look with custom labels
-                      label={renderCustomizedLabel} // Pass the custom render function here
-                      isAnimationActive={true} // Disable animation during development if it's distracting
-                    >
-                      {/* Assign colors to slices using Cell components */}
-                      {allocationData.countryAllocation.map((entry, index) => (
-                        <Cell
-                          key={`cell-${entry.countryCode}`}
-                          fill={COLORS[index % COLORS.length]}
-                        />
-                      ))}
-                    </Pie>
-                    {/* You might also want a Tooltip and Legend */}
-                    {/* <Tooltip /> */}
-                    {/* <Legend /> */}
-                  </PieChart>
+                  <CountryAllocationPieChart
+                    portfolioId={allocationData.portfolioId}
+                    date={allocationData.date}
+                    countryAllocation={allocationData.countryAllocation}
+                  />
                 </ResponsiveContainer>
               </>
             )}
@@ -296,78 +265,3 @@ const PortfolioHoldingsTable = ({
     />
   );
 };
-
-interface CustomLabelProps {
-  cx?: number;
-  cy?: number;
-  midAngle?: number;
-  innerRadius?: number;
-  outerRadius?: number;
-  percent?: number;
-  index?: number;
-  name?: string;
-  value?: number;
-}
-
-const RADIAN = Math.PI / 180;
-
-// Custom label rendering function
-const renderCustomizedLabel = ({
-  cx,
-  cy,
-  midAngle,
-  outerRadius,
-  percent,
-  name,
-}: CustomLabelProps) => {
-  // Add checks for undefined props if they are critical for your calculation,
-  // especially if 'percent' or 'name' might be missing for very small slices.
-  if (
-    cx === undefined ||
-    cy === undefined ||
-    midAngle === undefined ||
-    outerRadius === undefined ||
-    percent === undefined ||
-    name === undefined
-  ) {
-    return null; // Don't render label if crucial data is missing
-  }
-
-  // Calculate the position for the label outside the slice
-  const radiusOffset = outerRadius * 1.2;
-  const x = cx + radiusOffset * Math.cos(-midAngle * RADIAN);
-  const y = cy + radiusOffset * Math.sin(-midAngle * RADIAN);
-
-  // Determine text anchor based on angle to align text correctly
-  const textAnchor = x > cx ? "start" : "end";
-
-  return (
-    <text
-      x={x}
-      y={y}
-      fill="#330000" // Choose a visible color for the text
-      textAnchor={textAnchor}
-      dominantBaseline="central"
-      fontSize={10} // Adjust font size as needed
-    >
-      {`${name} (${formatPercent(percent)})`}
-    </text>
-  );
-};
-
-// You'll also want to define some colors for your pie slices
-// Use a consistent color palette, e.g., an array of hex codes
-const COLORS = [
-  "#0088FE",
-  "#00C49F",
-  "#FFBB28",
-  "#FF8042",
-  "#AF19FF",
-  "#FF0055",
-  "#66CCFF",
-  "#FF6666",
-  "#99FF66",
-  "#FFCC00",
-  "#CC66FF",
-  "#FF00CC",
-];
