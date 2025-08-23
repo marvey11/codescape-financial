@@ -7,11 +7,8 @@ import {
 import { AxiosRequestConfig } from "axios";
 import { useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  DataPageContainer,
-  DetailsPageHeader,
-  ViewDetailsActionButton,
-} from "../../components";
+import { DataPageContainer, DetailsPageHeader } from "../../components";
+import { ViewDetailsActionButton } from "../../components/action-buttons";
 import {
   DetailsPageDeleteButton,
   DetailsPageEditButton,

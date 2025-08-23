@@ -2,6 +2,7 @@ import { sortDataArray } from "@codescape-financial/core";
 import { Checkbox, DataTable } from "@codescape-financial/core-ui";
 import {
   AllLatestQuotesTransformedDTO,
+  AllocationTransformedDTO,
   PortfolioHoldingEmbeddedDTO,
   PortfolioResponseDTO,
   PortfolioViewFilterDTO,
@@ -10,14 +11,22 @@ import {
 } from "@codescape-financial/portfolio-data-models";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { ResponsiveContainer } from "recharts";
 import axiosInstance from "../../api/axios";
+import { DataPageContainer, DetailsPageHeader } from "../../components";
 import {
   ActionMenu,
   AddOperationButton,
-  DataPageContainer,
-  DetailsPageHeader,
   ViewDetailsActionButton,
-} from "../../components";
+} from "../../components/action-buttons";
+import {
+  CountryAllocationPieChart,
+  StockAllocationPieChart,
+} from "../../components/charts";
+import {
+  AllocationTreemapItem,
+  StockAllocationTreemap,
+} from "../../components/charts/StockAllocationTreeMap";
 import { DetailsPageEditButton } from "../../components/default-buttons";
 import { useOutletContextData } from "../../hooks";
 import {
@@ -45,6 +54,9 @@ export const PortfolioDetailsPage = () => {
   );
   const [portfolioXIRR, setPortfolioXIRR] =
     useState<XIRRPortfolioTransformedDTO | null>(null);
+
+  const [allocationData, setAllocationData] =
+    useState<AllocationTransformedDTO>();
 
   useEffect(() => {
     if (data == null) {
@@ -80,12 +92,23 @@ export const PortfolioDetailsPage = () => {
         method: "GET",
       });
 
-    Promise.all([quotesRequest, xirrHoldingListRequest, portfolioXirrRequest])
+    const allocationsRequest = axiosInstance.request<AllocationTransformedDTO>({
+      url: `/portfolios/${portfolioId}/allocations`,
+      method: "GET",
+    });
+
+    Promise.all([
+      quotesRequest,
+      xirrHoldingListRequest,
+      portfolioXirrRequest,
+      allocationsRequest,
+    ])
       .then(
         ([
           latestQuotesResponse,
           xirrHoldingListResponse,
           portfolioXirrResponse,
+          allocationsResponse,
         ]) => {
           setlatestQuotes(
             new Map(Object.entries(latestQuotesResponse.data ?? {})),
@@ -94,6 +117,7 @@ export const PortfolioDetailsPage = () => {
             new Map(Object.entries(xirrHoldingListResponse.data ?? {})),
           );
           setPortfolioXIRR(portfolioXirrResponse.data);
+          setAllocationData(allocationsResponse.data);
         },
       )
       .catch(console.error);
@@ -112,13 +136,29 @@ export const PortfolioDetailsPage = () => {
       : data.holdings;
   }, [data?.holdings, showActiveHoldingsOnly]);
 
-  const sortedHoldings = useMemo(
+  const holdingsByName = useMemo(
     () =>
       filteredHoldings
         ? sortDataArray(filteredHoldings, (item) => item.stock.name)
         : undefined,
     [filteredHoldings],
   );
+
+  const treemapData = useMemo(() => {
+    // splice the XIRR values into the allocation data
+    const tempData = [...(allocationData?.assetAllocation ?? [])].map(
+      (asset) =>
+        ({
+          ...asset,
+          xirr: holdingsXIRR.get(asset.isin)?.xirr,
+        }) as AllocationTreemapItem,
+    );
+
+    // sort the data by holding size in descending order
+    tempData.sort((a, b) => b.value - a.value);
+
+    return tempData;
+  }, [allocationData?.assetAllocation, holdingsXIRR]);
 
   return (
     <DataPageContainer isLoading={loading} error={error}>
@@ -135,7 +175,7 @@ export const PortfolioDetailsPage = () => {
             ]}
           />
 
-          {sortedHoldings && sortedHoldings.length > 0 ? (
+          {holdingsByName && holdingsByName.length > 0 ? (
             <>
               <div className="flex flex-row items-center justify-between">
                 <h2 className="text-2xl font-extrabold">Holdings</h2>
@@ -147,7 +187,7 @@ export const PortfolioDetailsPage = () => {
               </div>
               <div className="overflow-x-auto rounded-md border border-gray-300 shadow-sm">
                 <PortfolioHoldingsTable
-                  data={sortedHoldings}
+                  data={holdingsByName}
                   latestQuotes={latestQuotes}
                   holdingsXIRR={holdingsXIRR}
                   portfolioXIRR={portfolioXIRR?.xirr}
@@ -158,6 +198,46 @@ export const PortfolioDetailsPage = () => {
           ) : (
             <span>No holdings found for this portfolio.</span>
           )}
+
+          <h2 className="text-2xl font-extrabold">Allocations</h2>
+          <div className="z-10 flex w-full flex-row items-center justify-between gap-2">
+            {allocationData && (
+              <>
+                <div className="h-full w-full rounded-md border border-gray-400">
+                  {/* IMPORTANT: need to specify a surrounding container with a dimension */}
+                  <ResponsiveContainer width="100%" height={600}>
+                    <StockAllocationPieChart
+                      portfolioId={allocationData.portfolioId}
+                      date={allocationData.date}
+                      assetAllocation={allocationData.assetAllocation}
+                    />
+                  </ResponsiveContainer>
+                </div>
+                <div className="h-full w-full rounded-md border border-gray-400">
+                  {/* IMPORTANT: need to specify a surrounding container with a dimension */}
+                  <ResponsiveContainer width="100%" height={600}>
+                    <CountryAllocationPieChart
+                      portfolioId={allocationData.portfolioId}
+                      date={allocationData.date}
+                      countryAllocation={allocationData.countryAllocation}
+                    />
+                  </ResponsiveContainer>
+                </div>
+              </>
+            )}
+          </div>
+
+          <div className="w-full">
+            {allocationData && (
+              <ResponsiveContainer width="100%" height={600}>
+                <StockAllocationTreemap
+                  portfolioId={allocationData.portfolioId}
+                  date={allocationData.date}
+                  assetAllocation={treemapData}
+                />
+              </ResponsiveContainer>
+            )}
+          </div>
         </div>
       )}
     </DataPageContainer>

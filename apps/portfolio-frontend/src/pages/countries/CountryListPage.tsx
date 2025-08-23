@@ -3,7 +3,8 @@ import { Button, DataTable } from "@codescape-financial/core-ui";
 import { CountryResponseDTO } from "@codescape-financial/portfolio-data-models";
 import { useEffect, useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { DataPageContainer, ViewDetailsActionButton } from "../../components";
+import { DataPageContainer } from "../../components";
+import { ViewDetailsActionButton } from "../../components/action-buttons";
 import { useAxios } from "../../hooks";
 import { buildCountryColumnSchema } from "../../utils/table-schemas";
 
