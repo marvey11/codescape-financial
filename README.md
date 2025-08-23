@@ -6,9 +6,9 @@
   - [ ] Show stock/holding information on the `AddOperationPage`
   - [ ] Add operations for stocks without holding
   - Show charts for a portfolio:
-    - [ ] Allocation by company
-    - [ ] Allocation by country
-    - [ ] Portfolio Treemap
+    - [x] Allocation by company
+    - [x] Allocation by country
+    - [x] Portfolio Treemap
   - Show details for a holding:
     - [ ] Full summary
     - [x] Trade history
