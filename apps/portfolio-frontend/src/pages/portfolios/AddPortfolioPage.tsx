@@ -1,5 +1,6 @@
 import { CreatePortfolioDTO } from "@codescape-financial/portfolio-data-models";
 import { useNavigate } from "react-router-dom";
+import { ROUTES } from "../../config/routes";
 import { useAxios } from "../../hooks";
 import { PortfolioForm, PortfolioFormData } from "./PortfolioForm";
 
@@ -17,7 +18,7 @@ export const AddPortfolioPage = () => {
 
     sendRequest({ url: "/portfolios", method: "post", data: payload }).then(
       () => {
-        navigate("/portfolios");
+        navigate(ROUTES.PORTFOLIOS);
       },
     );
   };
@@ -27,7 +28,9 @@ export const AddPortfolioPage = () => {
       <h1 className="mb-4 text-4xl font-extrabold">Create Portfolio</h1>
       <PortfolioForm
         onSubmit={handleSubmit}
-        onCancel={() => navigate("..", { replace: true })}
+        onCancel={() => {
+          navigate(ROUTES.PORTFOLIOS, { replace: true });
+        }}
       />
     </div>
   );

@@ -7,7 +7,9 @@ import {
   DetailsPageDeleteButton,
   DetailsPageEditButton,
 } from "../../components/default-buttons";
+import { ROUTES } from "../../config/routes";
 import { useOutletContextData } from "../../hooks";
+import { buildEditStockRoute } from "../../utils";
 
 export const StockMetadataDetailsPage = () => {
   const navigate = useNavigate();
@@ -25,7 +27,7 @@ export const StockMetadataDetailsPage = () => {
         url: `/stock-metadata/${stock.id}`,
         method: "delete",
       } satisfies AxiosRequestConfig).then(() => {
-        navigate("/stocks");
+        navigate(ROUTES.STOCKS);
       });
     }
   };
@@ -39,7 +41,7 @@ export const StockMetadataDetailsPage = () => {
             extraComponents={[
               <DetailsPageEditButton
                 key={`${stock.id}-edit-button}`}
-                editPath={`/stocks/${stock.id}/edit`}
+                editPath={buildEditStockRoute(stock.id)}
               />,
               <DetailsPageDeleteButton
                 key={`${stock.id}-delete-button}`}

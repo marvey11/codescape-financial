@@ -35,7 +35,10 @@ import {
   XIRRMapping,
   XIRRObject,
 } from "../../types";
-import { buildPortfolioHoldingColumnSchema } from "../../utils";
+import {
+  buildPortfolioHoldingColumnSchema,
+  buildPortfolioHoldingDetailsRoute,
+} from "../../utils";
 
 /**
  * Renders the portfolio details page, which displays information about a specific portfolio,
@@ -282,7 +285,9 @@ const PortfolioHoldingsTable = ({
               <ViewDetailsActionButton
                 label={`Show details for holding ${data.stock.name}`}
                 onClick={() => {
-                  navigate(`/portfolios/${portfolioId}/holdings/${data.id}`);
+                  navigate(
+                    buildPortfolioHoldingDetailsRoute(portfolioId, data.id),
+                  );
                 }}
               />
               <AddOperationButton portfolioId={portfolioId} holding={data} />

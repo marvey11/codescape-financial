@@ -4,6 +4,7 @@ import {
 } from "@codescape-financial/portfolio-data-models";
 import { useNavigate } from "react-router-dom";
 import { DataPageContainer } from "../../components";
+import { ROUTES } from "../../config/routes";
 import { useOutletContextData } from "../../hooks";
 import { PortfolioForm, PortfolioFormData } from "./PortfolioForm";
 
@@ -30,7 +31,7 @@ export const EditPortfolioPage = () => {
         method: "put",
         data: payload,
       }).then(() => {
-        navigate("/portfolios");
+        navigate(ROUTES.PORTFOLIOS);
       });
     }
   };
@@ -47,7 +48,9 @@ export const EditPortfolioPage = () => {
             } satisfies PortfolioFormData
           }
           onSubmit={handleSubmit}
-          onCancel={() => navigate("..", { replace: true })}
+          onCancel={() => {
+            navigate(ROUTES.PORTFOLIOS, { replace: true });
+          }}
         />
       )}
     </DataPageContainer>

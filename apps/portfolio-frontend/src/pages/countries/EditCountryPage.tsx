@@ -4,6 +4,7 @@ import {
 } from "@codescape-financial/portfolio-data-models";
 import { useNavigate } from "react-router-dom";
 import { DataPageContainer } from "../../components";
+import { ROUTES } from "../../config/routes";
 import { useOutletContextData } from "../../hooks";
 import { CountryForm, CountryFormData } from "./CountryForm";
 
@@ -28,7 +29,7 @@ export const EditCountryPage = () => {
         method: "put",
         data: payload,
       }).then(() => {
-        navigate("/countries");
+        navigate(ROUTES.COUNTRIES);
       });
     }
   };
@@ -40,7 +41,9 @@ export const EditCountryPage = () => {
         <CountryForm
           value={{ ...country } satisfies CountryFormData}
           onSubmit={handleSubmit}
-          onCancel={() => navigate("..", { replace: true })}
+          onCancel={() => {
+            navigate(ROUTES.COUNTRIES, { replace: true });
+          }}
         />
       )}
     </DataPageContainer>

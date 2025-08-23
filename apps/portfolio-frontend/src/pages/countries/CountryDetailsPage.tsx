@@ -13,8 +13,13 @@ import {
   DetailsPageDeleteButton,
   DetailsPageEditButton,
 } from "../../components/default-buttons";
+import { ROUTES } from "../../config/routes";
 import { useAxios, useOutletContextData } from "../../hooks";
-import { buildStockMetadataColumnSchema } from "../../utils";
+import {
+  buildEditCountryRoute,
+  buildStockDetailsRoute,
+  buildStockMetadataColumnSchema,
+} from "../../utils";
 
 export const CountryDetailsPage = () => {
   const navigate = useNavigate();
@@ -49,7 +54,7 @@ export const CountryDetailsPage = () => {
         url: `/countries/${country.id}`,
         method: "delete",
       } satisfies AxiosRequestConfig).then(() => {
-        navigate("/countries");
+        navigate(ROUTES.COUNTRIES);
       });
     }
   };
@@ -63,7 +68,7 @@ export const CountryDetailsPage = () => {
             extraComponents={[
               <DetailsPageEditButton
                 key={`${country.id}-edit-button`}
-                editPath={`/countries/${country.id}/edit`}
+                editPath={buildEditCountryRoute(country.id)}
               />,
               <DetailsPageDeleteButton
                 key={`${country.id}-delete-button`}
@@ -111,7 +116,7 @@ const CountryStockTable = ({ data }: { data: StockResponseDTO[] }) => {
             <ViewDetailsActionButton
               label={`Show details for ${data.name}`}
               onClick={() => {
-                navigate(`/stocks/${data.id}`);
+                navigate(buildStockDetailsRoute(data.id));
               }}
             />
           ) : null,

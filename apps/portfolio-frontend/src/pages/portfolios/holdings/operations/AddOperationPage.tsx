@@ -8,6 +8,10 @@ import {
 } from "@codescape-financial/portfolio-data-models";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useAxios } from "../../../../hooks";
+import {
+  buildPortfolioDetailsRoute,
+  buildPortfolioHoldingDetailsRoute,
+} from "../../../../utils";
 import { OperationForm, OperationFormData } from "./OperationForm";
 
 type OperationPayloadType =
@@ -81,7 +85,7 @@ export const AddOperationPage = () => {
       method: "post",
       data: payload,
     }).then(() => {
-      navigate(`/portfolios/${portfolioId}`);
+      navigate(buildPortfolioDetailsRoute(portfolioId));
     });
   };
 
@@ -91,11 +95,11 @@ export const AddOperationPage = () => {
 
       <OperationForm
         onSubmit={handleSubmit}
-        onCancel={() =>
-          navigate(`/portfolios/${portfolioId}/holdings/${holdingId}`, {
-            replace: true,
-          })
-        }
+        onCancel={() => {
+          if (portfolioId && holdingId) {
+            navigate(buildPortfolioHoldingDetailsRoute(portfolioId, holdingId));
+          }
+        }}
       />
     </div>
   );

@@ -5,6 +5,7 @@ import {
 } from "@codescape-financial/portfolio-data-models";
 import { useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
+import { ROUTES } from "../../config/routes";
 import { useAxios } from "../../hooks";
 import {
   CountrySelectOption,
@@ -44,7 +45,7 @@ export const AddStockMetadataPage = () => {
     };
     sendRequest({ url: "/stock-metadata", method: "post", data: payload }).then(
       () => {
-        navigate("/stocks");
+        navigate(ROUTES.STOCKS);
       },
     );
   };
@@ -55,7 +56,9 @@ export const AddStockMetadataPage = () => {
       <StockMetadataForm
         availableCountries={sortedCountries ?? []}
         onSubmit={handleSubmit}
-        onCancel={() => navigate("..", { replace: true })}
+        onCancel={() => {
+          navigate(ROUTES.STOCKS, { replace: true });
+        }}
       />
     </div>
   );
