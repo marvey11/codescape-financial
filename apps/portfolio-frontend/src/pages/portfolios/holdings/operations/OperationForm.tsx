@@ -2,6 +2,7 @@ import { formatNormalizedDate, getDateObject } from "@codescape-financial/core";
 import {
   FormButtonsComponent,
   Input,
+  LabeledFormField,
   Select,
 } from "@codescape-financial/core-ui";
 import { OperationType } from "@codescape-financial/portfolio-data-models";
@@ -58,21 +59,15 @@ export const OperationForm = ({
         control={control}
         rules={{ required: true }}
         render={({ field }) => (
-          <>
-            <label
-              htmlFor="operation-type"
-              className="font-medium text-gray-700"
-            >
-              Operation Type:
-            </label>
-            <Select id="operation-type" {...field}>
+          <LabeledFormField id="operation-type" label="Operation Type:">
+            <Select {...field}>
               {Object.values(OperationType).map((type) => (
                 <option key={type} value={type}>
                   {selectLabelMapping[type]}
                 </option>
               ))}
             </Select>
-          </>
+          </LabeledFormField>
         )}
       />
 
@@ -81,21 +76,14 @@ export const OperationForm = ({
         control={control}
         rules={{ required: true }}
         render={({ field }) => (
-          <>
-            <label
-              htmlFor="operation-date"
-              className="font-medium text-gray-700"
-            >
-              Date:
-            </label>
+          <LabeledFormField id="operation-date" label="Date:">
             <Input
-              id="operation-date"
               type="date"
               {...field}
               value={formatNormalizedDate(field.value)}
               onChange={(e) => field.onChange(getDateObject(e.target.value))}
             />
-          </>
+          </LabeledFormField>
         )}
       />
 
@@ -142,15 +130,15 @@ const TransactionFormFields = ({ control }: FormFieldProps) => (
       control={control}
       rules={{ required: true, min: 0 }}
       render={({ field }) => (
-        <>
-          <label
-            htmlFor="operation-shares"
-            className="font-medium text-gray-700"
-          >
-            Shares:
-          </label>
-          <Input id="operation-shares" type="number" step={0.001} {...field} />
-        </>
+        <LabeledFormField id="operation-shares" label="Shares:">
+          <Input
+            type="number"
+            step={0.001}
+            {...field}
+            // Manually handle onChange to convert the value to a number
+            onChange={(e) => field.onChange(Number(e.target.value))}
+          />
+        </LabeledFormField>
       )}
     />
 
@@ -159,20 +147,18 @@ const TransactionFormFields = ({ control }: FormFieldProps) => (
       control={control}
       rules={{ required: true, min: 0 }}
       render={({ field }) => (
-        <>
-          <label
-            htmlFor="operation-price-per-share"
-            className="font-medium text-gray-700"
-          >
-            Price Per Share:
-          </label>
+        <LabeledFormField
+          id="operation-price-per-share"
+          label="Price per Share:"
+        >
           <Input
-            id="operation-price-per-share"
             type="number"
             step={0.0001}
             {...field}
+            // Manually handle onChange to convert the value to a number
+            onChange={(e) => field.onChange(Number(e.target.value))}
           />
-        </>
+        </LabeledFormField>
       )}
     />
 
@@ -181,12 +167,15 @@ const TransactionFormFields = ({ control }: FormFieldProps) => (
       control={control}
       rules={{ required: true, min: 0 }}
       render={({ field }) => (
-        <>
-          <label htmlFor="operation-fees" className="font-medium text-gray-700">
-            Fees:
-          </label>
-          <Input id="operation-fees" type="number" step={0.0001} {...field} />
-        </>
+        <LabeledFormField id="operation-fees" label="Fees:">
+          <Input
+            type="number"
+            step={0.0001}
+            {...field}
+            // Manually handle onChange to convert the value to a number
+            onChange={(e) => field.onChange(Number(e.target.value))}
+          />
+        </LabeledFormField>
       )}
     />
   </>
@@ -199,20 +188,18 @@ const DividendFormFields = ({ control }: FormFieldProps) => (
       control={control}
       rules={{ required: true, min: 0 }}
       render={({ field }) => (
-        <>
-          <label
-            htmlFor="operation-dividend-per-share"
-            className="font-medium text-gray-700"
-          >
-            Dividend Per Share:
-          </label>
+        <LabeledFormField
+          id="operation-dividend-per-share"
+          label="Dividend per Share:"
+        >
           <Input
-            id="operation-dividend-per-share"
             type="number"
             step={0.0001}
             {...field}
+            // Manually handle onChange to convert the value to a number
+            onChange={(e) => field.onChange(Number(e.target.value))}
           />
-        </>
+        </LabeledFormField>
       )}
     />
 
@@ -221,20 +208,18 @@ const DividendFormFields = ({ control }: FormFieldProps) => (
       control={control}
       rules={{ required: true, min: 0 }}
       render={({ field }) => (
-        <>
-          <label
-            htmlFor="operation-applicable-shares"
-            className="font-medium text-gray-700"
-          >
-            Applicable Shares:
-          </label>
+        <LabeledFormField
+          id="operation-applicable-shares"
+          label="Applicable Shares:"
+        >
           <Input
-            id="operation-applicable-shares"
             type="number"
             step={0.0001}
             {...field}
+            // Manually handle onChange to convert the value to a number
+            onChange={(e) => field.onChange(Number(e.target.value))}
           />
-        </>
+        </LabeledFormField>
       )}
     />
 
@@ -243,20 +228,15 @@ const DividendFormFields = ({ control }: FormFieldProps) => (
       control={control}
       rules={{ required: true, min: 0 }}
       render={({ field }) => (
-        <>
-          <label
-            htmlFor="operation-exchange-rate"
-            className="font-medium text-gray-700"
-          >
-            Exchange Rate:
-          </label>
+        <LabeledFormField id="operation-exchange-rate" label="Exchange Rate:">
           <Input
-            id="operation-exchange-rate"
             type="number"
             step={0.0001}
             {...field}
+            // Manually handle onChange to convert the value to a number
+            onChange={(e) => field.onChange(Number(e.target.value))}
           />
-        </>
+        </LabeledFormField>
       )}
     />
   </>
@@ -268,20 +248,15 @@ const StockSplitFormFields = ({ control }: FormFieldProps) => (
     control={control}
     rules={{ required: true, min: 0 }}
     render={({ field }) => (
-      <>
-        <label
-          htmlFor="operation-split-ratio"
-          className="font-medium text-gray-700"
-        >
-          Split Ratio:
-        </label>
+      <LabeledFormField id="operation-split-ratio" label="Split Ratio:">
         <Input
-          id="operation-split-ratio"
           type="number"
           step={0.0001}
           {...field}
+          // Manually handle onChange to convert the value to a number
+          onChange={(e) => field.onChange(Number(e.target.value))}
         />
-      </>
+      </LabeledFormField>
     )}
   />
 );

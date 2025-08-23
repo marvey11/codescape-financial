@@ -1,6 +1,7 @@
 import {
   FormButtonsComponent,
   Input,
+  LabeledFormField,
   Select,
 } from "@codescape-financial/core-ui";
 import { Controller, useForm } from "react-hook-form";
@@ -74,12 +75,13 @@ export const StockMetadataForm = ({
         control={control}
         rules={{ required: true }}
         render={({ field }) => (
-          <>
-            <label htmlFor="stock-isin" className="font-medium text-gray-700">
-              ISIN:
-            </label>
-            <Input id="stock-isin" type="text" {...field} />
-          </>
+          <LabeledFormField id="stock-isin" label="ISIN:">
+            <Input
+              title="International Securities Identification Number"
+              type="text"
+              {...field}
+            />
+          </LabeledFormField>
         )}
       />
 
@@ -88,12 +90,13 @@ export const StockMetadataForm = ({
         control={control}
         rules={{ required: true }}
         render={({ field }) => (
-          <>
-            <label htmlFor="stock-nsin" className="font-medium text-gray-700">
-              NSIN:
-            </label>
-            <Input id="stock-nsin" type="text" {...field} />
-          </>
+          <LabeledFormField id="stock-nsin" label="NSIN:">
+            <Input
+              title="National Securities Identification Number"
+              type="text"
+              {...field}
+            />
+          </LabeledFormField>
         )}
       />
 
@@ -102,12 +105,9 @@ export const StockMetadataForm = ({
         control={control}
         rules={{ required: true }}
         render={({ field }) => (
-          <>
-            <label htmlFor="stock-name" className="font-medium text-gray-700">
-              Name:
-            </label>
-            <Input id="stock-name" type="text" {...field} />
-          </>
+          <LabeledFormField id="stock-name" label="Name:">
+            <Input type="text" {...field} />
+          </LabeledFormField>
         )}
       />
 
@@ -116,14 +116,8 @@ export const StockMetadataForm = ({
         control={control}
         rules={{ required: true }}
         render={({ field }) => (
-          <>
-            <label
-              htmlFor="stock-country"
-              className="font-medium text-gray-700"
-            >
-              Country:
-            </label>
-            <Select id="stock-country" {...field}>
+          <LabeledFormField id="stock-country" label="Country:">
+            <Select {...field}>
               <option value="" disabled>
                 Select a country...
               </option>
@@ -133,7 +127,7 @@ export const StockMetadataForm = ({
                 </option>
               ))}
             </Select>
-          </>
+          </LabeledFormField>
         )}
       />
 
@@ -147,15 +141,8 @@ export const StockMetadataForm = ({
           pattern: /^[A-Z]{3}$/,
         }}
         render={({ field }) => (
-          <>
-            <label
-              htmlFor="stock-currency"
-              className="font-medium text-gray-700"
-            >
-              Currency:
-            </label>
+          <LabeledFormField id="stock-currency" label="Currency:">
             <Input
-              id="stock-currency"
               type="text"
               {...field}
               title="3-letter currency code (e.g., EUR, USD)"
@@ -166,7 +153,7 @@ export const StockMetadataForm = ({
                 <option key={currency} value={currency} />
               ))}
             </datalist>
-          </>
+          </LabeledFormField>
         )}
       />
 

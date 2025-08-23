@@ -1,4 +1,8 @@
-import { FormButtonsComponent, Input } from "@codescape-financial/core-ui";
+import {
+  FormButtonsComponent,
+  Input,
+  LabeledFormField,
+} from "@codescape-financial/core-ui";
 import { Controller, useForm } from "react-hook-form";
 
 export interface CountryFormData {
@@ -35,17 +39,16 @@ export const CountryForm = ({
       onSubmit={handleSubmit(onSubmit)}
       className="grid grid-cols-[max-content_1fr] items-center gap-4 rounded-lg bg-white p-4 shadow-md"
     >
+      {/* controllers... */}
+
       <Controller
         name="name"
         control={control}
         rules={{ required: true }}
         render={({ field }) => (
-          <>
-            <label htmlFor="country-name" className="font-medium text-gray-700">
-              Country Name:
-            </label>
-            <Input id="country-name" type="text" {...field} />
-          </>
+          <LabeledFormField id="country-name" label="Country Name:">
+            <Input type="text" {...field} />
+          </LabeledFormField>
         )}
       />
 
@@ -59,17 +62,13 @@ export const CountryForm = ({
           pattern: /^[A-Z]{2}$/,
         }}
         render={({ field }) => (
-          <>
-            <label htmlFor="country-code" className="font-medium text-gray-700">
-              Country Code:
-            </label>
+          <LabeledFormField id="country-code" label="Country Code:">
             <Input
-              id="country-code"
               type="text"
               title="2-letter country code (e.g., DE, US)"
               {...field}
             />
-          </>
+          </LabeledFormField>
         )}
       />
 
