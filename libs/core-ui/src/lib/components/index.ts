@@ -4,6 +4,7 @@ export { Checkbox } from "./Checkbox";
 export * from "./data-table";
 export * from "./forms";
 export { Input } from "./Input";
+export { LabeledInput } from "./LabeledInput";
 export { Select } from "./Select";
 export { Spinner } from "./Spinner";
 export * from "./Tag";

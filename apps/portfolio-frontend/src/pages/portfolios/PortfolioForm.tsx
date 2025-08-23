@@ -1,4 +1,7 @@
-import { FormButtonsComponent, Input } from "@codescape-financial/core-ui";
+import {
+  FormButtonsComponent,
+  LabeledInput,
+} from "@codescape-financial/core-ui";
 import { Controller, useForm } from "react-hook-form";
 
 export interface PortfolioFormData {
@@ -38,15 +41,12 @@ export const PortfolioForm = ({
         control={control}
         rules={{ required: true }}
         render={({ field }) => (
-          <>
-            <label
-              htmlFor="portfolio-name"
-              className="font-medium text-gray-700"
-            >
-              Portfolio Name:
-            </label>
-            <Input id="portfolio-name" type="text" {...field} />
-          </>
+          <LabeledInput
+            id="portfolio-name"
+            label="Portfolio Name:"
+            type="text"
+            {...field}
+          />
         )}
       />
 
@@ -54,15 +54,12 @@ export const PortfolioForm = ({
         name="description"
         control={control}
         render={({ field }) => (
-          <>
-            <label
-              htmlFor="portfolio-description"
-              className="font-medium text-gray-700"
-            >
-              Description:
-            </label>
-            <Input id="portfolio-description" type="text" {...field} />
-          </>
+          <LabeledInput
+            id="portfolio-description"
+            label="Description:"
+            type="text"
+            {...field}
+          />
         )}
       />
 

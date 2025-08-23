@@ -1,6 +1,7 @@
 import {
   FormButtonsComponent,
   Input,
+  LabeledInput,
   Select,
 } from "@codescape-financial/core-ui";
 import { Controller, useForm } from "react-hook-form";
@@ -74,12 +75,13 @@ export const StockMetadataForm = ({
         control={control}
         rules={{ required: true }}
         render={({ field }) => (
-          <>
-            <label htmlFor="stock-isin" className="font-medium text-gray-700">
-              ISIN:
-            </label>
-            <Input id="stock-isin" type="text" {...field} />
-          </>
+          <LabeledInput
+            id="stock-isin"
+            label="ISIN:"
+            title="International Securities Identification Number"
+            type="text"
+            {...field}
+          />
         )}
       />
 
@@ -88,12 +90,13 @@ export const StockMetadataForm = ({
         control={control}
         rules={{ required: true }}
         render={({ field }) => (
-          <>
-            <label htmlFor="stock-nsin" className="font-medium text-gray-700">
-              NSIN:
-            </label>
-            <Input id="stock-nsin" type="text" {...field} />
-          </>
+          <LabeledInput
+            id="stock-nsin"
+            label="NSIN:"
+            title="National Securities Identification Number"
+            type="text"
+            {...field}
+          />
         )}
       />
 
@@ -102,12 +105,7 @@ export const StockMetadataForm = ({
         control={control}
         rules={{ required: true }}
         render={({ field }) => (
-          <>
-            <label htmlFor="stock-name" className="font-medium text-gray-700">
-              Name:
-            </label>
-            <Input id="stock-name" type="text" {...field} />
-          </>
+          <LabeledInput id="stock-name" label="Name:" type="text" {...field} />
         )}
       />
 
