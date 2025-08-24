@@ -2,14 +2,19 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "outDir": "./out-tsc/vitest",
+    "lib": [
+      "es2022",
+      "dom"
+    ],
     "types": [
+      "node",
+      "vite/client",
+      "vitest",
       "vitest/globals",
       "vitest/importMeta",
-      "vite/client",
-      "node",
-      "vitest",
       "@nx/react/typings/cssmodule.d.ts",
-      "@nx/react/typings/image.d.ts"
+      "@nx/react/typings/image.d.ts",
+      "@testing-library/jest-dom"
     ],
     "jsx": "react-jsx"
   },

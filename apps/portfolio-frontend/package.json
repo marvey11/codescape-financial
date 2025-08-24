@@ -12,6 +12,7 @@
     "react-hook-form": "^7.62.0"
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "^6.6.4",
     "@types/axios": "^0.9.36"
   }
 }

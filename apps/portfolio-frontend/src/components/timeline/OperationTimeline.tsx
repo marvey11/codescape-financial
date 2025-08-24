@@ -17,16 +17,32 @@ const dotBorderColor: { [key in OperationType]: string } = {
 
 const dotIcon = {
   [OperationType.BUY]: (
-    <Icon name="BuyOperation" className="h-5 w-5 text-green-500" />
+    <Icon
+      name="BuyOperation"
+      className="h-5 w-5 text-green-500"
+      data-testid="testid-icon-buy-operation"
+    />
   ),
   [OperationType.SELL]: (
-    <Icon name="SellOperation" className="h-5 w-5 text-red-500" />
+    <Icon
+      name="SellOperation"
+      className="h-5 w-5 text-red-500"
+      data-testid="testid-icon-sell-operation"
+    />
   ),
   [OperationType.DIVIDEND]: (
-    <Icon name="DividendOperation" className="h-5 w-5 text-blue-500" />
+    <Icon
+      name="DividendOperation"
+      className="h-5 w-5 text-blue-500"
+      data-testid="testid-icon-dividend-operation"
+    />
   ),
   [OperationType.STOCK_SPLIT]: (
-    <Icon name="StockSplitOperation" className="h-5 w-5 text-orange-500" />
+    <Icon
+      name="StockSplitOperation"
+      className="h-5 w-5 text-orange-500"
+      data-testid="testid-icon-stock-split-operation"
+    />
   ),
 };
 
@@ -46,7 +62,7 @@ export const OperationTimeline = ({
           className={cn(
             "relative mb-8 flex w-full items-center",
             // Alternate card/date side, but the dot's position is absolute
-            index % 2 === 0 ? "flex-row-reverse" : "",
+            index % 2 === 0 ? "flex-row-reverse" : "flex-row",
           )}
         >
           {/* Card side (adjust padding if needed after dot is absolute) */}
