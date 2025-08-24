@@ -27,6 +27,7 @@ export const PortfolioHoldingDetailsPage = () => {
             title={`${holding.stock.name} — Holding Details`}
             extraComponents={[
               <Link
+                key={`${holding.id}-add-operation-button`}
                 to={buildAddOperationRoute(
                   holding.portfolioId,
                   holding.id,
@@ -35,7 +36,10 @@ export const PortfolioHoldingDetailsPage = () => {
               >
                 <Button>Add Operation</Button>
               </Link>,
-              <Link to={buildPortfolioDetailsRoute(holding.portfolioId)}>
+              <Link
+                key={`${holding.id}-view-portfolio-button`}
+                to={buildPortfolioDetailsRoute(holding.portfolioId)}
+              >
                 <Button variant="secondary">View Portfolio</Button>
               </Link>,
             ]}
