@@ -1,10 +1,10 @@
 import { AxiosRequestConfig } from "axios";
-import { RequestParamConfiguration } from "../types";
+import { RequestConfiguration } from "../types";
 import { interpolatePath } from "./api-utils";
 
 export const buildAxiosRequestConfig = (
   path: string,
-  config: RequestParamConfiguration = {},
+  config: RequestConfiguration = {},
 ): AxiosRequestConfig => {
   const { params, queryParams } = config;
 
@@ -14,6 +14,12 @@ export const buildAxiosRequestConfig = (
 
   if (queryParams) {
     requestConfig.params = queryParams;
+  }
+
+  requestConfig.method = config.method ?? "get";
+
+  if (config.data) {
+    requestConfig.data = config.data;
   }
 
   return requestConfig;
