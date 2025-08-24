@@ -11,7 +11,7 @@ import { buildAxiosRequestConfig } from "../utils";
 export class PortfolioOperationsAPI {
   static getAllOperationsConfig(): AxiosRequestConfig {
     const config = buildAxiosRequestConfig(API_ENDPOINTS.PORTFOLIO_OPERATIONS);
-    return { ...config, method: "get" };
+    return config;
   }
 
   static getBuyOperationConfig(
@@ -19,8 +19,9 @@ export class PortfolioOperationsAPI {
   ): AxiosRequestConfig {
     const config = buildAxiosRequestConfig(
       API_ENDPOINTS.PORTFOLIO_BUY_OPERATION,
+      { method: "post", data: payload },
     );
-    return { ...config, method: "post", data: payload };
+    return config;
   }
 
   static getSellOperationConfig(
@@ -28,8 +29,9 @@ export class PortfolioOperationsAPI {
   ): AxiosRequestConfig {
     const config = buildAxiosRequestConfig(
       API_ENDPOINTS.PORTFOLIO_SELL_OPERATION,
+      { method: "post", data: payload },
     );
-    return { ...config, method: "post", data: payload };
+    return config;
   }
 
   static getStockSplitOperationConfig(
@@ -37,8 +39,9 @@ export class PortfolioOperationsAPI {
   ): AxiosRequestConfig {
     const config = buildAxiosRequestConfig(
       API_ENDPOINTS.PORTFOLIO_STOCK_SPLIT_OPERATION,
+      { method: "post", data: payload },
     );
-    return { ...config, method: "post", data: payload };
+    return config;
   }
 
   static getDividendOperationConfig(
@@ -46,7 +49,8 @@ export class PortfolioOperationsAPI {
   ): AxiosRequestConfig {
     const config = buildAxiosRequestConfig(
       API_ENDPOINTS.PORTFOLIO_DIVIDEND_OPERATION,
+      { method: "post", data: payload },
     );
-    return { ...config, method: "post", data: payload };
+    return config;
   }
 }

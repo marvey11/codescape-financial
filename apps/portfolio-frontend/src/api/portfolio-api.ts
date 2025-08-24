@@ -3,15 +3,15 @@ import {
   CreatePortfolioDTO,
   UpdatePortfolioDTO,
 } from "@codescape-financial/portfolio-data-models";
-import { AxiosRequestConfig } from "axios";
+import { AxiosRequestConfig, Method } from "axios";
 import { API_ENDPOINTS } from "../config/api-endpoints";
-import { RequestParamConfiguration } from "../types";
+import { RequestConfiguration } from "../types";
 import { buildAxiosRequestConfig } from "../utils";
 
 export class PortfolioAPI {
   static getAllPortfoliosConfig(): AxiosRequestConfig {
     const config = buildAxiosRequestConfig(API_ENDPOINTS.PORTFOLIOS);
-    return { ...config, method: "get" };
+    return config;
   }
 
   static getPortfolioByIdConfig(portfolioId: string): AxiosRequestConfig {
@@ -19,14 +19,17 @@ export class PortfolioAPI {
       API_ENDPOINTS.PORTFOLIO_BY_ID,
       portfolioId,
     );
-    return { ...config, method: "get" };
+    return config;
   }
 
   static getAddPortfolioConfig(
     payload: CreatePortfolioDTO,
   ): AxiosRequestConfig {
-    const config = buildAxiosRequestConfig(API_ENDPOINTS.PORTFOLIOS);
-    return { ...config, method: "post", data: payload };
+    const config = buildAxiosRequestConfig(API_ENDPOINTS.PORTFOLIOS, {
+      method: "post",
+      data: payload,
+    });
+    return config;
   }
 
   static getEditPortfolioConfig(
@@ -36,16 +39,19 @@ export class PortfolioAPI {
     const config = PortfolioAPI.buildRequestConfigForId(
       API_ENDPOINTS.PORTFOLIO_BY_ID,
       portfolioId,
+      "put",
+      payload,
     );
-    return { ...config, method: "put", data: payload };
+    return config;
   }
 
   static getDeletePortfolioConfig(portfolioId: string): AxiosRequestConfig {
     const config = PortfolioAPI.buildRequestConfigForId(
       API_ENDPOINTS.PORTFOLIO_BY_ID,
       portfolioId,
+      "delete",
     );
-    return { ...config, method: "delete" };
+    return config;
   }
 
   static getPortfolioXirrConfig(
@@ -62,7 +68,7 @@ export class PortfolioAPI {
       paramConfig,
     );
 
-    return { ...config, method: "get" };
+    return config;
   }
 
   static getPortfolioAllocationsConfig(
@@ -73,12 +79,12 @@ export class PortfolioAPI {
       API_ENDPOINTS.PORTFOLIO_ALLOCATIONS,
       paramConfig,
     );
-    return { ...config, method: "get" };
+    return config;
   }
 
   private static buildRequestParamConfigForId(
     portfolioId: string,
-  ): RequestParamConfiguration {
+  ): RequestConfiguration {
     if (!portfolioId.trim()) {
       throw new Error("Portfolio ID must be a non-empty string.");
     }
@@ -88,8 +94,10 @@ export class PortfolioAPI {
   private static buildRequestConfigForId(
     route: string,
     portfolioId: string,
-  ): RequestParamConfiguration {
+    method: Method = "get",
+    data?: unknown,
+  ): AxiosRequestConfig {
     const paramConfig = PortfolioAPI.buildRequestParamConfigForId(portfolioId);
-    return buildAxiosRequestConfig(route, paramConfig);
+    return buildAxiosRequestConfig(route, { ...paramConfig, method, data });
   }
 }

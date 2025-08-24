@@ -1,7 +1,7 @@
 import { PortfolioViewType } from "@codescape-financial/core";
-import { AxiosRequestConfig } from "axios";
+import { AxiosRequestConfig, Method } from "axios";
 import { API_ENDPOINTS } from "../config/api-endpoints";
-import { RequestParamConfiguration } from "../types";
+import { RequestConfiguration } from "../types";
 import { buildAxiosRequestConfig } from "../utils";
 
 export class PortfolioHoldingAPI {
@@ -9,14 +9,14 @@ export class PortfolioHoldingAPI {
     const config = buildAxiosRequestConfig(API_ENDPOINTS.PORTFOLIO_HOLDINGS, {
       params: { portfolioId },
     });
-    return { ...config, method: "get" };
+    return config;
   }
 
   static getHoldingListXIRRConfig(
     portfolioId: string,
     viewType?: PortfolioViewType,
   ): AxiosRequestConfig {
-    const paramConfig: RequestParamConfiguration = {
+    const paramConfig: RequestConfiguration = {
       params: { portfolioId },
     };
     if (viewType) {
@@ -28,7 +28,7 @@ export class PortfolioHoldingAPI {
       paramConfig,
     );
 
-    return { ...config, method: "get" };
+    return config;
   }
 
   static getOneHoldingConfig(
@@ -39,17 +39,19 @@ export class PortfolioHoldingAPI {
       API_ENDPOINTS.PORTFOLIO_HOLDING_BY_ID,
       { params: { portfolioId, holdingId } },
     );
-    return { ...config, method: "get" };
+    return config;
   }
 
   static getOneHoldingXIRRConfig(
     portfolioId: string,
     holdingId: string,
+    method: Method = "get",
+    data?: unknown,
   ): AxiosRequestConfig {
-    const config = buildAxiosRequestConfig(
+    const paramConfig = { params: { portfolioId, holdingId }, method, data };
+    return buildAxiosRequestConfig(
       API_ENDPOINTS.PORTFOLIO_HOLDING_XIRR,
-      { params: { portfolioId, holdingId } },
+      paramConfig,
     );
-    return { ...config, method: "get" };
   }
 }
