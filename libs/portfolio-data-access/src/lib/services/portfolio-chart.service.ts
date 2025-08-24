@@ -1,4 +1,8 @@
-import { formatNormalizedDate, getDateObject } from "@codescape-financial/core";
+import {
+  formatNormalizedDate,
+  generatePortfolioAllocationKey,
+  getDateObject,
+} from "@codescape-financial/core";
 import { HistoricalQuoteService } from "@codescape-financial/historical-data-access";
 import {
   AllocationResponseDTO,
@@ -9,6 +13,7 @@ import { Injectable, Logger } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { PortfolioHolding } from "../entities";
+import { PortfolioCachingService } from "./portfolio-caching.service";
 
 @Injectable()
 export class PortfolioChartService {
@@ -18,7 +23,26 @@ export class PortfolioChartService {
     @InjectRepository(PortfolioHolding)
     private readonly holdingRepository: Repository<PortfolioHolding>,
     private readonly historicalQuoteService: HistoricalQuoteService,
+    private readonly cachingService: PortfolioCachingService,
   ) {}
+
+  async getAllocationChartDataWithCache(
+    portfolioId: string,
+  ): Promise<AllocationResponseDTO> {
+    const cacheKey = generatePortfolioAllocationKey(portfolioId);
+    const TTL_MILLISECONDS = 60 * 60 * 1000;
+
+    return this.cachingService.getOrCreateAndCache<AllocationResponseDTO>(
+      cacheKey,
+      async () => {
+        this.logger.verbose(
+          `Generating fresh allocation data for portfolio ${portfolioId}`,
+        );
+        return this.getAllocationChartData(portfolioId);
+      },
+      TTL_MILLISECONDS,
+    );
+  }
 
   async getAllocationChartData(
     portfolioId: string,
@@ -107,15 +131,14 @@ export class PortfolioChartService {
       }),
     );
 
+    assetAllocation.sort((a, b) => a.name.localeCompare(b.name));
+    countryAllocation.sort((a, b) => a.name.localeCompare(b.name));
+
     return {
       portfolioId,
       date: formatNormalizedDate(date),
-      assetAllocation: assetAllocation.sort((a, b) =>
-        a.name.localeCompare(b.name),
-      ),
-      countryAllocation: countryAllocation.sort((a, b) =>
-        a.name.localeCompare(b.name),
-      ),
+      assetAllocation: assetAllocation,
+      countryAllocation: countryAllocation,
     };
   }
 }

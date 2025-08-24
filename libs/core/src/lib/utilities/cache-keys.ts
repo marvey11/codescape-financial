@@ -17,3 +17,6 @@ export const generateHoldingXirrKey = (
   portfolioId: string,
   holdingId: string,
 ) => `xirr:${portfolioId}:${holdingId}:${formatNormalizedDate(new Date())}`;
+
+export const generatePortfolioAllocationKey = (portfolioId: string) =>
+  `allocation:${portfolioId}:${formatNormalizedDate(new Date())}`;

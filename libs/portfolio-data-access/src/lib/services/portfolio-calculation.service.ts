@@ -1,6 +1,9 @@
 import {
   FLOATING_POINT_TOLERANCE,
   formatNormalizedDate,
+  generateHoldingListXirrKey,
+  generateHoldingXirrKey,
+  generatePortfolioXirrKey,
   getDateObject,
   isEffectivelyZero,
   PortfolioViewType,
@@ -19,8 +22,10 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { In, Repository } from "typeorm";
 import { PortfolioHolding, PortfolioOperation } from "../entities";
 import { CashFlow } from "../types";
+import { PortfolioCachingService } from "./portfolio-caching.service";
 
 const MILLISECONDS_PER_YEAR = 365 * 24 * 3600 * 1000;
+const MILLISECONDS_PER_HOUR = 60 * 60 * 1000;
 const MAX_ITERATIONS = 100;
 const INITIAL_LOW_RATE = -0.999999;
 const INITIAL_HIGH_RATE = 10.0;
@@ -36,6 +41,7 @@ export class PortfolioCalculationService {
     @InjectRepository(PortfolioHolding)
     private readonly holdingRepository: Repository<PortfolioHolding>,
     private readonly historicalQuoteService: HistoricalQuoteService,
+    private readonly cachingService: PortfolioCachingService,
   ) {}
 
   // --- Helper for Building Common Holding/Operation Queries ---
@@ -94,6 +100,24 @@ export class PortfolioCalculationService {
   }
 
   // --- calculateXIRRForPortfolio (Refactored) ---
+  async calculateXIRRForPortfolioWithCache(
+    portfolioId: string,
+    viewType: PortfolioViewType,
+  ): Promise<XIRRPortfolioResponseDTO | null> {
+    const cacheKey = generatePortfolioXirrKey(portfolioId, viewType);
+
+    return this.cachingService.getOrCreateAndCache<XIRRPortfolioResponseDTO | null>(
+      cacheKey,
+      async () => {
+        this.logger.verbose(
+          `Generating fresh XIRR data for portfolio ${portfolioId} with viewType ${viewType}`,
+        );
+        return this.calculateXIRRForPortfolio(portfolioId, viewType);
+      },
+      MILLISECONDS_PER_HOUR,
+    );
+  }
+
   async calculateXIRRForPortfolio(
     portfolioId: string,
     viewType: PortfolioViewType,
@@ -153,6 +177,24 @@ export class PortfolioCalculationService {
       date: formatNormalizedDate(calculationDate),
       xirr: this.calculateXIRR(cashflows),
     };
+  }
+
+  async calculateXIRRForHoldingListWithCache(
+    portfolioId: string,
+    viewType: PortfolioViewType,
+  ): Promise<XIRRHoldingListResponseDTO> {
+    const cacheKey = generateHoldingListXirrKey(portfolioId, viewType);
+
+    return this.cachingService.getOrCreateAndCache<XIRRHoldingListResponseDTO>(
+      cacheKey,
+      async () => {
+        this.logger.verbose(
+          `Generating fresh XIRR data for holdings in portfolio ${portfolioId} with viewType ${viewType}`,
+        );
+        return this.calculateXIRRForHoldingList(portfolioId, viewType);
+      },
+      MILLISECONDS_PER_HOUR,
+    );
   }
 
   // --- calculateXIRRForHoldingList (Refactored) ---
@@ -276,6 +318,24 @@ export class PortfolioCalculationService {
     });
 
     return result;
+  }
+
+  async calculateXIRRForHoldingWithCache(
+    portfolioId: string,
+    holdingId: string,
+  ): Promise<XIRRHoldingResponseDTO | null> {
+    const cacheKey = generateHoldingXirrKey(portfolioId, holdingId);
+
+    return this.cachingService.getOrCreateAndCache<XIRRHoldingResponseDTO | null>(
+      cacheKey,
+      async () => {
+        this.logger.verbose(
+          `Generating fresh XIRR data for holding ${holdingId} in portfolio ${portfolioId}`,
+        );
+        return this.calculateXIRRForHolding(portfolioId, holdingId);
+      },
+      MILLISECONDS_PER_HOUR,
+    );
   }
 
   // This method is now only for a SINGLE holding and doesn't need to fetch relations if called

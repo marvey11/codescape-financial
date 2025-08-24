@@ -9,6 +9,7 @@ import {
   PortfolioOperation,
 } from "./entities";
 import {
+  PortfolioCachingService,
   PortfolioCalculationService,
   PortfolioChartService,
   PortfolioHoldingService,
@@ -33,6 +34,7 @@ import {
     HistoricalDataAccessModule,
   ],
   providers: [
+    PortfolioCachingService,
     PortfolioCalculationService,
     PortfolioChartService,
     PortfolioHoldingService,
@@ -41,6 +43,7 @@ import {
     TaxCalculationService,
   ],
   exports: [
+    PortfolioCachingService,
     PortfolioCalculationService,
     PortfolioChartService,
     PortfolioHoldingService,

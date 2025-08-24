@@ -1,4 +1,3 @@
-import { generatePortfolioXirrKey } from "@codescape-financial/core";
 import {
   PortfolioCalculationService,
   PortfolioChartService,
@@ -11,21 +10,16 @@ import {
   UpdatePortfolioDTO,
   XIRRPortfolioResponseDTO,
 } from "@codescape-financial/portfolio-data-models";
-import { CACHE_MANAGER } from "@nestjs/cache-manager";
 import {
   Body,
   Controller,
   Delete,
   Get,
-  Inject,
   Param,
   Post,
   Put,
   Query,
 } from "@nestjs/common";
-import type { Cache } from "cache-manager";
-
-const TTL_MILLISECONDS = 60 * 60 * 1000;
 
 @Controller("portfolios")
 export class PortfolioController {
@@ -33,7 +27,6 @@ export class PortfolioController {
     private readonly portfolioService: PortfolioService,
     private readonly portfolioCalculationService: PortfolioCalculationService,
     private readonly portfolioChartService: PortfolioChartService,
-    @Inject(CACHE_MANAGER) private cacheManager: Cache, // Inject the Cache Manager
   ) {}
 
   @Get()
@@ -69,33 +62,18 @@ export class PortfolioController {
     @Param("id") portfolioId: string,
     @Query() filter: PortfolioViewFilterDTO,
   ): Promise<XIRRPortfolioResponseDTO | null> {
-    const cacheKey = generatePortfolioXirrKey(
+    return this.portfolioCalculationService.calculateXIRRForPortfolioWithCache(
       portfolioId,
       filter.viewType ?? "all",
     );
-
-    // Attempt to retrieve from cache
-    const cachedXIRR =
-      await this.cacheManager.get<XIRRPortfolioResponseDTO>(cacheKey);
-    if (cachedXIRR) {
-      return cachedXIRR;
-    }
-
-    const xirrResult =
-      this.portfolioCalculationService.calculateXIRRForPortfolio(
-        portfolioId,
-        filter.viewType ?? "all",
-      );
-
-    await this.cacheManager.set(cacheKey, xirrResult, TTL_MILLISECONDS);
-
-    return xirrResult;
   }
 
   @Get(":id/allocations")
   async getPortfolioSummary(
     @Param("id") portfolioId: string,
   ): Promise<AllocationResponseDTO> {
-    return this.portfolioChartService.getAllocationChartData(portfolioId);
+    return this.portfolioChartService.getAllocationChartDataWithCache(
+      portfolioId,
+    );
   }
 }
