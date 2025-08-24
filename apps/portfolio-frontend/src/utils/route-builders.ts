@@ -45,5 +45,5 @@ export const buildAddOperationRoute = (
     portfolioId,
   ).replace(":holdingId", holdingId);
   const queryString = new URLSearchParams({ stockId }).toString();
-  return `${baseRoute}?${queryString}}`;
+  return `${baseRoute}?${queryString}`;
 };
