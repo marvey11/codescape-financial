@@ -3,6 +3,7 @@ import { Button, DataTable } from "@codescape-financial/core-ui";
 import { CountryResponseDTO } from "@codescape-financial/portfolio-data-models";
 import { useEffect, useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { CountryAPI } from "../../api";
 import { DataPageContainer } from "../../components";
 import { ViewDetailsActionButton } from "../../components/action-buttons";
 import { ROUTES } from "../../config/routes";
@@ -15,7 +16,8 @@ export const CountryListPage = () => {
     useAxios<CountryResponseDTO[]>();
 
   useEffect(() => {
-    sendRequest({ url: "/countries", method: "get" });
+    const config = CountryAPI.getAllCountriesConfig();
+    sendRequest(config);
   }, [sendRequest]);
 
   const sortedCountries = useMemo(

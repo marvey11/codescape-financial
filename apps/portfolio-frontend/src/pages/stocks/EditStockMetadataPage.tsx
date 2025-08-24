@@ -6,6 +6,7 @@ import {
 } from "@codescape-financial/portfolio-data-models";
 import { useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
+import { CountryAPI, StockMetadataAPI } from "../../api";
 import { DataPageContainer } from "../../components";
 import { ROUTES } from "../../config/routes";
 import { useAxios, useOutletContextData } from "../../hooks";
@@ -43,7 +44,8 @@ export const EditStockMetadataPage = () => {
   );
 
   useEffect(() => {
-    sendCountriesRequest({ url: "/countries", method: "get" });
+    const config = CountryAPI.getAllCountriesConfig();
+    sendCountriesRequest(config);
   }, [sendCountriesRequest]);
 
   const handleSubmit = (data: StockFormData) => {
@@ -52,11 +54,8 @@ export const EditStockMetadataPage = () => {
         ...data,
       } satisfies UpdateStockDTO;
 
-      sendStockRequest({
-        url: `/stock-metadata/${stock.id}`,
-        method: "put",
-        data: payload,
-      }).then(() => {
+      const config = StockMetadataAPI.getEditStockConfig(stock.id, payload);
+      sendStockRequest(config).then(() => {
         navigate(ROUTES.STOCKS);
       });
     }

@@ -3,6 +3,7 @@ import { Button, DataTable } from "@codescape-financial/core-ui";
 import { StockResponseDTO } from "@codescape-financial/portfolio-data-models";
 import { useEffect, useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { StockMetadataAPI } from "../../api";
 import { DataPageContainer } from "../../components";
 import { ViewDetailsActionButton } from "../../components/action-buttons";
 import { ROUTES } from "../../config/routes";
@@ -16,7 +17,8 @@ export const StockMetadataListPage = () => {
   const { loading, error, data, sendRequest } = useAxios<StockResponseDTO[]>();
 
   useEffect(() => {
-    sendRequest({ url: "/stock-metadata", method: "get" });
+    const config = StockMetadataAPI.getAllStocksConfig();
+    sendRequest(config);
   }, [sendRequest]);
 
   const sortedStocks = useMemo(

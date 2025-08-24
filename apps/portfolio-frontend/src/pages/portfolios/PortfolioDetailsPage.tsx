@@ -12,6 +12,7 @@ import {
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ResponsiveContainer } from "recharts";
+import { HistoricalQuoteAPI, PortfolioAPI } from "../../api";
 import axiosInstance from "../../api/axios";
 import { DataPageContainer, DetailsPageHeader } from "../../components";
 import {
@@ -72,10 +73,11 @@ export const PortfolioDetailsPage = () => {
       return;
     }
 
-    const quotesRequest = axiosInstance.post<AllLatestQuotesTransformedDTO>(
-      "/historical-quotes/latest-batch",
-      { isins },
-    );
+    const latestQuotesConfig = HistoricalQuoteAPI.getLatestQuotesBatchConfig({
+      isins,
+    });
+    const quotesRequest =
+      axiosInstance.request<AllLatestQuotesTransformedDTO>(latestQuotesConfig);
 
     const xirrHoldingListRequest =
       axiosInstance.request<XIRRHoldingListTransformedDTO>({
@@ -86,6 +88,8 @@ export const PortfolioDetailsPage = () => {
         method: "GET",
       });
 
+    const getPortfolioXirrConfig =
+      PortfolioAPI.getPortfolioXirrConfig(portfolioId);
     const portfolioXirrRequest =
       axiosInstance.request<XIRRPortfolioTransformedDTO>({
         url: `/portfolios/${portfolioId}/xirr`,
@@ -95,10 +99,10 @@ export const PortfolioDetailsPage = () => {
         method: "GET",
       });
 
-    const allocationsRequest = axiosInstance.request<AllocationTransformedDTO>({
-      url: `/portfolios/${portfolioId}/allocations`,
-      method: "GET",
-    });
+    const getAllocationConfig =
+      PortfolioAPI.getPortfolioAllocationsConfig(portfolioId);
+    const allocationsRequest =
+      axiosInstance.request<AllocationTransformedDTO>(getAllocationConfig);
 
     Promise.all([
       quotesRequest,

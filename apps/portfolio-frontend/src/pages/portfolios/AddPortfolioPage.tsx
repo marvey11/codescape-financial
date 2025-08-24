@@ -1,5 +1,6 @@
 import { CreatePortfolioDTO } from "@codescape-financial/portfolio-data-models";
 import { useNavigate } from "react-router-dom";
+import { PortfolioAPI } from "../../api";
 import { ROUTES } from "../../config/routes";
 import { useAxios } from "../../hooks";
 import { PortfolioForm, PortfolioFormData } from "./PortfolioForm";
@@ -16,11 +17,10 @@ export const AddPortfolioPage = () => {
       description && { description },
     ) satisfies CreatePortfolioDTO;
 
-    sendRequest({ url: "/portfolios", method: "post", data: payload }).then(
-      () => {
-        navigate(ROUTES.PORTFOLIOS);
-      },
-    );
+    const config = PortfolioAPI.getAddPortfolioConfig(payload);
+    sendRequest(config).then(() => {
+      navigate(ROUTES.PORTFOLIOS);
+    });
   };
 
   return (

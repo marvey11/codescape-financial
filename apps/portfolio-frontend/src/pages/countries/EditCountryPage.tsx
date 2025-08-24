@@ -3,6 +3,7 @@ import {
   UpdateCountryDTO,
 } from "@codescape-financial/portfolio-data-models";
 import { useNavigate } from "react-router-dom";
+import { CountryAPI } from "../../api";
 import { DataPageContainer } from "../../components";
 import { ROUTES } from "../../config/routes";
 import { useOutletContextData } from "../../hooks";
@@ -24,11 +25,8 @@ export const EditCountryPage = () => {
         ...data,
       } satisfies UpdateCountryDTO;
 
-      sendRequest({
-        url: `/countries/${country.id}`,
-        method: "put",
-        data: payload,
-      }).then(() => {
+      const config = CountryAPI.getEditCountryConfig(country.id, payload);
+      sendRequest(config).then(() => {
         navigate(ROUTES.COUNTRIES);
       });
     }

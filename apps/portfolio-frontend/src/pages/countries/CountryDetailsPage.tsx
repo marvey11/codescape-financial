@@ -4,9 +4,9 @@ import {
   CountryResponseDTO,
   StockResponseDTO,
 } from "@codescape-financial/portfolio-data-models";
-import { AxiosRequestConfig } from "axios";
 import { useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
+import { CountryAPI } from "../../api";
 import { DataPageContainer, DetailsPageHeader } from "../../components";
 import { ViewDetailsActionButton } from "../../components/action-buttons";
 import {
@@ -50,10 +50,8 @@ export const CountryDetailsPage = () => {
 
   const handleDelete = () => {
     if (country) {
-      sendRequest({
-        url: `/countries/${country.id}`,
-        method: "delete",
-      } satisfies AxiosRequestConfig).then(() => {
+      const config = CountryAPI.getDeleteCountryConfig(country.id);
+      sendRequest(config).then(() => {
         navigate(ROUTES.COUNTRIES);
       });
     }
