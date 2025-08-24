@@ -3,16 +3,22 @@ import { Button, DataTable } from "@codescape-financial/core-ui";
 import { StockResponseDTO } from "@codescape-financial/portfolio-data-models";
 import { useEffect, useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { StockMetadataAPI } from "../../api";
 import { DataPageContainer } from "../../components";
 import { ViewDetailsActionButton } from "../../components/action-buttons";
+import { ROUTES } from "../../config/routes";
 import { useAxios } from "../../hooks";
-import { buildStockMetadataColumnSchema } from "../../utils";
+import {
+  buildStockDetailsRoute,
+  buildStockMetadataColumnSchema,
+} from "../../utils";
 
 export const StockMetadataListPage = () => {
   const { loading, error, data, sendRequest } = useAxios<StockResponseDTO[]>();
 
   useEffect(() => {
-    sendRequest({ url: "/stock-metadata", method: "get" });
+    const config = StockMetadataAPI.getAllStocksConfig();
+    sendRequest(config);
   }, [sendRequest]);
 
   const sortedStocks = useMemo(
@@ -24,7 +30,7 @@ export const StockMetadataListPage = () => {
     <DataPageContainer isLoading={loading} error={error}>
       <span className="mb-3 flex flex-row items-center justify-between">
         <h1 className="text-4xl font-extrabold">Stock Universe</h1>
-        <Link to="/stocks/add">
+        <Link to={ROUTES.ADD_STOCK}>
           <Button>Add Stock</Button>
         </Link>
       </span>
@@ -49,7 +55,7 @@ const StockMetadataTable = ({ data }: { data: StockResponseDTO[] }) => {
             <ViewDetailsActionButton
               label={`Show details for ${data.name}`}
               onClick={() => {
-                navigate(`/stocks/${data.id}`);
+                navigate(buildStockDetailsRoute(data.id));
               }}
             />
           ) : null,

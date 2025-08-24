@@ -1,17 +1,21 @@
-import { sortDataArray } from "@codescape-financial/core";
+import { PortfolioViewType, sortDataArray } from "@codescape-financial/core";
 import { Checkbox, DataTable } from "@codescape-financial/core-ui";
 import {
   AllLatestQuotesTransformedDTO,
   AllocationTransformedDTO,
   PortfolioHoldingEmbeddedDTO,
   PortfolioResponseDTO,
-  PortfolioViewFilterDTO,
   XIRRHoldingListTransformedDTO,
   XIRRPortfolioTransformedDTO,
 } from "@codescape-financial/portfolio-data-models";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ResponsiveContainer } from "recharts";
+import {
+  HistoricalQuoteAPI,
+  PortfolioAPI,
+  PortfolioHoldingAPI,
+} from "../../api";
 import axiosInstance from "../../api/axios";
 import { DataPageContainer, DetailsPageHeader } from "../../components";
 import {
@@ -35,7 +39,10 @@ import {
   XIRRMapping,
   XIRRObject,
 } from "../../types";
-import { buildPortfolioHoldingColumnSchema } from "../../utils";
+import {
+  buildPortfolioHoldingColumnSchema,
+  buildPortfolioHoldingDetailsRoute,
+} from "../../utils";
 
 /**
  * Renders the portfolio details page, which displays information about a specific portfolio,
@@ -69,33 +76,36 @@ export const PortfolioDetailsPage = () => {
       return;
     }
 
-    const quotesRequest = axiosInstance.post<AllLatestQuotesTransformedDTO>(
-      "/historical-quotes/latest-batch",
-      { isins },
-    );
+    const viewType: PortfolioViewType = showActiveHoldingsOnly
+      ? "active"
+      : "all";
 
-    const xirrHoldingListRequest =
-      axiosInstance.request<XIRRHoldingListTransformedDTO>({
-        url: `/portfolios/${portfolioId}/holdings/xirr`,
-        params: {
-          viewType: showActiveHoldingsOnly ? "active" : "all",
-        } satisfies PortfolioViewFilterDTO,
-        method: "GET",
-      });
-
-    const portfolioXirrRequest =
-      axiosInstance.request<XIRRPortfolioTransformedDTO>({
-        url: `/portfolios/${portfolioId}/xirr`,
-        params: {
-          viewType: showActiveHoldingsOnly ? "active" : "all",
-        } satisfies PortfolioViewFilterDTO,
-        method: "GET",
-      });
-
-    const allocationsRequest = axiosInstance.request<AllocationTransformedDTO>({
-      url: `/portfolios/${portfolioId}/allocations`,
-      method: "GET",
+    const latestQuotesConfig = HistoricalQuoteAPI.getLatestQuotesBatchConfig({
+      isins,
     });
+    const quotesRequest =
+      axiosInstance.request<AllLatestQuotesTransformedDTO>(latestQuotesConfig);
+
+    const xirrHoldingListRequestConfig =
+      PortfolioHoldingAPI.getHoldingListXIRRConfig(portfolioId, viewType);
+    const xirrHoldingListRequest =
+      axiosInstance.request<XIRRHoldingListTransformedDTO>(
+        xirrHoldingListRequestConfig,
+      );
+
+    const portfolioXirrRequestConfig = PortfolioAPI.getPortfolioXirrConfig(
+      portfolioId,
+      viewType,
+    );
+    const portfolioXirrRequest =
+      axiosInstance.request<XIRRPortfolioTransformedDTO>(
+        portfolioXirrRequestConfig,
+      );
+
+    const getAllocationConfig =
+      PortfolioAPI.getPortfolioAllocationsConfig(portfolioId);
+    const allocationsRequest =
+      axiosInstance.request<AllocationTransformedDTO>(getAllocationConfig);
 
     Promise.all([
       quotesRequest,
@@ -282,7 +292,9 @@ const PortfolioHoldingsTable = ({
               <ViewDetailsActionButton
                 label={`Show details for holding ${data.stock.name}`}
                 onClick={() => {
-                  navigate(`/portfolios/${portfolioId}/holdings/${data.id}`);
+                  navigate(
+                    buildPortfolioHoldingDetailsRoute(portfolioId, data.id),
+                  );
                 }}
               />
               <AddOperationButton portfolioId={portfolioId} holding={data} />

@@ -1,6 +1,5 @@
 import { Button } from "@codescape-financial/core-ui";
 import { PortfolioHoldingTransformedDTO } from "@codescape-financial/portfolio-data-models";
-import { useCallback } from "react";
 import { Link } from "react-router-dom";
 import {
   DataPageContainer,
@@ -8,6 +7,10 @@ import {
   OperationTimeline,
 } from "../../../components";
 import { useOutletContextData } from "../../../hooks";
+import {
+  buildAddOperationRoute,
+  buildPortfolioDetailsRoute,
+} from "../../../utils";
 
 export const PortfolioHoldingDetailsPage = () => {
   const {
@@ -15,14 +18,6 @@ export const PortfolioHoldingDetailsPage = () => {
     error,
     data: holding,
   } = useOutletContextData<PortfolioHoldingTransformedDTO>();
-
-  const getQueryString = useCallback(
-    (data: PortfolioHoldingTransformedDTO) =>
-      new URLSearchParams({
-        stockId: data.stock.id,
-      }).toString(),
-    [],
-  );
 
   return (
     <DataPageContainer isLoading={loading} error={error}>
@@ -32,11 +27,15 @@ export const PortfolioHoldingDetailsPage = () => {
             title={`${holding.stock.name} — Holding Details`}
             extraComponents={[
               <Link
-                to={`/portfolios/${holding.portfolioId}/holdings/${holding.id}/operations/add?${getQueryString(holding)}`}
+                to={buildAddOperationRoute(
+                  holding.portfolioId,
+                  holding.id,
+                  holding.stock.id,
+                )}
               >
                 <Button>Add Operation</Button>
               </Link>,
-              <Link to={`/portfolios/${holding.portfolioId}`}>
+              <Link to={buildPortfolioDetailsRoute(holding.portfolioId)}>
                 <Button variant="secondary">View Portfolio</Button>
               </Link>,
             ]}

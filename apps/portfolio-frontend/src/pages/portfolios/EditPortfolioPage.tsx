@@ -1,9 +1,11 @@
 import {
   PortfolioResponseDTO,
-  UpdateCountryDTO,
+  UpdatePortfolioDTO,
 } from "@codescape-financial/portfolio-data-models";
 import { useNavigate } from "react-router-dom";
+import { PortfolioAPI } from "../../api";
 import { DataPageContainer } from "../../components";
+import { ROUTES } from "../../config/routes";
 import { useOutletContextData } from "../../hooks";
 import { PortfolioForm, PortfolioFormData } from "./PortfolioForm";
 
@@ -20,17 +22,14 @@ export const EditPortfolioPage = () => {
   const handleSubmit = (data: PortfolioFormData) => {
     if (portfolio && data) {
       const { name, description } = data;
-      const payload = Object.assign(
-        { name },
-        description && { description },
-      ) satisfies UpdateCountryDTO;
+      const payload: UpdatePortfolioDTO = { name };
+      if (description) {
+        payload.description = description;
+      }
 
-      sendRequest({
-        url: `/portfolios/${portfolio.id}`,
-        method: "put",
-        data: payload,
-      }).then(() => {
-        navigate("/portfolios");
+      const config = PortfolioAPI.getEditPortfolioConfig(portfolio.id, payload);
+      sendRequest(config).then(() => {
+        navigate(ROUTES.PORTFOLIOS);
       });
     }
   };
@@ -47,7 +46,9 @@ export const EditPortfolioPage = () => {
             } satisfies PortfolioFormData
           }
           onSubmit={handleSubmit}
-          onCancel={() => navigate("..", { replace: true })}
+          onCancel={() => {
+            navigate(ROUTES.PORTFOLIOS, { replace: true });
+          }}
         />
       )}
     </DataPageContainer>

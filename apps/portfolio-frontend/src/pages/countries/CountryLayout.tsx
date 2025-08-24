@@ -1,6 +1,7 @@
 import { CountryResponseDTO } from "@codescape-financial/portfolio-data-models";
 import { useEffect } from "react";
 import { Outlet, useParams } from "react-router-dom";
+import { CountryAPI } from "../../api";
 import { useAxios } from "../../hooks";
 import { UseGenericContextType } from "../../types";
 
@@ -11,7 +12,8 @@ export const CountryLayout = () => {
 
   useEffect(() => {
     if (id) {
-      sendRequest({ url: `/countries/${id}`, method: "get" });
+      const config = CountryAPI.getCountryByIdConfig(id);
+      sendRequest(config);
     }
   }, [id, sendRequest]);
 

@@ -1,13 +1,15 @@
 import { Tag } from "@codescape-financial/core-ui";
 import { StockResponseDTO } from "@codescape-financial/portfolio-data-models";
-import { AxiosRequestConfig } from "axios";
 import { useNavigate } from "react-router-dom";
+import { StockMetadataAPI } from "../../api";
 import { DataPageContainer, DetailsPageHeader } from "../../components";
 import {
   DetailsPageDeleteButton,
   DetailsPageEditButton,
 } from "../../components/default-buttons";
+import { ROUTES } from "../../config/routes";
 import { useOutletContextData } from "../../hooks";
+import { buildEditStockRoute } from "../../utils";
 
 export const StockMetadataDetailsPage = () => {
   const navigate = useNavigate();
@@ -21,11 +23,9 @@ export const StockMetadataDetailsPage = () => {
 
   const handleDelete = () => {
     if (stock) {
-      sendRequest({
-        url: `/stock-metadata/${stock.id}`,
-        method: "delete",
-      } satisfies AxiosRequestConfig).then(() => {
-        navigate("/stocks");
+      const config = StockMetadataAPI.getDeleteStockConfig(stock.id);
+      sendRequest(config).then(() => {
+        navigate(ROUTES.STOCKS);
       });
     }
   };
@@ -39,7 +39,7 @@ export const StockMetadataDetailsPage = () => {
             extraComponents={[
               <DetailsPageEditButton
                 key={`${stock.id}-edit-button}`}
-                editPath={`/stocks/${stock.id}/edit`}
+                editPath={buildEditStockRoute(stock.id)}
               />,
               <DetailsPageDeleteButton
                 key={`${stock.id}-delete-button}`}

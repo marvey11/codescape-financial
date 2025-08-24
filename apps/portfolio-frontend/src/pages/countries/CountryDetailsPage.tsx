@@ -4,17 +4,22 @@ import {
   CountryResponseDTO,
   StockResponseDTO,
 } from "@codescape-financial/portfolio-data-models";
-import { AxiosRequestConfig } from "axios";
 import { useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
+import { CountryAPI } from "../../api";
 import { DataPageContainer, DetailsPageHeader } from "../../components";
 import { ViewDetailsActionButton } from "../../components/action-buttons";
 import {
   DetailsPageDeleteButton,
   DetailsPageEditButton,
 } from "../../components/default-buttons";
+import { ROUTES } from "../../config/routes";
 import { useAxios, useOutletContextData } from "../../hooks";
-import { buildStockMetadataColumnSchema } from "../../utils";
+import {
+  buildEditCountryRoute,
+  buildStockDetailsRoute,
+  buildStockMetadataColumnSchema,
+} from "../../utils";
 
 export const CountryDetailsPage = () => {
   const navigate = useNavigate();
@@ -45,11 +50,9 @@ export const CountryDetailsPage = () => {
 
   const handleDelete = () => {
     if (country) {
-      sendRequest({
-        url: `/countries/${country.id}`,
-        method: "delete",
-      } satisfies AxiosRequestConfig).then(() => {
-        navigate("/countries");
+      const config = CountryAPI.getDeleteCountryConfig(country.id);
+      sendRequest(config).then(() => {
+        navigate(ROUTES.COUNTRIES);
       });
     }
   };
@@ -63,7 +66,7 @@ export const CountryDetailsPage = () => {
             extraComponents={[
               <DetailsPageEditButton
                 key={`${country.id}-edit-button`}
-                editPath={`/countries/${country.id}/edit`}
+                editPath={buildEditCountryRoute(country.id)}
               />,
               <DetailsPageDeleteButton
                 key={`${country.id}-delete-button`}
@@ -111,7 +114,7 @@ const CountryStockTable = ({ data }: { data: StockResponseDTO[] }) => {
             <ViewDetailsActionButton
               label={`Show details for ${data.name}`}
               onClick={() => {
-                navigate(`/stocks/${data.id}`);
+                navigate(buildStockDetailsRoute(data.id));
               }}
             />
           ) : null,

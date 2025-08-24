@@ -1,6 +1,7 @@
 import { StockResponseDTO } from "@codescape-financial/portfolio-data-models";
 import { useEffect } from "react";
 import { Outlet, useParams } from "react-router-dom";
+import { StockMetadataAPI } from "../../api";
 import { useAxios } from "../../hooks";
 import { UseGenericContextType } from "../../types";
 
@@ -11,7 +12,8 @@ export const StockMetadataLayout = () => {
 
   useEffect(() => {
     if (id) {
-      sendRequest({ url: `/stock-metadata/${id}`, method: "get" });
+      const config = StockMetadataAPI.getStockByIdConfig(id);
+      sendRequest(config);
     }
   }, [id, sendRequest]);
 

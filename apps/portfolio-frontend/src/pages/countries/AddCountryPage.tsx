@@ -1,5 +1,7 @@
 import { CreateCountryDTO } from "@codescape-financial/portfolio-data-models";
 import { useNavigate } from "react-router-dom";
+import { API_ENDPOINTS } from "../../config/api-endpoints";
+import { ROUTES } from "../../config/routes";
 import { useAxios } from "../../hooks";
 import { CountryForm, CountryFormData } from "./CountryForm";
 
@@ -13,11 +15,13 @@ export const AddCountryPage = () => {
       ...data,
     } satisfies CreateCountryDTO;
 
-    sendRequest({ url: "/countries", method: "post", data: payload }).then(
-      () => {
-        navigate("/countries");
-      },
-    );
+    sendRequest({
+      url: API_ENDPOINTS.COUNTRIES,
+      method: "post",
+      data: payload,
+    }).then(() => {
+      navigate(ROUTES.COUNTRIES);
+    });
   };
 
   return (
@@ -25,7 +29,9 @@ export const AddCountryPage = () => {
       <h1 className="mb-4 text-4xl font-extrabold">Create Country</h1>
       <CountryForm
         onSubmit={handleSubmit}
-        onCancel={() => navigate("..", { replace: true })}
+        onCancel={() => {
+          navigate(ROUTES.COUNTRIES, { replace: true });
+        }}
       />
     </div>
   );
