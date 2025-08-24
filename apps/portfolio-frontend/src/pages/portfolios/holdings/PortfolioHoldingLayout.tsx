@@ -1,6 +1,7 @@
 import { PortfolioHoldingResponseDTO } from "@codescape-financial/portfolio-data-models";
 import { useEffect } from "react";
 import { Outlet, useParams } from "react-router-dom";
+import { PortfolioHoldingAPI } from "../../../api";
 import { useAxios } from "../../../hooks";
 import { UseGenericContextType } from "../../../types";
 
@@ -12,10 +13,11 @@ export const PortfolioHoldingLayout = () => {
 
   useEffect(() => {
     if (portfolioId && holdingId) {
-      sendRequest({
-        url: `/portfolios/${portfolioId}/holdings/${holdingId}`,
-        method: "get",
-      });
+      const config = PortfolioHoldingAPI.getOneHoldingConfig(
+        portfolioId,
+        holdingId,
+      );
+      sendRequest(config);
     }
   }, [portfolioId, holdingId, sendRequest]);
 
