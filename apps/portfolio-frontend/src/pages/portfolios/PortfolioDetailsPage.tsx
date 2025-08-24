@@ -32,7 +32,8 @@ import {
   StockAllocationTreemap,
 } from "../../components/charts/StockAllocationTreeMap";
 import { DetailsPageEditButton } from "../../components/default-buttons";
-import { useOutletContextData } from "../../hooks";
+import { LOCAL_STORAGE_KEYS } from "../../config/local-storage-keys";
+import { useLocalStorage, useOutletContextData } from "../../hooks";
 import {
   LatestQuoteMapping,
   QuoteObject,
@@ -51,7 +52,10 @@ import {
 export const PortfolioDetailsPage = () => {
   const { loading, error, data } = useOutletContextData<PortfolioResponseDTO>();
 
-  const [showActiveHoldingsOnly, setShowActiveHoldingsOnly] = useState(true);
+  const [showActiveHoldingsOnly, setShowActiveHoldingsOnly] = useLocalStorage(
+    LOCAL_STORAGE_KEYS.PORTFOLIO_DETAILS_SHOW_ACTIVE_HOLDINGS_ONLY,
+    true,
+  );
 
   const [latestQuotes, setlatestQuotes] = useState<LatestQuoteMapping>(
     new Map<string, QuoteObject>(),
@@ -272,6 +276,7 @@ interface PortfolioHoldingsTableProps {
 
 /**
  * Renders a table of portfolio holdings.
+ *
  * @param {PortfolioHoldingsTableProps} props - The props for the component.
  */
 const PortfolioHoldingsTable = ({
@@ -281,31 +286,21 @@ const PortfolioHoldingsTable = ({
   portfolioXIRR,
   data,
 }: PortfolioHoldingsTableProps) => {
-  const navigate = useNavigate();
-
-  const columns = useMemo(() => {
-    return buildPortfolioHoldingColumnSchema(
-      {
-        actionsComponent: ({ data }) =>
-          data ? (
-            <ActionMenu>
-              <ViewDetailsActionButton
-                label={`Show details for holding ${data.stock.name}`}
-                onClick={() => {
-                  navigate(
-                    buildPortfolioHoldingDetailsRoute(portfolioId, data.id),
-                  );
-                }}
-              />
-              <AddOperationButton portfolioId={portfolioId} holding={data} />
-            </ActionMenu>
-          ) : null,
-      },
-      latestQuotes,
-      holdingsXIRR,
-      portfolioXIRR,
-    );
-  }, [latestQuotes, holdingsXIRR, portfolioXIRR, portfolioId, navigate]);
+  const columns = useMemo(
+    () =>
+      buildPortfolioHoldingColumnSchema(
+        {
+          actionsComponent: ({ data }) =>
+            data ? (
+              <HoldingActions data={data} portfolioId={portfolioId} />
+            ) : null,
+        },
+        latestQuotes,
+        holdingsXIRR,
+        portfolioXIRR,
+      ),
+    [latestQuotes, holdingsXIRR, portfolioXIRR, portfolioId],
+  );
 
   return (
     <DataTable<PortfolioHoldingEmbeddedDTO>
@@ -313,5 +308,34 @@ const PortfolioHoldingsTable = ({
       data={data}
       keyExtractor={(item) => item.id}
     />
+  );
+};
+
+/**
+ * Props for the HoldingActions component.
+ */
+interface HoldingActionsProps {
+  portfolioId: string;
+  data: PortfolioHoldingEmbeddedDTO;
+}
+
+/**
+ * Renders the actions for a portfolio holding.
+ *
+ * @param {HoldingActionsProps} props - The props for the component.
+ */
+const HoldingActions = ({ portfolioId, data }: HoldingActionsProps) => {
+  const navigate = useNavigate();
+
+  return (
+    <ActionMenu>
+      <ViewDetailsActionButton
+        label={`Show details for holding ${data.stock.name}`}
+        onClick={() => {
+          navigate(buildPortfolioHoldingDetailsRoute(portfolioId, data.id));
+        }}
+      />
+      <AddOperationButton portfolioId={portfolioId} holding={data} />
+    </ActionMenu>
   );
 };
