@@ -25,8 +25,13 @@ export class PortfolioHoldingService {
         where: { id: holdingId, portfolioId },
         relations: ["stockMetadata", "operations"],
       })
-      .then((res) =>
-        res ? mapPortfolioHoldingEntityToDto(res, portfolioId) : null,
-      );
+      .then((res) => {
+        if (res) {
+          const dto = mapPortfolioHoldingEntityToDto(res, portfolioId);
+          dto.operations.sort((a, b) => b.date.localeCompare(a.date));
+          return dto;
+        }
+        return null;
+      });
   }
 }
