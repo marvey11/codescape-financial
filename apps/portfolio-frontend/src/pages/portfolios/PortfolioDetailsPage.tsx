@@ -1,18 +1,21 @@
-import { sortDataArray } from "@codescape-financial/core";
+import { PortfolioViewType, sortDataArray } from "@codescape-financial/core";
 import { Checkbox, DataTable } from "@codescape-financial/core-ui";
 import {
   AllLatestQuotesTransformedDTO,
   AllocationTransformedDTO,
   PortfolioHoldingEmbeddedDTO,
   PortfolioResponseDTO,
-  PortfolioViewFilterDTO,
   XIRRHoldingListTransformedDTO,
   XIRRPortfolioTransformedDTO,
 } from "@codescape-financial/portfolio-data-models";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ResponsiveContainer } from "recharts";
-import { HistoricalQuoteAPI, PortfolioAPI } from "../../api";
+import {
+  HistoricalQuoteAPI,
+  PortfolioAPI,
+  PortfolioHoldingAPI,
+} from "../../api";
 import axiosInstance from "../../api/axios";
 import { DataPageContainer, DetailsPageHeader } from "../../components";
 import {
@@ -73,31 +76,31 @@ export const PortfolioDetailsPage = () => {
       return;
     }
 
+    const viewType: PortfolioViewType = showActiveHoldingsOnly
+      ? "active"
+      : "all";
+
     const latestQuotesConfig = HistoricalQuoteAPI.getLatestQuotesBatchConfig({
       isins,
     });
     const quotesRequest =
       axiosInstance.request<AllLatestQuotesTransformedDTO>(latestQuotesConfig);
 
+    const xirrHoldingListRequestConfig =
+      PortfolioHoldingAPI.getHoldingListXIRRConfig(portfolioId, viewType);
     const xirrHoldingListRequest =
-      axiosInstance.request<XIRRHoldingListTransformedDTO>({
-        url: `/portfolios/${portfolioId}/holdings/xirr`,
-        params: {
-          viewType: showActiveHoldingsOnly ? "active" : "all",
-        } satisfies PortfolioViewFilterDTO,
-        method: "GET",
-      });
+      axiosInstance.request<XIRRHoldingListTransformedDTO>(
+        xirrHoldingListRequestConfig,
+      );
 
-    const getPortfolioXirrConfig =
-      PortfolioAPI.getPortfolioXirrConfig(portfolioId);
+    const portfolioXirrRequestConfig = PortfolioAPI.getPortfolioXirrConfig(
+      portfolioId,
+      viewType,
+    );
     const portfolioXirrRequest =
-      axiosInstance.request<XIRRPortfolioTransformedDTO>({
-        url: `/portfolios/${portfolioId}/xirr`,
-        params: {
-          viewType: showActiveHoldingsOnly ? "active" : "all",
-        } satisfies PortfolioViewFilterDTO,
-        method: "GET",
-      });
+      axiosInstance.request<XIRRPortfolioTransformedDTO>(
+        portfolioXirrRequestConfig,
+      );
 
     const getAllocationConfig =
       PortfolioAPI.getPortfolioAllocationsConfig(portfolioId);
