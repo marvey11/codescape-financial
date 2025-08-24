@@ -2,6 +2,7 @@ import {
   FLOATING_POINT_TOLERANCE,
   generateHoldingListXirrKey,
   generateHoldingXirrKey,
+  generatePortfolioAllocationKey,
   generatePortfolioXirrKey,
   isEffectivelyZero,
 } from "@codescape-financial/core";
@@ -530,7 +531,7 @@ export class PortfolioOperationService {
   }
 
   /**
-   * Helper to invalidate relevant XIRR caches.
+   * Helper to invalidate relevant XIRR and asset allocation caches.
    *
    * @param portfolioId The portfolio ID.
    * @param holdingId The holding ID (optional).
@@ -568,6 +569,13 @@ export class PortfolioOperationService {
     await this.cacheManager.del(portfolioActiveCacheKey);
     this.logger.debug(
       `Invalidated portfolio XIRR caches: ${portfolioAllCacheKey}, ${portfolioActiveCacheKey}`,
+    );
+
+    const portfolioAllocationCacheKey =
+      generatePortfolioAllocationKey(portfolioId);
+    await this.cacheManager.del(portfolioAllocationCacheKey);
+    this.logger.debug(
+      `Invalidated portfolio allocation cache: ${portfolioAllocationCacheKey}`,
     );
   }
 }
