@@ -1,4 +1,4 @@
-import { useOutletContext } from "react-router-dom";
+import { useOutletContext } from "react-router";
 import { UseGenericContextType } from "../types";
 
 export const useOutletContextData = <T>() => {

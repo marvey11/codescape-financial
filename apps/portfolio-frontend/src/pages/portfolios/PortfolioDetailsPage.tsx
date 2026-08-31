@@ -9,7 +9,7 @@ import {
   XIRRPortfolioTransformedDTO,
 } from "@codescape-financial/portfolio-data-models";
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import { ResponsiveContainer } from "recharts";
 import {
   HistoricalQuoteAPI,

@@ -6,7 +6,7 @@ import {
   CreateStockSplitDTO,
   OperationType,
 } from "@codescape-financial/portfolio-data-models";
-import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router";
 import { useAxios } from "../../../../hooks";
 import {
   buildPortfolioDetailsRoute,

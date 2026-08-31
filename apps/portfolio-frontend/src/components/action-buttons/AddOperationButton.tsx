@@ -1,6 +1,6 @@
 import { ActionButton } from "@codescape-financial/core-ui";
 import { PortfolioHoldingEmbeddedDTO } from "@codescape-financial/portfolio-data-models";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import { buildAddOperationRoute } from "../../utils";
 import { Icon } from "../icons";
 

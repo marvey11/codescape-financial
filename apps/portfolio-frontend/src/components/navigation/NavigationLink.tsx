@@ -1,6 +1,6 @@
 import { cn } from "@codescape-financial/core-ui";
 import { ReactNode } from "react";
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink, useLocation } from "react-router";
 
 interface NavigationLinkProps {
   to: string;
