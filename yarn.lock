@@ -2143,7 +2143,7 @@
     picocolors "^1.1.0"
     tslib "^2.3.0"
 
-"@nx/webpack@23.1.2":
+"@nx/webpack@^23.1.2":
   version "23.1.2"
   resolved "https://registry.yarnpkg.com/@nx/webpack/-/webpack-23.1.2.tgz#4f397b03f4c78f464d79704edf0a6bc03f6da293"
   integrity sha512-fKjGEQ70H3HZwQckTwixKDH6EkA4U/3/0LxxKMCFi5M5N16pDb3o1LDTUikJoBxqTD+YlEO4eXm2+ovaZoWODg==
