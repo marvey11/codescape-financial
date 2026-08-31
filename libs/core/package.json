@@ -12,7 +12,5 @@
     },
     "./package.json": "./package.json"
   },
-  "dependencies": {
-    "crc": "^4.3.2"
-  }
+  "dependencies": {}
 }

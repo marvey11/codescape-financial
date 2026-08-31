@@ -11,8 +11,5 @@
       "require": "./src/index.ts"
     },
     "./package.json": "./package.json"
-  },
-  "dependencies": {
-    "class-validator": "^0.15.1"
   }
 }

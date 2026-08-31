@@ -7,8 +7,7 @@
     "@codescape-financial/historical-data-access": "*",
     "@codescape-financial/portfolio-config": "*",
     "@codescape-financial/portfolio-data-access": "*",
-    "@codescape-financial/portfolio-data-models": "*",
-    "csv-parser": "^3.2.1"
+    "@codescape-financial/portfolio-data-models": "*"
   },
   "nx": {
     "targets": {
