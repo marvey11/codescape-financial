@@ -11,18 +11,27 @@
   "nx": {
     "targets": {
       "build": {
-        "executor": "nx:run-commands",
+        "executor": "@nx/webpack:webpack",
+        "outputs": [
+          "{options.outputPath}"
+        ],
+        "defaultConfiguration": "production",
         "options": {
-          "command": "webpack-cli build",
-          "args": [
-            "--node-env=production"
-          ]
+          "target": "node",
+          "compiler": "tsc",
+          "outputPath": "dist/apps/portfolio-csv-processor",
+          "main": "apps/portfolio-csv-processor/src/main.ts",
+          "tsConfig": "apps/portfolio-csv-processor/tsconfig.app.json",
+          "webpackConfig": "apps/portfolio-csv-processor/webpack.config.js"
         },
         "configurations": {
           "development": {
-            "args": [
-              "--node-env=development"
-            ]
+            "optimization": false,
+            "extractLicenses": false
+          },
+          "production": {
+            "optimization": true,
+            "extractLicenses": true
           }
         }
       },

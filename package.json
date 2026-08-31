@@ -37,7 +37,7 @@
     "@nx/vite": "23.1.2",
     "@nx/vitest": "23.1.2",
     "@nx/web": "23.1.2",
-    "@nx/webpack": "23.1.2",
+    "@nx/webpack": "^23.1.2",
     "@nx/workspace": "23.1.2",
     "@swc-node/register": "~1.12.1",
     "@swc/cli": "~0.8.1",
@@ -82,7 +82,7 @@
     "vite": "8.2.2",
     "vitest": "4.1.11",
     "webpack": "^5.110.2",
-    "webpack-cli": "^5.1.4"
+    "webpack-cli": "^7.2.3"
   },
   "workspaces": [
     "apps/*",
