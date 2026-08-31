@@ -40,6 +40,12 @@ export default [
             "^.*/eslint(\\.base)?\\.config\\.[cm]?[jt]s$",
             ".*/webpack\\.base\\.config\\.js$",
           ],
+          depConstraints: [
+            {
+              sourceTag: "*",
+              onlyDependOnLibsWithTags: ["*"],
+            },
+          ],
         },
       ],
       "@nx/dependency-checks": [
