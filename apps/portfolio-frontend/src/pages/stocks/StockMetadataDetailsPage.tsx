@@ -1,6 +1,6 @@
 import { Tag } from "@codescape-financial/core-ui";
 import { StockResponseDTO } from "@codescape-financial/portfolio-data-models";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import { StockMetadataAPI } from "../../api";
 import { DataPageContainer, DetailsPageHeader } from "../../components";
 import {

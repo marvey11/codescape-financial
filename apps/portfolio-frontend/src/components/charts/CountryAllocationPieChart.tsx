@@ -31,7 +31,9 @@ export const CountryAllocationPieChart = ({
         {countryAllocation.map((entry, index) => (
           <Cell
             key={`cell-${entry.countryCode}`}
-            fill={PIE_CHART_COLORS[index % PIE_CHART_COLORS.length]}
+            fill={
+              PIE_CHART_COLORS[index % PIE_CHART_COLORS.length] ?? "#8884d8"
+            }
           />
         ))}
       </Pie>

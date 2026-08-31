@@ -5,7 +5,7 @@ import {
   StockResponseDTO,
 } from "@codescape-financial/portfolio-data-models";
 import { useEffect, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import { CountryAPI } from "../../api";
 import { DataPageContainer, DetailsPageHeader } from "../../components";
 import { ViewDetailsActionButton } from "../../components/action-buttons";

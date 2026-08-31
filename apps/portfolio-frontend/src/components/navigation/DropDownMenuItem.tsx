@@ -1,5 +1,5 @@
 import { cn } from "@codescape-financial/core-ui";
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink, useLocation } from "react-router";
 import { MenuItem } from "../../types";
 
 interface Props {

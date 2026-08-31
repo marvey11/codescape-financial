@@ -2,7 +2,7 @@ import {
   CountryResponseDTO,
   UpdateCountryDTO,
 } from "@codescape-financial/portfolio-data-models";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import { CountryAPI } from "../../api";
 import { DataPageContainer } from "../../components";
 import { ROUTES } from "../../config/routes";

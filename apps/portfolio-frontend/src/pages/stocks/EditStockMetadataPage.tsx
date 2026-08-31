@@ -5,7 +5,7 @@ import {
   UpdateStockDTO,
 } from "@codescape-financial/portfolio-data-models";
 import { useEffect, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import { CountryAPI, StockMetadataAPI } from "../../api";
 import { DataPageContainer } from "../../components";
 import { ROUTES } from "../../config/routes";

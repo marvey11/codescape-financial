@@ -27,4 +27,4 @@ jobs:
 
       # Runs lint, test, and build targets for affected projects in parallel
       - name: Run affected commands
-        run: yarn nx run-many --target=lint --target=test --target=build --parallel=3
+        run: yarn nx run-many --target=typecheck --target=lint --target=test --target=build --parallel=3

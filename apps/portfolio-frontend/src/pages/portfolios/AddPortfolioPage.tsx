@@ -1,5 +1,5 @@
 import { CreatePortfolioDTO } from "@codescape-financial/portfolio-data-models";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import { PortfolioAPI } from "../../api";
 import { ROUTES } from "../../config/routes";
 import { useAxios } from "../../hooks";

@@ -2,7 +2,7 @@ import {
   PortfolioResponseDTO,
   UpdatePortfolioDTO,
 } from "@codescape-financial/portfolio-data-models";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import { PortfolioAPI } from "../../api";
 import { DataPageContainer } from "../../components";
 import { ROUTES } from "../../config/routes";

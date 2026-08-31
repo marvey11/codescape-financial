@@ -4,7 +4,7 @@ import {
   CreateStockDTO,
 } from "@codescape-financial/portfolio-data-models";
 import { useEffect, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import { CountryAPI, StockMetadataAPI } from "../../api";
 import { ROUTES } from "../../config/routes";
 import { useAxios } from "../../hooks";

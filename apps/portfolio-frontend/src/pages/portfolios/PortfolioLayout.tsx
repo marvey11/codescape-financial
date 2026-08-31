@@ -1,6 +1,6 @@
 import { PortfolioResponseDTO } from "@codescape-financial/portfolio-data-models";
 import { useEffect } from "react";
-import { Outlet, useParams } from "react-router-dom";
+import { Outlet, useParams } from "react-router";
 import { PortfolioAPI } from "../../api";
 import { useAxios } from "../../hooks";
 import { UseGenericContextType } from "../../types";

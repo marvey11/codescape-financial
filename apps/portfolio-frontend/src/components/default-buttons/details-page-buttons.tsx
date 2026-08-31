@@ -1,5 +1,5 @@
 import { Button } from "@codescape-financial/core-ui";
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
 
 interface DetailsPageEditButtonProps {
   editPath: string;

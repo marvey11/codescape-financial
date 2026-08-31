@@ -1,6 +1,6 @@
 import { Button } from "@codescape-financial/core-ui";
 import { PortfolioHoldingTransformedDTO } from "@codescape-financial/portfolio-data-models";
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
 import {
   DataPageContainer,
   DetailsPageHeader,
