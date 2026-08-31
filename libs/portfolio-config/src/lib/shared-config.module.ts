@@ -15,14 +15,9 @@ import { ConfigService } from "./config.service";
         `${process.cwd()}/apps/portfolio-ingestion/.env`, // .env specific to portfolio ingestion
       ],
       isGlobal: true, // Makes ConfigModule available everywhere without re-importing
-      validationSchema: ApplicationConfigSchema,
       // The validate function is required to bridge Zod's .parse method
       // with NestJS's configuration validation system.
-      validate: ApplicationConfigSchema.parse,
-      validationOptions: {
-        allowUnknown: true, // Allow unknown keys in process.env
-        abortEarly: false, // Report all errors, not just the first
-      },
+      validate: (config) => ApplicationConfigSchema.parse(config),
       expandVariables: true, // Expand environment variables in .env files
     }),
   ],
