@@ -179,7 +179,7 @@ export class PortfolioIngestionService {
     // 1. Find all holding IDs for the given portfolio.
     const holdings = await this.holdingRepository.find({
       where: { portfolioId },
-      select: ["id"],
+      select: { id: true },
     });
 
     if (holdings.length === 0) {

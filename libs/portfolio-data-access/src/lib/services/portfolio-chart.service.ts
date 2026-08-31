@@ -51,7 +51,7 @@ export class PortfolioChartService {
 
     const holdings = await this.holdingRepository.find({
       where: { portfolioId },
-      relations: ["stockMetadata", "stockMetadata.country"],
+      relations: { stockMetadata: { country: true } },
     });
 
     const activeHoldings = holdings.filter(

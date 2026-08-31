@@ -16,7 +16,9 @@ export class HistoricalQuoteService {
   ) {}
 
   async findAll(): Promise<HistoricalQuote[]> {
-    return this.historicalQuoteRepository.find({ relations: ["stock"] });
+    return this.historicalQuoteRepository.find({
+      relations: { stock: true },
+    });
   }
 
   async findLatestByIsin(isin: string): Promise<LatestQuoteResponseDTO | null> {
@@ -24,7 +26,7 @@ export class HistoricalQuoteService {
       .findOne({
         where: { stock: { isin } },
         order: { date: "DESC" },
-        relations: ["stock"],
+        relations: { stock: true },
       })
       .then((res) => (res ? mapHistoricalToLatestQuoteDTO(res) : null));
   }
@@ -60,7 +62,7 @@ export class HistoricalQuoteService {
   async findOne(id: string): Promise<HistoricalQuote | null> {
     return this.historicalQuoteRepository.findOne({
       where: { id },
-      relations: ["stock"],
+      relations: { stock: true },
     });
   }
 
@@ -75,7 +77,7 @@ export class HistoricalQuoteService {
     await this.historicalQuoteRepository.update(id, historicalQuote);
     return this.historicalQuoteRepository.findOne({
       where: { id },
-      relations: ["stock"],
+      relations: { stock: true },
     });
   }
 
