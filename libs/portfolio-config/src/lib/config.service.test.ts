@@ -14,12 +14,7 @@ describe("ConfigService", () => {
           // This is more robust than using the `load` option.
           envFilePath: ".env.test",
           isGlobal: true,
-          validationSchema: ApplicationConfigSchema,
-          validate: ApplicationConfigSchema.parse,
-          validationOptions: {
-            allowUnknown: true,
-            abortEarly: false,
-          },
+          validate: (config) => ApplicationConfigSchema.parse(config),
           expandVariables: true,
         }),
       ],
