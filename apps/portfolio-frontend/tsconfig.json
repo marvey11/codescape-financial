@@ -3,15 +3,6 @@
   "include": [],
   "references": [
     {
-      "path": "../../libs/core"
-    },
-    {
-      "path": "../../libs/portfolio-data-models"
-    },
-    {
-      "path": "../../libs/core-ui"
-    },
-    {
       "path": "./tsconfig.app.json"
     },
     {

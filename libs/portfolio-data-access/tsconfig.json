@@ -4,15 +4,6 @@
   "include": [],
   "references": [
     {
-      "path": "../portfolio-data-models"
-    },
-    {
-      "path": "../core"
-    },
-    {
-      "path": "../historical-data-access"
-    },
-    {
       "path": "./tsconfig.lib.json"
     },
     {

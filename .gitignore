@@ -65,3 +65,7 @@ test-output
 
 # docker-compose authentication secrets
 /secrets/
+
+.claude/worktrees
+.nx/polygraph
+.nx/self-healing

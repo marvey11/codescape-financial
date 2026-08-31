@@ -14,5 +14,8 @@
   "devDependencies": {
     "@testing-library/jest-dom": "^7.0.1",
     "@types/axios": "^0.14.4"
+  },
+  "nx": {
+    "projectType": "application"
   }
 }
