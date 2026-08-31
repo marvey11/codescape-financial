@@ -6,10 +6,10 @@
     "@codescape-financial/core-ui": "*",
     "@codescape-financial/portfolio-data-models": "*",
     "@heroicons/react": "^2.2.0",
-    "axios": "^1.13.5",
-    "recharts": "^3.1.2",
+    "axios": "^1.20.0",
+    "recharts": "^3.10.1",
     "lucide-react": "^0.541.0",
-    "react-hook-form": "^7.62.0"
+    "react-hook-form": "^7.86.0"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^6.6.4",

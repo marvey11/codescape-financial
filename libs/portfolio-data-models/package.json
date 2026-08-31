@@ -13,6 +13,6 @@
     "./package.json": "./package.json"
   },
   "dependencies": {
-    "class-validator": "^0.14.2"
+    "class-validator": "^0.15.1"
   }
 }
