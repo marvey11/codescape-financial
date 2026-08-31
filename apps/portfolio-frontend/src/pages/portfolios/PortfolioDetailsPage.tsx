@@ -137,18 +137,19 @@ export const PortfolioDetailsPage = () => {
       .catch(console.error);
   }, [data, showActiveHoldingsOnly]);
 
+  const holdings = data?.holdings;
   const filteredHoldings = useMemo(() => {
-    if (!data?.holdings) {
+    if (!holdings) {
       return undefined;
     }
 
     return showActiveHoldingsOnly
-      ? data.holdings.filter(
+      ? holdings.filter(
           ({ summary: { totalShares } }) =>
             typeof totalShares === "number" && totalShares > 0,
         )
-      : data.holdings;
-  }, [data?.holdings, showActiveHoldingsOnly]);
+      : holdings;
+  }, [holdings, showActiveHoldingsOnly]);
 
   const holdingsByName = useMemo(
     () =>
