@@ -5,8 +5,7 @@
   "dependencies": {
     "@codescape-financial/core": "*",
     "@codescape-financial/portfolio-config": "*",
-    "@codescape-financial/historical-data-access": "*",
-    "csv-parser": "^3.2.1"
+    "@codescape-financial/historical-data-access": "*"
   },
   "nx": {
     "targets": {

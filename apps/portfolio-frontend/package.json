@@ -7,12 +7,7 @@
   },
   "dependencies": {
     "@codescape-financial/core-ui": "*",
-    "@codescape-financial/portfolio-data-models": "*",
-    "@heroicons/react": "^2.2.0",
-    "axios": "^1.20.0",
-    "recharts": "^3.10.1",
-    "lucide-react": "^1.35.0",
-    "react-hook-form": "^7.86.0"
+    "@codescape-financial/portfolio-data-models": "*"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^7.0.1",

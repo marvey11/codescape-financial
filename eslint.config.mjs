@@ -36,13 +36,24 @@ export default [
         "error",
         {
           enforceBuildableLibDependency: true,
-          allow: ["^.*/eslint(\\.base)?\\.config\\.[cm]?[jt]s$"],
+          allow: [
+            "^.*/eslint(\\.base)?\\.config\\.[cm]?[jt]s$",
+            ".*/webpack\\.base\\.config\\.js$",
+          ],
           depConstraints: [
             {
               sourceTag: "*",
               onlyDependOnLibsWithTags: ["*"],
             },
           ],
+        },
+      ],
+      "@nx/dependency-checks": [
+        "error",
+        {
+          buildTargets: ["build"],
+          checkMissingDependencies: true,
+          checkObsoleteDependencies: true,
         },
       ],
     },

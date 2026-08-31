@@ -4,6 +4,11 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+
+    ignore:
+      - dependency-name: "nx"
+      - dependency-name: "@nx/*"
+
     groups:
       dev-dependencies:
         dependency-type: "development"
