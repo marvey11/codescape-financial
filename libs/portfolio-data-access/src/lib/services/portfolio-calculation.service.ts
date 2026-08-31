@@ -223,7 +223,7 @@ export class PortfolioCalculationService {
     const holdingIds = holdings.map((h) => h.id);
     const allOperations = await this.operationRepository.find({
       where: { holdingId: In(holdingIds) }, // Use In operator for batch fetching
-      relations: ["holding", "holding.stockMetadata"], // Ensure relations are loaded
+      relations: { holding: { stockMetadata: true } }, // Ensure relations are loaded
       order: { date: "ASC" },
     });
 
@@ -349,7 +349,7 @@ export class PortfolioCalculationService {
     // Use findOne to get the specific holding and its operations
     const holding = await this.holdingRepository.findOne({
       where: { id: holdingId, portfolioId }, // Ensure holding belongs to the portfolio
-      relations: ["operations", "stockMetadata", "operations.holding"], // Load operations and stock metadata
+      relations: { operations: { holding: true }, stockMetadata: true }, // Load operations and stock metadata
       order: {
         operations: { date: "ASC" }, // Order operations by date for XIRR
       },

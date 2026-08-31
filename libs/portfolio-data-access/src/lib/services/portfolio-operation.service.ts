@@ -43,7 +43,7 @@ export class PortfolioOperationService {
 
   async findAll(): Promise<PortfolioOperation[]> {
     return this.operationRepository.find({
-      relations: ["holding", "holding.stockMetadata"],
+      relations: { holding: { stockMetadata: true } },
       order: { date: "DESC" },
     });
   }
@@ -457,7 +457,7 @@ export class PortfolioOperationService {
     return holdingRepo.findOne({
       where: { stockId, portfolioId },
       // Ensure relations needed for current shares calculation or display are loaded
-      relations: ["stockMetadata"],
+      relations: { stockMetadata: true },
     });
   }
 
@@ -482,7 +482,7 @@ export class PortfolioOperationService {
 
     const stock = await stockRepo.findOne({
       where: { id: stockId },
-      relations: ["country"],
+      relations: { country: true },
     });
 
     if (!stock) {
@@ -493,7 +493,7 @@ export class PortfolioOperationService {
 
     let holding = await holdingRepo.findOne({
       where: { stockId, portfolioId },
-      relations: ["buyTransactions", "stockMetadata", "stockMetadata.country"],
+      relations: { buyTransactions: true, stockMetadata: { country: true } },
     });
 
     if (!holding) {

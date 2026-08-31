@@ -62,7 +62,7 @@ export class PortfolioService {
   ): Promise<PortfolioResponseDTO> {
     const portfolioToUpdate = await this.portfolioRepository.findOne({
       where: { id: portfolioId },
-      relations: ["holdings", "holdings.stockMetadata"],
+      relations: { holdings: { stockMetadata: true } },
     });
 
     if (!portfolioToUpdate) {
@@ -95,7 +95,7 @@ export class PortfolioService {
   ): Promise<void> {
     const portfolio = await manager.findOne(Portfolio, {
       where: { id: portfolioId },
-      relations: ["holdings", "holdings.stockMetadata"],
+      relations: { holdings: { stockMetadata: true } },
     });
 
     if (!portfolio) {

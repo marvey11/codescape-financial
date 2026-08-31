@@ -23,7 +23,7 @@ export class PortfolioHoldingService {
     return this.holdingRepository
       .findOne({
         where: { id: holdingId, portfolioId },
-        relations: ["stockMetadata", "operations"],
+        relations: { stockMetadata: true, operations: true },
       })
       .then((res) => {
         if (res) {

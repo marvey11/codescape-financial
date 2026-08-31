@@ -31,7 +31,7 @@ export class StockMetadataService {
 
     return this.stockMetadataRepository
       .find({
-        relations: ["country"],
+        relations: { country: true },
         where,
       })
       .then((stocks) => stocks.map(mapStockMetadataEntityToDto));
@@ -41,7 +41,7 @@ export class StockMetadataService {
     return this.stockMetadataRepository
       .findOne({
         where: { id },
-        relations: ["country"],
+        relations: { country: true },
       })
       .then((stock) => (stock ? mapStockMetadataEntityToDto(stock) : null));
   }
@@ -73,7 +73,7 @@ export class StockMetadataService {
   ): Promise<StockResponseDTO> {
     const stockToUpdate = await this.stockMetadataRepository.findOne({
       where: { id },
-      relations: ["country"],
+      relations: { country: true },
     });
 
     if (!stockToUpdate) {

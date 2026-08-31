@@ -33,7 +33,7 @@ export class JsonDividendParserService {
     // Fetch all necessary stock metadata in a single query
     const stocks = await this.stockMetadataRepository.find({
       where: { isin: In(isins) },
-      relations: ["country"],
+      relations: { country: true },
     });
 
     // Create a map for efficient lookup
