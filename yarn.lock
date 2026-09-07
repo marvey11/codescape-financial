@@ -8018,10 +8018,10 @@ lru-cache@^5.1.1:
   dependencies:
     yallist "^3.0.2"
 
-lucide-react@^1.35.0:
-  version "1.35.0"
-  resolved "https://registry.yarnpkg.com/lucide-react/-/lucide-react-1.35.0.tgz#fb8388192f834e1316bf7cb8520577051bf987b5"
-  integrity sha512-yXCCWxGFYT6bLIPYC4SY6fPQPRs/d797rRIue+J9XP2Td6vQvD53gaQRBCnIVT1kTQRHtAtxlfOQNWAuIF8ELg==
+lucide-react@^1.40.0:
+  version "1.40.0"
+  resolved "https://registry.yarnpkg.com/lucide-react/-/lucide-react-1.40.0.tgz#d0c803e74afb9a677d3933403d0f9ac0f6162fe7"
+  integrity sha512-MaG+8WnOXkDWz9XeElj7TnQ890tTZUB0a36i03aRRCKGWE6e7jJpmdCvtxxuxcjjdqyN6m4sL6qlHVuSUDtYgg==
 
 lz-string@^1.5.0:
   version "1.5.0"
@@ -10939,10 +10939,10 @@ typedarray@^0.0.6:
   resolved "https://registry.yarnpkg.com/typedarray/-/typedarray-0.0.6.tgz#867ac74e3864187b1d3d47d996a78ec5c8830777"
   integrity sha512-/aCDEGatGvZ2BIk+HmLf4ifCJFwvKFNb9/JeZPMulfgFracn9QFcAf5GO8B/mweUjSoblS5In0cWhqpfs/5PQA==
 
-typeorm@^1.1.0:
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/typeorm/-/typeorm-1.1.0.tgz#cdd218532c9096e502e9ec0aa2b355ce09bcc171"
-  integrity sha512-iX/kvsV42/htCNAQUyElGW87E4Z12neZc6YUFBTEu0BnLiREYDNT5Wfw3wRqZw9vyOEC36zUBAY6Qvywoig06Q==
+typeorm@^1.1.1:
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/typeorm/-/typeorm-1.1.1.tgz#cab734c4a10d1bd3843a0128db9b053ea266b2c0"
+  integrity sha512-og9mG4Lwlvj6MfvYd8yRCzXy73gETtwgTKQ/ISLYvEOpJPy4IrjU/89HK4ZAFmRIbEg1hkIk04v8phTrxfgPmQ==
   dependencies:
     "@sqltools/formatter" "^1.2.5"
     ansis "^4.3.1"
