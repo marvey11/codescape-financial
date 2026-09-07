@@ -76,7 +76,7 @@
     "@types/react-router": "^5.1.20",
     "@vitejs/plugin-react": "^6.1.1",
     "@vitest/coverage-v8": "4.1.11",
-    "@vitest/mocker": "^4.1.11",
+    "@vitest/mocker": "^5.0.0",
     "@vitest/ui": "4.1.11",
     "autoprefixer": "10.5.4",
     "eslint": "^9.8.0",
