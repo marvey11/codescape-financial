@@ -27,7 +27,7 @@
     "clsx": "^2.1.1",
     "crc": "^4.3.2",
     "csv-parser": "^3.2.1",
-    "lucide-react": "^1.40.0",
+    "lucide-react": "^1.41.0",
     "pg": "^8.23.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
