@@ -70,3 +70,5 @@ test-output
 .nx/polygraph
 .nx/self-healing
 .nx/migrate-runs
+
+.prompts
