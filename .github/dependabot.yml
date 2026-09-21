@@ -4,26 +4,72 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+      day: "tuesday"
+    open-pull-requests-limit: 10
     groups:
-      nx-packages:
+      # Nx tooling & plugins
+      nx-ecosystem:
         patterns:
           - "nx"
           - "@nx/*"
 
+      # Vitest test framework & plugins
+      vitest-packages:
+        patterns:
+          - "vitest"
+          - "@vitest/*"
+
+      # NestJS framework & modules
+      nestjs-ecosystem:
+        patterns:
+          - "@nestjs/*"
+
+      # React ecosystem & types
+      react-ecosystem:
+        patterns:
+          - "react"
+          - "react-dom"
+          - "@types/react"
+          - "@types/react-dom"
+
+      # Linting and static analysis
+      linting-tools:
+        patterns:
+          - "eslint*"
+          - "@typescript-eslint/*"
+          - "prettier*"
+
+      # Catch-all for remaining minor/patch dev dependencies
       dev-dependencies:
         dependency-type: "development"
-        exclude-patterns:
-          - "nx"
-          - "@nx/*"
         update-types:
           - "minor"
           - "patch"
+        exclude-patterns:
+          - "nx"
+          - "@nx/*"
+          - "vitest"
+          - "@vitest/*"
+          - "@nestjs/*"
+          - "react"
+          - "react-dom"
+          - "@types/react"
+          - "@types/react-dom"
+          - "eslint*"
+          - "@typescript-eslint/*"
+          - "prettier*"
 
+      # Catch-all for remaining minor/patch production dependencies
       prod-dependencies:
         dependency-type: "production"
-        exclude-patterns:
-          - "nx"
-          - "@nx/*"
         update-types:
           - "minor"
           - "patch"
+        exclude-patterns:
+          - "@nestjs/*"
+          - "react"
+          - "react-dom"
+          - "@types/react"
+          - "@types/react-dom"
+          - "vitest"
+          - "@vitest/*"
