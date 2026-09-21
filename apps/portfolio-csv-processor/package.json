@@ -1,7 +1,6 @@
 {
   "name": "@codescape-financial/csv-processor",
   "version": "0.0.1",
-  "private": true,
   "dependencies": {
     "@codescape-financial/core": "*",
     "@codescape-financial/portfolio-config": "*",

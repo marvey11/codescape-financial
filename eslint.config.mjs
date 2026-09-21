@@ -23,7 +23,12 @@ export default [
   },
   {
     ignores: [
-      "**/dist",
+      "**/node_modules/**",
+      "**/dist/**",
+      "**/out-tsc/**",
+      "**/.nx/**",
+      "**/.yarn/**",
+      "**/coverage/**",
       "**/jest.config.ts",
       "**/vite.config.*.timestamp*",
       "**/vitest.config.*.timestamp*",

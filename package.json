@@ -7,9 +7,9 @@
     "affected:check": "nx affected -t typecheck -t build -t lint -t test",
     "check:all": "nx run-many -t typecheck -t build -t lint -t test",
     "typeorm": "ts-node --compiler-options '{\"module\":\"node16\", \"moduleResolution\": \"node16\"}' -r tsconfig-paths/register ./node_modules/typeorm/cli.js",
-    "migration:generate": "npm run typeorm -- -d ./apps/portfolio-api/src/data-source.ts migration:generate",
-    "migration:run": "npm run typeorm -- -d ./apps/portfolio-api/src/data-source.ts migration:run",
-    "migration:revert": "npm run typeorm -- -d ./apps/portfolio-api/src/data-source.ts migration:revert"
+    "migration:generate": "yarn typeorm -- -d ./apps/portfolio-api/src/data-source.ts migration:generate",
+    "migration:run": "yarn typeorm -- -d ./apps/portfolio-api/src/data-source.ts migration:run",
+    "migration:revert": "yarn typeorm -- -d ./apps/portfolio-api/src/data-source.ts migration:revert"
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",
@@ -79,7 +79,7 @@
     "@vitest/mocker": "^5.0.1",
     "@vitest/ui": "5.0.1",
     "autoprefixer": "10.6.1",
-    "eslint": "^9.8.0",
+    "eslint": "^10.10.0",
     "eslint-config-prettier": "^10.0.0",
     "eslint-plugin-import": "2.32.0",
     "eslint-plugin-jsx-a11y": "6.10.2",

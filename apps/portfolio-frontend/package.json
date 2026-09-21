@@ -1,7 +1,6 @@
 {
   "name": "@codescape-financial/portfolio-frontend",
   "version": "0.0.1",
-  "private": true,
   "scripts": {
     "typecheck": "tsc --noEmit -p tsconfig.app.json && tsc --noEmit -p tsconfig.spec.json"
   },
@@ -9,10 +8,7 @@
     "@codescape-financial/core-ui": "*",
     "@codescape-financial/portfolio-data-models": "*"
   },
-  "devDependencies": {
-    "@testing-library/jest-dom": "^7.0.1",
-    "@types/axios": "^0.14.4"
-  },
+  "devDependencies": {},
   "nx": {
     "name": "portfolio-frontend",
     "projectType": "application",
