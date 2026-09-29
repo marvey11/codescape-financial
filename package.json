@@ -114,7 +114,6 @@
     "@nx/vitest": {
       "vitest": "$vitest"
     },
-    "elliptic": "^6.6.1",
     "eslint": "$eslint",
     "smol-toml": "^1.7.1"
   },
