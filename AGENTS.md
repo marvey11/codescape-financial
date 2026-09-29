@@ -14,7 +14,7 @@ This repository is a TypeScript/React monorepo for Codescape Financial. The work
 
 ## Validation
 
-Before considering work complete, run the relevant verification command using Yarn, such as:
+Before considering work complete, run the relevant verification command, such as:
 - `npx nx run-many -t lint --skip-nx-cache`
 
 If a narrower command is enough for the change, prefer the smallest relevant validation.
