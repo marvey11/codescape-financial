@@ -23,7 +23,7 @@ jobs:
           node-version: 24
           cache: 'npm'
 
-      - run: npm install --frozen-lockfile
+      - run: npm ci
 
       # Runs lint, test, and build targets for affected projects in parallel
       - name: Run affected commands
