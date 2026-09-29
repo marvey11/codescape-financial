@@ -12,5 +12,6 @@ module.exports = {
   transform: {
     "^.+\\.[tj]s$": ["@swc/jest", rootSwcConfig],
   },
-  transformIgnorePatterns: ["/node_modules/(?!(@nestjs/config|.*\\.mjs$))"],
+  // Allow @nestjs packages (and rxJS/tslib if used) to be transformed by SWC
+  transformIgnorePatterns: ["/node_modules/(?!(@nestjs|rxjs|.*\\.mjs$))"],
 };
