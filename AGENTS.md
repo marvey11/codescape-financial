@@ -2,17 +2,7 @@
 
 ## Repository overview
 
-This repository is a TypeScript/React monorepo for Codescape Financial. The workspace uses Nx, Yarn, and ESLint flat config.
-
-## Required package manager
-
-Use Yarn for all commands and scripts in this repo. Do not use npm for installs, scripts, or package-manager operations.
-
-Examples:
-- `yarn install`
-- `yarn nx ...`
-- `yarn eslint ...`
-- `yarn test ...`
+This repository is a TypeScript/React monorepo for Codescape Financial. The workspace uses Nx and ESLint flat config.
 
 ## Working conventions
 
@@ -25,6 +15,6 @@ Examples:
 ## Validation
 
 Before considering work complete, run the relevant verification command using Yarn, such as:
-- `yarn nx run-many -t lint --skip-nx-cache`
+- `npx nx run-many -t lint --skip-nx-cache`
 
 If a narrower command is enough for the change, prefer the smallest relevant validation.
