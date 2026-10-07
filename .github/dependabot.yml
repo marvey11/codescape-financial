@@ -19,6 +19,12 @@ updates:
           - "vitest"
           - "@vitest/*"
 
+      # Babel core and presets need to stay compatible
+      babel-ecosystem:
+        patterns:
+          - "@babel/core"
+          - "@babel/preset-react"
+
       # NestJS framework & modules
       nestjs-ecosystem:
         patterns:
@@ -50,6 +56,8 @@ updates:
           - "@nx/*"
           - "vitest"
           - "@vitest/*"
+          - "@babel/core"
+          - "@babel/preset-react"
           - "@nestjs/*"
           - "react"
           - "react-dom"
