@@ -81,3 +81,8 @@ updates:
           - "@types/react-dom"
           - "vitest"
           - "@vitest/*"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
