@@ -1,5 +1,5 @@
 const { NxAppWebpackPlugin } = require("@nx/webpack/app-plugin");
-const { join } = require("path");
+const { basename, join } = require("path");
 
 /**
  * Generates standard Node application Webpack config.
@@ -8,7 +8,7 @@ const { join } = require("path");
 function createNodeWebpackConfig(projectRoot) {
   return {
     output: {
-      path: join(projectRoot, "dist"),
+      path: join(projectRoot, "../../dist/apps", basename(projectRoot)),
     },
     plugins: [
       new NxAppWebpackPlugin({
@@ -17,7 +17,8 @@ function createNodeWebpackConfig(projectRoot) {
         main: "./src/main.ts",
         tsConfig: "./tsconfig.app.json",
         assets: ["./src/assets"],
-        optimization: false,
+        optimization: process.env.NODE_ENV === "production",
+        extractLicenses: process.env.NODE_ENV === "production",
         outputHashing: "none",
         generatePackageJson: true,
       }),

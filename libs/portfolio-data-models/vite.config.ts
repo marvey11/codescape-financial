@@ -1,13 +1,10 @@
 import { defineConfig } from "vite";
+import { nxReadySignal } from "@nx/vite/plugins/nx-ready-signal.plugin";
 
 export default defineConfig(() => ({
   root: __dirname,
   cacheDir: "../../node_modules/.vite/libs/portfolio-data-models",
-  plugins: [],
-  // Uncomment this if you are using workers.
-  // worker: {
-  //  plugins: [ nxViteTsPaths() ],
-  // },
+  plugins: [nxReadySignal()],
   test: {
     watch: false,
     globals: true,

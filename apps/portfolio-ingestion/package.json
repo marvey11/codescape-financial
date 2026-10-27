@@ -11,27 +11,12 @@
   "nx": {
     "targets": {
       "build": {
-        "executor": "@nx/webpack:webpack",
-        "outputs": [
-          "{options.outputPath}"
-        ],
         "defaultConfiguration": "production",
-        "options": {
-          "target": "node",
-          "compiler": "tsc",
-          "outputPath": "dist/apps/portfolio-ingestion",
-          "main": "apps/portfolio-ingestion/src/main.ts",
-          "tsConfig": "apps/portfolio-ingestion/tsconfig.app.json",
-          "webpackConfig": "apps/portfolio-ingestion/webpack.config.js"
-        },
         "configurations": {
-          "development": {
-            "optimization": false,
-            "extractLicenses": false
-          },
           "production": {
-            "optimization": true,
-            "extractLicenses": true
+            "env": {
+              "NODE_ENV": "production"
+            }
           }
         }
       },

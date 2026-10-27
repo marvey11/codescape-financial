@@ -2,6 +2,7 @@
 import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
 import { nodePolyfills } from "vite-plugin-node-polyfills";
+import { nxReadySignal } from "@nx/vite/plugins/nx-ready-signal.plugin";
 
 export default defineConfig(() => ({
   root: __dirname,
@@ -29,6 +30,7 @@ export default defineConfig(() => ({
         Buffer: true,
       },
     }),
+    nxReadySignal(),
   ],
   build: {
     outDir: "./dist",
