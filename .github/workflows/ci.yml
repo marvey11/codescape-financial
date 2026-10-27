@@ -27,4 +27,4 @@ jobs:
 
       # Runs lint, test, and build targets for affected projects in parallel
       - name: Run affected commands
-        run: npm run check:all --parallel=3
+        run: npm run check:all -- --parallel=3
