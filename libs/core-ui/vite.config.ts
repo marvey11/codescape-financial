@@ -1,14 +1,11 @@
 import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
+import { nxReadySignal } from "@nx/vite/plugins/nx-ready-signal.plugin";
 
 export default defineConfig(() => ({
   root: __dirname,
   cacheDir: "../../node_modules/.vite/libs/core-ui",
-  plugins: [react()],
-  // Uncomment this if you are using workers.
-  // worker: {
-  //  plugins: [ nxViteTsPaths() ],
-  // },
+  plugins: [react(), nxReadySignal()],
   test: {
     watch: false,
     globals: true,

@@ -10,27 +10,12 @@
   "nx": {
     "targets": {
       "build": {
-        "executor": "@nx/webpack:webpack",
-        "outputs": [
-          "{options.outputPath}"
-        ],
         "defaultConfiguration": "production",
-        "options": {
-          "target": "node",
-          "compiler": "tsc",
-          "outputPath": "dist/apps/portfolio-api",
-          "main": "apps/portfolio-api/src/main.ts",
-          "tsConfig": "apps/portfolio-api/tsconfig.app.json",
-          "webpackConfig": "apps/portfolio-api/webpack.config.js"
-        },
         "configurations": {
-          "development": {
-            "optimization": false,
-            "extractLicenses": false
-          },
           "production": {
-            "optimization": true,
-            "extractLicenses": true
+            "env": {
+              "NODE_ENV": "production"
+            }
           }
         }
       },
