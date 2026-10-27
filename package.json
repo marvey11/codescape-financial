@@ -107,6 +107,9 @@
     "webpack-cli": "^7.2.3"
   },
   "overrides": {
+    "nx": {
+      "undici": "^7.30.1"
+    },
     "@nx/nest": {
       "@nestjs/common": "$@nestjs/common",
       "@nestjs/core": "$@nestjs/core"
